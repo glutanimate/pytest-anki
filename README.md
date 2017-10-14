@@ -1,6 +1,7 @@
 ## Easy testing of Anki add-ons
 
-A small utility for testing Anki 2.1 addons 
+A small utility for testing Anki 2.1 add-ons.
+The code from this repository is used by [Anki-Night-Mode](https://github.com/krassowski/Anki-Night-Mode) and [AwesomeTTS](https://github.com/AwesomeTTS/awesometts-anki-addon).
 
 ### Usage
 
@@ -40,6 +41,7 @@ Lets call the file above `run_tests.sh`.
 
 ```yml
 language: python
+sudo: required
 
 python:
   - 3.6
