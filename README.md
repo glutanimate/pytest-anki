@@ -13,7 +13,7 @@ anki_testing
 2. Clone this repository into the root of your add-on repo:
 
 ```bash
-git clone anki_testing
+git clone https://github.com/krassowski/anki_testing
 ```
 
 2. In your tests add:
@@ -21,7 +21,7 @@ git clone anki_testing
 from anki_testing import anki_running
 
 def test_my_addon():
-    with anki_running() as ankI_app:
+    with anki_running() as anki_app:
         import my_addon
         # add some tests in here
 ```
@@ -34,7 +34,7 @@ bash anki_testing/install_anki.sh
 python3 -m pytest tests
 ```
 
-Lets call the file above `run_tests.sh`. Remember to `chmod u+x run_tests.sh`.
+Lets call the file above `run_tests.sh`.
 
 4. (Optional) configure `.travis.yml` using following template:
 
@@ -45,7 +45,7 @@ python:
   - 3.6
 
 install: 
-  - git clone anki_testing
+  - git clone https://github.com/krassowski/anki_testing
   - source anki_testing/setup.sh 
 
 script:
