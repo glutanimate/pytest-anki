@@ -11,6 +11,3 @@ then
     ./tools/build_ui.sh
     cd ..
 fi
-
-python3.6 -m pytest tests
-
