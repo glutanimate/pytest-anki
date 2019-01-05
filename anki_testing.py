@@ -28,6 +28,8 @@ def temporary_user(dir_name, name="__Temporary Test User__", lang="en_US"):
 
     pm = ProfileManager(base=dir_name)
 
+    pm.setupMeta()
+
     if name in pm.profiles():
         warn(f"Temporary user named {name} already exists")
     else:
