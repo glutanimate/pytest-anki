@@ -10,8 +10,8 @@ from warnings import warn
 
 
 @contextmanager
-def _temporary_user(dir_name: str, name: str = "__Temporary Test User__",
-                    lang: str = "en_US"):
+def _temporary_user(dir_name: str, name: str="__Temporary Test User__",
+                    lang: str="en_US"):
     from aqt.profiles import ProfileManager
 
     # prevent popping up language selection dialog
@@ -47,9 +47,10 @@ def _temporary_dir(tmp_path: str, name: str):
 
 
 @contextmanager
-def anki_running(anki_path: str = "anki_root",
-                 tmp_path: str = tempfile.gettempdir(),
-                 lang: str = "en_US"):
+def anki_running(anki_path: str="anki_root",
+                 tmp_path: str=tempfile.gettempdir(),
+                 lang: str="en_US",
+                 keep_profile):
 
     if anki_path and anki_path not in sys.path:
         sys.path.insert(0, anki_path)
