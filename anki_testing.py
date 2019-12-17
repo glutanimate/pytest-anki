@@ -8,8 +8,10 @@ import os
 import sys
 from warnings import warn
 
+
 @contextmanager
-def _temporary_user(dir_name, name="__Temporary Test User__", lang="en_US"):
+def _temporary_user(dir_name: str, name: str = "__Temporary Test User__",
+                    lang: str = "en_US"):
     from aqt.profiles import ProfileManager
 
     # prevent popping up language selection dialog
@@ -38,25 +40,27 @@ def _temporary_user(dir_name, name="__Temporary Test User__", lang="en_US"):
 
 
 @contextmanager
-def _temporary_dir(tmp_path, name):
+def _temporary_dir(tmp_path: str, name: str):
     path = os.path.join(tmp_path, name)
     yield path
     shutil.rmtree(path)
 
 
 @contextmanager
-def anki_running(anki_path="anki_root", tmp_path=tempfile.gettempdir()):
+def anki_running(anki_path: str = "anki_root",
+                 tmp_path: str = tempfile.gettempdir()):
 
     if anki_path and anki_path not in sys.path:
         sys.path.insert(0, anki_path)
-    
+
     import aqt
     from aqt import _run
 
     # we need a new user for the test
     with _temporary_dir(tmp_path, "anki_temp_base") as dir_name:
         with _temporary_user(dir_name) as user_name:
-            app = _run(argv=["anki", "-p", user_name, "-b", dir_name], exec=False)
+            app = _run(argv=["anki", "-p", user_name,
+                             "-b", dir_name], exec=False)
             yield app
 
     # clean up what was spoiled
