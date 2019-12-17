@@ -8,15 +8,9 @@ import os
 import sys
 from warnings import warn
 
-sys.path.insert(0, 'anki_root')
-
-import aqt
-from aqt import _run
-from aqt.profiles import ProfileManager
-
-
 @contextmanager
-def temporary_user(dir_name, name="__Temporary Test User__", lang="en_US"):
+def _temporary_user(dir_name, name="__Temporary Test User__", lang="en_US"):
+    from aqt.profiles import ProfileManager
 
     # prevent popping up language selection dialog
     original = ProfileManager._setDefaultLang
@@ -44,18 +38,24 @@ def temporary_user(dir_name, name="__Temporary Test User__", lang="en_US"):
 
 
 @contextmanager
-def temporary_dir(name):
-    path = os.path.join(tempfile.gettempdir(), name)
+def _temporary_dir(tmp_path, name):
+    path = os.path.join(tmp_path, name)
     yield path
     shutil.rmtree(path)
 
 
 @contextmanager
-def anki_running():
+def anki_running(anki_path="anki_root", tmp_path=tempfile.gettempdir()):
+
+    if anki_path and anki_path not in sys.path:
+        sys.path.insert(0, anki_path)
+    
+    import aqt
+    from aqt import _run
 
     # we need a new user for the test
-    with temporary_dir("anki_temp_base") as dir_name:
-        with temporary_user(dir_name) as user_name:
+    with _temporary_dir(tmp_path, "anki_temp_base") as dir_name:
+        with _temporary_user(dir_name) as user_name:
             app = _run(argv=["anki", "-p", user_name, "-b", dir_name], exec=False)
             yield app
 
@@ -69,4 +69,3 @@ def anki_running():
     # test_nextIvl will fail on some systems if the locales are not restored
     import locale
     locale.setlocale(locale.LC_ALL, locale.getdefaultlocale())
-
