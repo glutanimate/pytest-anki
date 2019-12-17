@@ -42,8 +42,8 @@ def _temporary_user(dir_name: str, name: str, lang: str, keep: bool):
 
 
 @contextmanager
-def _temporary_dir(tmp_path: str, name: str, keep: bool):
-    path = os.path.join(tmp_path, name)
+def _base_directory(base_path: str, base_name: str, keep: bool):
+    path = os.path.join(base_path, base_name)
     yield path
     if not keep:
         shutil.rmtree(path)
@@ -51,10 +51,11 @@ def _temporary_dir(tmp_path: str, name: str, keep: bool):
 
 @contextmanager
 def anki_running(anki_path: str="anki_root",
-                 tmp_path: str=tempfile.gettempdir(),
-                 lang: str="en_US",
-                 profile_name="__Temporary Test User__",
-                 keep_profile=False):
+                 base_path: str=tempfile.gettempdir(),
+                 base_name: str="anki_temp_base",
+                 profile_name: str="__Temporary Test User__",
+                 keep_profile: bool=False,
+                 lang: str="en_US"):
 
     if anki_path and anki_path not in sys.path:
         sys.path.insert(0, anki_path)
@@ -63,7 +64,7 @@ def anki_running(anki_path: str="anki_root",
     from aqt import _run
 
     # we need a new user for the test
-    with _temporary_dir(tmp_path, "anki_temp_base", keep_profile) as dir_name:
+    with _base_directory(base_path, base_name, keep_profile) as dir_name:
         with _temporary_user(dir_name, lang, profile_name, keep_profile) as user_name:
             app = _run(argv=["anki", "-p", user_name,
                              "-b", dir_name], exec=False)
