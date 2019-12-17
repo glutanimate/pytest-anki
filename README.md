@@ -7,19 +7,20 @@ The code from this repository is used by [Anki-Night-Mode](https://github.com/kr
 
 ### Usage
 
-1. (Optional) add following to you .gitignore:
+1. (Optional) add the following to you .gitignore:
 ```
 anki_root
-anki_testing
 ```
 
-2. Clone this repository into the root of your add-on repo:
+2. Install `anki_testing` into your testing environment:
+
+<!-- TODO: update URLs in case of merged PR ↓ -->
 
 ```bash
-git clone https://github.com/krassowski/anki_testing
+pip install --upgrade git+https://github.com/glutanimate/anki-testing.git
 ```
 
-2. In your tests add:
+3. In your tests add:
 ```python
 from anki_testing import anki_running
 
@@ -29,7 +30,7 @@ def test_my_addon():
         # add some tests in here
 ```
 
-3. Create a testing script which will install Anki and then call your test-runner. For example:
+4. Create a testing script which will install Anki and then call your test-runner. For example:
 
 ```bash
 #!/usr/bin/env bash
@@ -39,7 +40,9 @@ python3 -m pytest tests
 
 Lets call the file above `run_tests.sh`.
 
-4. (Optional) configure `.travis.yml` using following template:
+5. (Optional) configure `.travis.yml` using following template:
+
+<!-- TODO: update URLs in case of merged PR ↓ -->
 
 ```yml
 language: python
@@ -49,7 +52,8 @@ python:
   - 3.6
 
 install: 
-  - git clone https://github.com/krassowski/anki_testing
+  - pip install --upgrade git+https://github.com/glutanimate/anki-testing.git
+  - git clone https://github.com/glutanimate/anki-testing
   - source anki_testing/setup.sh 
 
 script:
