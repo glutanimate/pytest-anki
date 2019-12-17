@@ -48,7 +48,8 @@ def _temporary_dir(tmp_path: str, name: str):
 
 @contextmanager
 def anki_running(anki_path: str = "anki_root",
-                 tmp_path: str = tempfile.gettempdir()):
+                 tmp_path: str = tempfile.gettempdir(),
+                 lang: str = "en_US"):
 
     if anki_path and anki_path not in sys.path:
         sys.path.insert(0, anki_path)
@@ -58,7 +59,7 @@ def anki_running(anki_path: str = "anki_root",
 
     # we need a new user for the test
     with _temporary_dir(tmp_path, "anki_temp_base") as dir_name:
-        with _temporary_user(dir_name) as user_name:
+        with _temporary_user(dir_name, lang=lang) as user_name:
             app = _run(argv=["anki", "-p", user_name,
                              "-b", dir_name], exec=False)
             yield app
