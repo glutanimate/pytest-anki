@@ -51,15 +51,15 @@ jobs:
         run: |
           sudo apt install xvfb
 
-      - name: Start xvfb
-        run: |
-          start-stop-daemon --start --pidfile ~/xvfb.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset
+      # - name: Start xvfb
+      #   run: |
+      #     start-stop-daemon --start --pidfile ~/xvfb.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset
 
       - name: Set PYTHONPATH
         run: echo ::set-env name=PYTHONPATH::$PYTHONPATH:anki_root
 
       - name: Test with pytest
         run: |
-          python -m pytest tests/
-        env:
-          DISPLAY: :99
+          xvfb-run python -m pytest tests/
+        # env:
+        #   DISPLAY: :99
