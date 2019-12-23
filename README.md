@@ -20,17 +20,26 @@ anki_root
 pip install --upgrade git+https://github.com/glutanimate/anki-testing.git
 ```
 
-3. In your tests add:
+3.  Install `pytest` and the `pytest-forked` plugin:
+
+```
+pip install pytest pytest-forked
+```
+
+  Running the tests in forked subprocesses prevents state from one test affecting others (which can be crucial when using monkey patching in add-ons).
+
+4. In your tests add:
 ```python
 from anki_testing import anki_running
 
+@pytest.mark.forked  # run this test in a subprocess (!)
 def test_my_addon():
     with anki_running() as anki_app:
         import my_addon
         # add some tests in here
 ```
 
-4. Create a testing script which will install Anki and then call your test-runner. For example:
+5. Create a testing script which will install Anki and then call your test-runner. For example:
 
 ```bash
 #!/usr/bin/env bash
