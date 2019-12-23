@@ -43,7 +43,7 @@ jobs:
 
       - name: Install anki-testing dependencies
         run: |
-          pip install -r requirements.tests
+          pip install -r requirements-tests.txt
           pip install .
 
       - name: Install xvfb dependencies
