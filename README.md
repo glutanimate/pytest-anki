@@ -1,6 +1,6 @@
 ## Easy testing of Anki add-ons
 
-[![Build Status](https://travis-ci.org/krassowski/anki_testing.svg?branch=master)](https://travis-ci.org/krassowski/anki_testing)
+[![](https://github.com/glutanimate/anki-running/workflows/Tests/badge.svg)](https://github.com/glutanimate/anki-running/actions?query=workflow%3ATests)
 
 A small utility for testing Anki 2.1 add-ons.
 The code from this repository is used by [Anki-Night-Mode](https://github.com/krassowski/Anki-Night-Mode) and [AwesomeTTS](https://github.com/AwesomeTTS/awesometts-anki-addon).
