@@ -1,0 +1,44 @@
+name: Checks
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.6]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Checkout anki-testing
+        uses: actions/checkout@v2
+      - name: Checkout anki
+        uses: actions/checkout@v2
+        with:
+          repository: dae/anki
+          path: anki_root
+      - name: Install anki dependencies
+        working-directory: anki_root
+        run: |
+          sudo apt install portaudio19-dev
+          pip install -r requirements.qt
+      - name: Set up Node for Anki
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Build anki
+        working-directory: anki_root
+        run: |
+          make build
+      - name: Install anki-testing dependencies
+        run: |
+          pip install -r requirements.tests
+          pip install .
+      - name: Test with pytest
+        run: |
+          python -m pytest tests/
