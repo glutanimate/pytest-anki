@@ -1,6 +1,6 @@
 ## Easy testing of Anki add-ons
 
-[![](https://github.com/glutanimate/anki-testing/workflows/tests/badge.svg)](https://github.com/glutanimate/anki-running/actions?query=workflow%3Atests)
+[![](https://github.com/glutanimate/anki-testing/workflows/tests/badge.svg)](https://github.com/glutanimate/anki-testing/actions?query=workflow%3Atests)
 
 A small utility for testing Anki 2.1 add-ons.
 The code from this repository is used by [Anki-Night-Mode](https://github.com/krassowski/Anki-Night-Mode) and [AwesomeTTS](https://github.com/AwesomeTTS/awesometts-anki-addon).
