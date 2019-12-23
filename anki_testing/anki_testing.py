@@ -67,7 +67,7 @@ def anki_running(
 
     # we need a new user for the test
     with _base_directory(base_path, base_name, keep_profile) as dir_name:
-        with _temporary_user(dir_name, lang, profile_name, keep_profile) as user_name:
+        with _temporary_user(dir_name, profile_name, lang, keep_profile) as user_name:
             app = _run(argv=["anki", "-p", user_name, "-b", dir_name], exec=False)
             yield app
 
