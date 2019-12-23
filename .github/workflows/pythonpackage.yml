@@ -59,8 +59,8 @@ jobs:
         run: |
           echo ::set-env name=PYTHONPATH::$PYTHONPATH:anki_root
           echo ::set-env name=DISPLAY:::99.0
-          echo ::set-env name=QT_DEBUG_PLUGINS::True
+          echo ::set-env name=QT_DEBUG_PLUGINS::1
 
       - name: Test with pytest
         run: |
-          xvfb-runpython -m pytest tests/
+          python -m pytest tests/
