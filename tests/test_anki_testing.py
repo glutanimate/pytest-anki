@@ -1,8 +1,6 @@
 import os
 import pytest
 
-from anki.hooks import addHook
-
 from anki_testing import anki_running, mw_addons_loaded, mw_profile_loaded
 
 ANKI_RUNNING_ARGS = dict(base_path=os.getcwd())
@@ -37,6 +35,8 @@ def test_mw_profile_loaded():
 
 @pytest.mark.forked
 def test_profile_hook():
+    from anki.hooks import addHook
+    
     with anki_running(**ANKI_RUNNING_ARGS):
         foo = False
 
