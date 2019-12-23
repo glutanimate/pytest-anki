@@ -89,16 +89,12 @@ def _base_directory(base_path: str, base_name: str, keep: bool):
 
 @contextmanager
 def anki_running(
-    anki_path: str = "anki_root",
     base_path: str = tempfile.gettempdir(),
     base_name: str = "anki_temp_base",
     profile_name: str = "__Temporary Test User__",
     keep_profile: bool = False,
     lang: str = "en_US",
 ):
-
-    if anki_path and anki_path not in sys.path:
-        sys.path.insert(0, anki_path)
 
     import aqt
     from aqt import _run
