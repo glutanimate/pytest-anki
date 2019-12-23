@@ -46,7 +46,6 @@ jobs:
           pip install -r requirements.tests
           pip install .
 
-
       - name: Install xvfb dependencies
         run: |
           sudo apt install xvfb libxkbcommon-x11-0
@@ -59,7 +58,7 @@ jobs:
         run: |
           echo ::set-env name=PYTHONPATH::$PYTHONPATH:anki_root
           echo ::set-env name=DISPLAY:::99.0
-          echo ::set-env name=QT_DEBUG_PLUGINS::1
+        # echo ::set-env name=QT_DEBUG_PLUGINS::1
 
       - name: Test with pytest
         run: |
