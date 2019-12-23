@@ -49,7 +49,7 @@ jobs:
 
       - name: Install xvfb dependencies
         run: |
-          sudo apt install xvfb
+          sudo apt install xvfb libxkbcommon-x11-0
 
       - name: Start xvfb
         run: |
