@@ -22,9 +22,9 @@ def _patched_ankiqt_init(
     opts: Namespace,
     args: List[Any],
 ) -> None:
-    """Terminates before profile initialization, allowing more fine-
-    grained control of the testing environment (and replication of the
-    actual environment add-ons are loaded in)
+    """Terminates before profile initialization, replicating the
+    actual environment add-ons are loaded in and preventing
+    weird race conditions with QTimer
     """
     QMainWindow.__init__(self)
     self.state = "startup"
