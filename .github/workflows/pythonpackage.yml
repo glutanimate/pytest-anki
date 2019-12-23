@@ -59,6 +59,7 @@ jobs:
         run: |
           echo ::set-env name=PYTHONPATH::$PYTHONPATH:anki_root
           echo ::set-env name=DISPLAY:::99.0
+          echo ::set-env name=QT_DEBUG_PLUGINS::True
 
       - name: Test with pytest
         run: |
