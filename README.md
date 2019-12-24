@@ -50,7 +50,7 @@ python3 -m pytest tests
 
 (also see the [sample script under tools](./tools/run_tests.sh))
 
-1. (optional) Set up continuous integration with a [GitHub workflow similar to this one](./.github/workflows/tests.yml).
+5. (optional) Set up continuous integration with a [GitHub workflow similar to this one](./.github/workflows/tests.yml).
 
 
 ### License and Credits
@@ -61,4 +61,8 @@ python3 -m pytest tests
 
 *Copyright © 2019 [Aristotelis P.](https://glutanimate.com/) (glutanimate)*
 
-This is Michal's work, by a large margin. My changes are only minor and simply seek to make a few things easier for my add-on development workflow (I initially planned on submitting them as a PR, but as these things often go, the codebase just started straying too far away at some point.)
+Please note that my changes are only minor and simply seek to make a few things easier for my add-on development workflow (I initially planned on submitting them as a PR, but as these things often go, the codebase just started straying too far away at some point.) Michal far and away deserves the most credit for this project.
+
+_anki-testing_ is free and open-source software. Its source-code is released under the GNU GPLv3 license.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. Please see the license file for more details.
