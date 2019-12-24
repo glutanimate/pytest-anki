@@ -40,7 +40,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements.qt
 
-      - name: Set up node for anki
+      - name: Set up node build dependency for anki
         uses: actions/setup-node@v1
         with:
           node-version: 12
@@ -50,14 +50,14 @@ jobs:
         run: |
           make build
 
-      - name: Install anki-tests dependencies
-        run: |
-          pip install .
-
-      - name: Install xvfb dependencies
+      - name: Install xvfb and its dependencies
         run: |
           sudo apt-get install xvfb libxkbcommon-x11-0
 
-      - name: Test with pytest
+      - name: Install anki-tests and its dependencies
+        run: |
+          pip install .
+
+      - name: Run tests
         run: |
           ./tools/run_tests.sh
