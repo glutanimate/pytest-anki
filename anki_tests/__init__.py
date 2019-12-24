@@ -17,8 +17,13 @@ from aqt.main import AnkiQt
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 
-# Ugly workaround: patch pyvirtualdisplay to allow for concurrent
-# pytest-xdist tests
+__version__ = "0.2.0"
+__author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
+__title__ = "anki-tests"
+__homepage__ = "https://github.com/glutanimate/anki-tests"
+
+
+# Ugly workaround: patch pyvirtualdisplay to allow for concurrent pytest-xdist tests
 # cf. https://github.com/The-Compiler/pytest-xvfb/issues/16#issuecomment-355005600
 abstractdisplay.RANDOMIZE_DISPLAY_NR = True
 abstractdisplay.random = random
