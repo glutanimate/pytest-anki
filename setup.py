@@ -4,11 +4,11 @@ with open("README.md") as f:
     long_description = f.read()
 
 setup(
-    name="anki_testing",
+    name="anki_tests",
     version="0.2.0",
     description="A small utility for testing Anki 2.1 addons",
     author="Michal Krassowski, Aristotelis P. (Glutanimate)",
-    url="https://github.com/krassowski/anki_testing",
+    url="https://github.com/glutanimate/anki-tests",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Software Development :: Testing",

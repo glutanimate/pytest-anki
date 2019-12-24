@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Checkout anki-testing
+      - name: Checkout anki-tests
         uses: actions/checkout@v2
 
       - name: Checkout anki
@@ -50,7 +50,7 @@ jobs:
         run: |
           make build
 
-      - name: Install anki-testing dependencies
+      - name: Install anki-tests dependencies
         run: |
           pip install .
 

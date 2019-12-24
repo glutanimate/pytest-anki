@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from anki_testing import anki_running, mw_addons_loaded, mw_profile_loaded
+from anki_tests import anki_running, mw_addons_loaded, mw_profile_loaded
 
 ANKI_RUNNING_ARGS = dict(base_path=os.getcwd())
 
