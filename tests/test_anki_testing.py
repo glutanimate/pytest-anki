@@ -34,7 +34,7 @@ def test_mw_profile_loaded():
 
 
 @pytest.mark.forked
-def test_profile_hook():
+def test_profile_loaded_hook():
     from anki.hooks import addHook
     
     with anki_running(**ANKI_RUNNING_ARGS):
@@ -47,5 +47,26 @@ def test_profile_hook():
                 foo = True
 
             addHook("profileLoaded", onProfileLoaded)
+            
             assert foo is False
+       
+        assert foo is True
+
+@pytest.mark.forked
+def test_profile_unload_hook():
+    from anki.hooks import addHook
+    
+    with anki_running(**ANKI_RUNNING_ARGS):
+        foo = False
+
+        with mw_profile_loaded():
+
+            def onProfileUnload():
+                nonlocal foo
+                foo = True
+
+            addHook("unloadProfile", onProfileUnload)
+            
+            assert foo is False
+        
         assert foo is True

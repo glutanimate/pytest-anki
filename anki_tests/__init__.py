@@ -3,7 +3,6 @@ from argparse import Namespace
 from contextlib import contextmanager
 import os
 import shutil
-import sys
 import tempfile
 from typing import Any, List, Optional
 from warnings import warn
@@ -142,3 +141,8 @@ def mw_profile_loaded():
     mw.setupProfile()
 
     yield mw
+
+    def do_nothing():
+        pass
+
+    mw.unloadProfile(do_nothing)
