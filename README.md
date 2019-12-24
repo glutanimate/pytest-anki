@@ -27,9 +27,9 @@ This is still very much a work-in-progress. Neither the API, nor the implementat
 pip install --upgrade git+https://github.com/glutanimate/anki-testing.git
 ```
 
-1. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add the cloned Anki folder to your `PYTHONPATH` (so that both the `anki` and `aqt` package can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
+2. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add the cloned Anki folder to your `PYTHONPATH` (so that both the `anki` and `aqt` package can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
 
-2. In your tests add:
+3. In your tests add:
 ```python
 from anki_testing import anki_running
 
