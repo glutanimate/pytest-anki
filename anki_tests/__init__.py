@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 import random
 import shutil
 import tempfile
@@ -15,7 +16,6 @@ from anki.collection import _Collection
 from aqt.main import AnkiQt
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
-
 
 # Ugly workaround: patch pyvirtualdisplay to allow for concurrent
 # pytest-xdist tests
@@ -103,6 +103,8 @@ def _temporary_user(dir_name: str, name: str, lang: str, keep: bool):
 
 @contextmanager
 def _base_directory(base_path: str, base_name: str, keep: bool):
+    if not os.path.isdir(base_path):
+        os.mkdir(base_path)
     path = tempfile.mkdtemp(prefix=f"{base_name}_", dir=base_path)
     yield path
     if not keep:
