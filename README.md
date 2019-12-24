@@ -1,18 +1,25 @@
-## Easy testing of Anki add-ons
+## anki-testing
 
 [![](https://github.com/glutanimate/anki-testing/workflows/tests/badge.svg)](https://github.com/glutanimate/anki-testing/actions?query=workflow%3Atests)
 
-A small utility for testing Anki 2.1 add-ons.
-The code from this repository is used by [Anki-Night-Mode](https://github.com/krassowski/Anki-Night-Mode) and [AwesomeTTS](https://github.com/AwesomeTTS/awesometts-anki-addon).
+> a small helper package for testing Anki add-ons
+
+This is a fork of [krassowski/anki_testing](https://github.com/glutanimate/anki-testing/blob/master/.github/workflows/tests.yml) with a number of minor adjustments for use in my add-ons.
+
+
+### Disclaimer
+
+#### Project State
+
+This is still very much a work-in-progress. Neither the API, nor the implementation are set in stone.
+
+#### Platform Support
+
+`anki-testing` has only been tested on Linux so far.
 
 ### Usage
 
-1. (Optional) add the following to you .gitignore:
-```
-anki_root
-```
-
-2. Install `anki_testing` into your testing environment:
+1. Install `anki_testing` into your testing environment:
 
 <!-- TODO: update URLs in case of merged PR ↓ -->
 
@@ -20,15 +27,9 @@ anki_root
 pip install --upgrade git+https://github.com/glutanimate/anki-testing.git
 ```
 
-3.  Install `pytest` and the `pytest-forked` plugin:
+1. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add the cloned Anki folder to your `PYTHONPATH` (so that both the `anki` and `aqt` package can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
 
-```
-pip install pytest pytest-forked
-```
-
-  Running the tests in forked subprocesses prevents state from one test affecting others (which can be crucial when using monkey patching in add-ons).
-
-4. In your tests add:
+2. In your tests add:
 ```python
 from anki_testing import anki_running
 
@@ -39,32 +40,25 @@ def test_my_addon():
         # add some tests in here
 ```
 
-5. Create a testing script which will install Anki and then call your test-runner. For example:
+  I highly recommend running your tests in separate subprocesses using `pytest-forked` as that prevents state persisting across tests, which frequently happens with Anki and can lead to your tests crashing.
+
+4. Assuming that your tests are located in a `tests` folder at the root of your project, run your tests with:
 
 ```bash
-#!/usr/bin/env bash
-bash anki_testing/install_anki.sh
 python3 -m pytest tests
 ```
 
-Lets call the file above `run_tests.sh`.
+(also see the [sample script under tools](./tools/run_tests.sh))
 
-5. (Optional) configure `.travis.yml` using following template:
+1. (optional) Set up continuous integration with a [GitHub workflow similar to this one](./.github/workflows/tests.yml).
 
-<!-- TODO: update URLs in case of merged PR ↓ -->
 
-```yml
-language: python
-sudo: required
+### License and Credits
 
-python:
-  - 3.6
+*anki-testing* is
 
-install: 
-  - pip install --upgrade git+https://github.com/glutanimate/anki-testing.git
-  - git clone https://github.com/glutanimate/anki-testing
-  - source anki_testing/setup.sh 
+*Copyright © 2017-2019 [Michal Krassowski](https://github.com/krassowski/anki_testing) (krassowski)*
 
-script:
-  - bash run_tests.sh
-```
+*Copyright © 2019 [Aristotelis P.](https://glutanimate.com/) (glutanimate)*
+
+This is Michal's work, by a large margin. My changes are only minor and simply seek to make a few things easier for my add-on development workflow (I initially planned on submitting them as a PR, but as these things often go, the codebase just started straying too far away at some point.)
