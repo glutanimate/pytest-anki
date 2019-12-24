@@ -3,7 +3,7 @@ import pytest
 
 from anki_tests import anki_running, mw_addons_loaded, mw_profile_loaded
 
-ANKI_RUNNING_ARGS = dict(base_path=os.getcwd())
+ANKI_RUNNING_ARGS = dict(base_path=os.path.join(os.getcwd(), "anki_bases"))
 
 
 @pytest.mark.forked

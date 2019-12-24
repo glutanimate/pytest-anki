@@ -22,5 +22,5 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     python_requires=">=3.6",
-    install_requires=["pytest", "pytest-forked", "pytest-xvfb"]
+    install_requires=["pytest", "pytest-forked", "pytest-xvfb", "pytest-xdist"]
 )

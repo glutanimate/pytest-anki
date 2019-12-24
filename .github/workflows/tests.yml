@@ -58,11 +58,6 @@ jobs:
         run: |
           sudo apt-get install xvfb libxkbcommon-x11-0
 
-      - name: Set environment
-        run: |
-          echo ::set-env name=PYTHONPATH::$PYTHONPATH:anki_root
-        # echo ::set-env name=QT_DEBUG_PLUGINS::1
-
       - name: Test with pytest
         run: |
-          python -m pytest tests/
+          tests/run_tests.sh

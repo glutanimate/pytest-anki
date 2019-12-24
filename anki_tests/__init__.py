@@ -1,17 +1,28 @@
 # coding: utf-8
-from argparse import Namespace
-from contextlib import contextmanager
-import os
+import random
 import shutil
 import tempfile
+import uuid
+from argparse import Namespace
+from contextlib import contextmanager
 from typing import Any, List, Optional
 from warnings import warn
 
-from anki.collection import _Collection
+from pyvirtualdisplay import abstractdisplay
+
 import aqt
+from anki.collection import _Collection
+from aqt.main import AnkiQt
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
-from aqt.main import AnkiQt
+
+
+# Ugly workaround: patch pyvirtualdisplay to allow for concurrent
+# pytest-xdist tests
+# cf. https://github.com/The-Compiler/pytest-xvfb/issues/16#issuecomment-355005600
+abstractdisplay.RANDOMIZE_DISPLAY_NR = True
+abstractdisplay.random = random
+random.seed()
 
 
 def _patched_ankiqt_init(
@@ -37,13 +48,25 @@ def _patched_ankiqt_init(
 
 
 @contextmanager
-def _patch_ankiqt_init():
+def _patch_anki():
+    """Patch Anki to:
+    - allow more fine-grained control of test execution environment
+    - enable concurrent testing
+    """
     from aqt.main import AnkiQt
+    from aqt import AnkiApp
+    from anki.utils import checksum
 
     old_init = AnkiQt.__init__
+    old_key = AnkiApp.KEY
+
     AnkiQt.__init__ = _patched_ankiqt_init
-    yield
+    AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
+
+    yield AnkiApp.KEY
+
     AnkiQt.__init__ = old_init
+    AnkiApp.KEY = old_key
 
 
 @contextmanager
@@ -80,7 +103,7 @@ def _temporary_user(dir_name: str, name: str, lang: str, keep: bool):
 
 @contextmanager
 def _base_directory(base_path: str, base_name: str, keep: bool):
-    path = os.path.join(base_path, base_name)
+    path = tempfile.mkdtemp(prefix=f"{base_name}_", dir=base_path)
     yield path
     if not keep:
         shutil.rmtree(path)
@@ -89,7 +112,7 @@ def _base_directory(base_path: str, base_name: str, keep: bool):
 @contextmanager
 def anki_running(
     base_path: str = tempfile.gettempdir(),
-    base_name: str = "anki_temp_base",
+    base_name: str = "anki_base",
     profile_name: str = "__Temporary Test User__",
     keep_profile: bool = False,
     lang: str = "en_US",
@@ -102,7 +125,7 @@ def anki_running(
 
     with _base_directory(base_path, base_name, keep_profile) as dir_name:
         with _temporary_user(dir_name, profile_name, lang, keep_profile) as user_name:
-            with _patch_ankiqt_init():
+            with _patch_anki():
                 app = _run(argv=["anki", "-p", user_name, "-b", dir_name], exec=False)
                 yield app
 
