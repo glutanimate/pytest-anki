@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 setup(
     name="anki_tests",
-    version="0.2.0",
+    version="0.2.1",
     description="A small utility for testing Anki 2.1 addons",
     author="Michal Krassowski, Aristotelis P. (Glutanimate)",
     url="https://github.com/glutanimate/anki-tests",

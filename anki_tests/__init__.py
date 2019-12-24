@@ -17,7 +17,7 @@ from aqt.main import AnkiQt
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
 __title__ = "anki-tests"
 __homepage__ = "https://github.com/glutanimate/anki-tests"
