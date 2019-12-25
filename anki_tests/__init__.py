@@ -79,17 +79,10 @@ def _temporary_user(dir_name: str, name: str, lang: str, keep: bool):
 
     from aqt.profiles import ProfileManager
 
-    # prevent popping up language selection dialog
-    original = ProfileManager._setDefaultLang
-
-    def set_default_lang(profileManager):
-        profileManager.setLang(lang)
-
-    ProfileManager._setDefaultLang = set_default_lang
-
     pm = ProfileManager(base=dir_name)
 
     pm.setupMeta()
+    pm.setLang(lang)
 
     if not keep and name in pm.profiles():
         warn(f"Temporary user named {name} already exists")
@@ -102,8 +95,6 @@ def _temporary_user(dir_name: str, name: str, lang: str, keep: bool):
 
     if not keep:
         pm.remove(name)
-
-    ProfileManager._setDefaultLang = original
 
 
 @contextmanager
