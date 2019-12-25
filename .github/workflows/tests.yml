@@ -33,6 +33,11 @@ jobs:
           repository: dae/anki
           path: anki_root
 
+      - name: Set up python venv
+        run: |
+          python${{ matrix.python-version }} -m venv ~/pyenv
+          . ~/pyenv/bin/activate
+
       - name: Install anki dependencies
         working-directory: anki_root
         run: |
