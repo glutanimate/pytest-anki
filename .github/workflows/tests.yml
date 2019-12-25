@@ -24,6 +24,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Set up python venv
+        run: |
+          python${{ matrix.python-version }} -m venv ~/pyenv
+
       - name: Checkout anki-tests
         uses: actions/checkout@v2
 
@@ -33,15 +37,11 @@ jobs:
           repository: dae/anki
           path: anki_root
 
-      - name: Set up python venv
-        run: |
-          python${{ matrix.python-version }} -m venv ~/pyenv
-          . ~/pyenv/bin/activate
-
       - name: Install anki dependencies
         working-directory: anki_root
         run: |
           sudo apt-get install portaudio19-dev
+          . ~/pyenv/bin/activate
           pip install --upgrade setuptools pip
           pip install -r requirements.txt
           pip install -r requirements.qt
@@ -65,8 +65,10 @@ jobs:
 
       - name: Install anki-tests and its dependencies
         run: |
+          . ~/pyenv/bin/activate
           pip install .
 
       - name: Run tests
         run: |
+          . ~/pyenv/bin/activate
           ./tools/run_tests.sh
