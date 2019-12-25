@@ -19,7 +19,7 @@ jobs:
         python-version: [3.6]
 
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
@@ -37,6 +37,7 @@ jobs:
         working-directory: anki_root
         run: |
           sudo apt-get install portaudio19-dev
+          pip install --upgrade setuptools pip
           pip install -r requirements.txt
           pip install -r requirements.qt
 
@@ -44,6 +45,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
+
+      - name: Set up protoc build dependency for anki
+        uses: Arduino/actions/setup-protoc@master
 
       - name: Build anki
         working-directory: anki_root
