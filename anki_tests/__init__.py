@@ -4,6 +4,7 @@ import random
 import shutil
 import tempfile
 import uuid
+import shutil
 from argparse import Namespace
 from contextlib import contextmanager
 from typing import Any, List, Optional
@@ -16,6 +17,7 @@ from anki.collection import _Collection
 from aqt.main import AnkiQt
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
+
 
 __version__ = "0.2.1"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
@@ -94,7 +96,12 @@ def _temporary_user(dir_name: str, name: str, lang: str, keep: bool):
     yield name
 
     if not keep:
-        pm.remove(name)
+        # reimplement pm.remove() to avoid trouble with trash
+        p = pm.profileFolder()
+        if os.path.exists(p):
+            shutil.rmtree(p)
+        pm.db.execute("delete from profiles where name = ?", name)
+        pm.db.commit()
 
 
 @contextmanager
