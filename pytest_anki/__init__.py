@@ -52,7 +52,7 @@ from anki.collection import _Collection
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
 __title__ = "pytest-anki"
 __homepage__ = "https://github.com/glutanimate/pytest-anki"
