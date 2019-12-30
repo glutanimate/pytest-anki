@@ -29,71 +29,72 @@
 # Any modifications to this file must keep this entire header intact.
 
 import pytest
-from pytest_anki import anki_running, mw_addons_loaded, mw_profile_loaded
+
+from pytest_anki import AnkiSession, profile_loaded
 
 
 @pytest.mark.forked
-def test_anki_running():
-    from aqt.qt import QApplication
+def test_anki_session_types(anki_session: AnkiSession):
+    from aqt import AnkiApp
+    from aqt.main import AnkiQt
 
-    with anki_running() as anki_app:
-        assert isinstance(anki_app, QApplication)
+    assert isinstance(anki_session.app, AnkiApp)
+    assert isinstance(anki_session.mw, AnkiQt)
+    assert isinstance(anki_session.user, str)
+    assert isinstance(anki_session.base, str)
 
 
 @pytest.mark.forked
-def test_mw_addons_loaded():
+@pytest.mark.parametrize("anki_session", [dict(profile_name="foo")], indirect=True)
+def test_anki_session_parametrization(anki_session: AnkiSession):
+    from aqt import AnkiApp
+    from aqt.main import AnkiQt
+
+    assert isinstance(anki_session.app, AnkiApp)
+    assert isinstance(anki_session.mw, AnkiQt)
+    assert isinstance(anki_session.user, str)
+    assert isinstance(anki_session.base, str)
+
+
+@pytest.mark.forked
+def test_load_profile(anki_session: AnkiSession):
+    from pytest_anki import profile_loaded
     from anki.collection import _Collection
 
-    with anki_running():
-        with mw_addons_loaded() as mw:
-            assert mw.col is None
-        assert isinstance(mw.col, _Collection)
+    assert anki_session.mw.col is None
+
+    with profile_loaded(anki_session.mw):
+        assert isinstance(anki_session.mw.col, _Collection)
+
+    assert anki_session.mw.col is None
 
 
 @pytest.mark.forked
-def test_mw_profile_loaded():
+@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
+def test_profile_preloaded(anki_session: AnkiSession):
     from anki.collection import _Collection
 
-    with anki_running():
-        with mw_profile_loaded() as mw:
-            assert isinstance(mw.col, _Collection)
+    assert isinstance(anki_session.mw.col, _Collection)
 
 
 @pytest.mark.forked
-def test_profile_loaded_hook():
+def test_profile_hooks(anki_session):
     from anki.hooks import addHook
 
-    with anki_running():
+    foo = False
+
+    def onProfileLoaded():
+        nonlocal foo
+        foo = True
+
+    def onProfileUnload():
+        nonlocal foo
         foo = False
 
-        with mw_addons_loaded():
+    addHook("profileLoaded", onProfileLoaded)
+    addHook("unloadProfile", onProfileUnload)
 
-            def onProfileLoaded():
-                nonlocal foo
-                foo = True
-
-            addHook("profileLoaded", onProfileLoaded)
-
-            assert foo is False
-
+    with profile_loaded(anki_session.mw):
         assert foo is True
 
-
-@pytest.mark.forked
-def test_profile_unload_hook():
-    from anki.hooks import addHook
-
-    with anki_running():
-        foo = False
-
-        with mw_profile_loaded():
-
-            def onProfileUnload():
-                nonlocal foo
-                foo = True
-
-            addHook("unloadProfile", onProfileUnload)
-
-            assert foo is False
-
-        assert foo is True
+    assert foo is False

@@ -25,6 +25,12 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     python_requires=">=3.6",
-    install_requires=["pytest>=3.5.0", "pytest-forked", "pytest-xvfb", "pytest-xdist"],
+    install_requires=[
+        "pytest>=3.5.0",
+        "pytest-forked",
+        "pytest-xdist",
+        "pytest-xvfb",
+        "pyvirtualdisplay",
+    ],
     entry_points={"pytest11": ["anki = pytest_anki"]},
 )

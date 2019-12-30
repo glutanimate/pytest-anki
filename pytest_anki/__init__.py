@@ -40,15 +40,15 @@ import tempfile
 import uuid
 from argparse import Namespace
 from contextlib import contextmanager
-from typing import Any, List, Optional
+from typing import Any, Iterator, List, NamedTuple, Optional
 from warnings import warn
 
 import pytest
 from pyvirtualdisplay import abstractdisplay
 
-import aqt
-from anki.collection import _Collection
+from aqt import AnkiApp
 from aqt.main import AnkiQt
+from anki.collection import _Collection
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 
@@ -65,6 +65,11 @@ abstractdisplay.random = random
 random.seed()
 
 
+@contextmanager
+def _nullcontext():
+    yield None
+
+
 def _patched_ankiqt_init(
     self: AnkiQt,
     app: QApplication,
@@ -76,6 +81,8 @@ def _patched_ankiqt_init(
     actual environment add-ons are loaded in and preventing
     weird race conditions with QTimer
     """
+    import aqt
+
     QMainWindow.__init__(self)
     self.state = "startup"
     self.opts = opts
@@ -85,6 +92,7 @@ def _patched_ankiqt_init(
     self.pm = profileManager
     self.safeMode = False  # disable safe mode, of no use to us
     self.setupUI()
+    self.setupAddons()
 
 
 @contextmanager
@@ -110,11 +118,11 @@ def _patch_anki():
 
 
 @contextmanager
-def _temporary_user(dir_name: str, name: str, lang: str, keep: bool):
+def _temporary_user(base_dir: str, name: str, lang: str, keep: bool):
 
     from aqt.profiles import ProfileManager
 
-    pm = ProfileManager(base=dir_name)
+    pm = ProfileManager(base=base_dir)
 
     pm.setupMeta()
     pm.setLang(lang)
@@ -147,25 +155,83 @@ def _base_directory(base_path: str, base_name: str, keep: bool):
         shutil.rmtree(path)
 
 
+class AnkiSession(NamedTuple):
+    """Named tuple characterizing an Anki test session
+    
+    Arguments:
+        app {AnkiApp} -- Anki QApplication instance
+        mw {AnkiQt} -- Anki QMainWindow instance
+        user {str} -- User profile name (e.g. "User 1")
+        base {str} -- Path to Anki base directory
+    """
+
+    app: AnkiApp
+    mw: AnkiQt
+    user: str
+    base: str
+
+
+@contextmanager
+def profile_loaded(mw: AnkiQt) -> Iterator[AnkiQt]:
+    """Context manager that safely loads and unloads Anki profile
+    
+    Arguments:
+        mw {AnkiQt} -- Anki QMainWindow instance
+    
+    Yields:
+        AnkiQt -- Anki QMainWindow instance
+    """
+    mw.setupProfile()
+
+    yield mw
+
+    mw.unloadProfile(lambda *args, **kwargs: None)
+
+
 @contextmanager
 def anki_running(
     base_path: str = tempfile.gettempdir(),
     base_name: str = "anki_base",
     profile_name: str = "__Temporary Test User__",
     keep_profile: bool = False,
+    load_profile: bool = False,
     lang: str = "en_US",
-):
+) -> Iterator[AnkiSession]:
+    """Context manager that safely launches an Anki session, cleaning up after itself
+    
+    Keyword Arguments:
+        base_path {str} -- Path to write Anki base folder to
+                           (default: {tempfile.gettempdir()})
+        base_name {str} -- Base folder name (default: {"anki_base"})
+        profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
+        keep_profile {bool} -- Whether to preserve profile at context exit
+                               (default: {False})
+        load_profile {bool} -- Whether to return an Anki session with the user profile
+                               and collection fully preloaded (default: {False})
+        lang {str} -- Language to use for the user profile (default: {"en_US"})
+    
+    Returns:
+        Iterator[AnkiSession] -- [description]
+    
+    Yields:
+        Iterator[AnkiSession] -- [description]
+    """
 
     import aqt
     from aqt import _run
 
     # we need a new user for the test
 
-    with _base_directory(base_path, base_name, keep_profile) as dir_name:
-        with _temporary_user(dir_name, profile_name, lang, keep_profile) as user_name:
-            with _patch_anki():
-                app = _run(argv=["anki", "-p", user_name, "-b", dir_name], exec=False)
-                yield app
+    with _patch_anki():
+        with _base_directory(base_path, base_name, keep_profile) as base_dir:
+            with _temporary_user(
+                base_dir, profile_name, lang, keep_profile
+            ) as user_name:
+                app = _run(argv=["anki", "-p", user_name, "-b", base_dir], exec=False)
+                mw = aqt.mw
+
+                with profile_loaded(mw) if load_profile else _nullcontext():
+                    yield AnkiSession(app=app, mw=mw, user=user_name, base=base_dir)
 
     # NOTE: clean up does not seem to work properly in all cases,
     # so use pytest-forked for now
@@ -184,33 +250,11 @@ def anki_running(
     locale.setlocale(locale.LC_ALL, locale.getdefaultlocale())
 
 
-@contextmanager
-def mw_addons_loaded():
-    from aqt import mw
-
-    mw.setupAddons()
-
-    yield mw
-
-    mw.setupProfile()
-
-
-@contextmanager
-def mw_profile_loaded():
-    from aqt import mw
-
-    mw.setupProfile()
-
-    yield mw
-
-    def do_nothing():
-        pass
-
-    mw.unloadProfile(do_nothing)
-
-
 @pytest.fixture
-def anki_mw():
-    with anki_running():
-        with mw_profile_loaded() as mw:
-            yield mw
+def anki_session(request) -> Iterator[AnkiSession]:
+    # uses the pytest request fixture
+    # https://docs.pytest.org/en/latest/reference.html#request
+    param = getattr(request, "param", None)
+
+    with anki_running() if not param else anki_running(**param) as session:
+        yield session
