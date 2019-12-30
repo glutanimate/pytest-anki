@@ -19,7 +19,7 @@ jobs:
         python-version: [3.6]
 
     steps:
-      - name: Checkout anki-tests
+      - name: Checkout pytest-anki
         uses: actions/checkout@v2
 
       - name: Checkout anki
@@ -55,7 +55,7 @@ jobs:
           pip install -r requirements.qt
           make build
 
-      - name: Install anki-tests and its dependencies
+      - name: Install pytest-anki and its dependencies
         run: |
           . ~/pyenv/bin/activate
           sudo apt-get install xvfb libxkbcommon-x11-0
