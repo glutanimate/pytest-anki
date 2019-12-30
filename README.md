@@ -1,10 +1,10 @@
-## anki-tests
+## pytest-anki
 
-[![](https://github.com/glutanimate/anki-tests/workflows/tests/badge.svg)](https://github.com/glutanimate/anki-tests/actions?query=workflow%3Atests)
+[![](https://github.com/glutanimate/pytest-anki/workflows/tests/badge.svg)](https://github.com/glutanimate/pytest-anki/actions?query=workflow%3Atests)
 
-> a small helper package for testing Anki add-ons
+> a simple pytest plugin for testing Anki add-ons
 
-This is a fork of [krassowski/anki_testing](https://github.com/glutanimate/anki-tests/blob/master/.github/workflows/tests.yml) with a number of minor adjustments for use in my add-ons.
+This is a fork of [krassowski/anki_testing](https://github.com/glutanimate/pytest-anki/blob/master/.github/workflows/tests.yml) with a number of minor adjustments for use in my add-ons.
 
 
 ### Disclaimer
@@ -15,23 +15,21 @@ This is still very much a work-in-progress. Neither the API, nor the implementat
 
 #### Platform Support
 
-`anki-tests` has only been tested on Linux so far.
+`pytest-anki` has only been tested on Linux so far.
 
 ### Usage
 
-1. Install `anki_tests` into your testing environment:
-
-<!-- TODO: update URLs in case of merged PR ↓ -->
+1. Install `pytest-anki` into your testing environment:
 
 ```bash
-pip install --upgrade git+https://github.com/glutanimate/anki-tests.git
+pip install --upgrade git+https://github.com/glutanimate/pytest-anki.git
 ```
 
-2. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add the cloned Anki folder to your `PYTHONPATH` (so that both the `anki` and `aqt` package can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
+1. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add the cloned Anki folder to your `PYTHONPATH` (so that both the `anki` and `aqt` package can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
 
-3. In your tests add:
+2. In your tests add:
 ```python
-from anki_tests import anki_running
+from pytest_anki import anki_running
 
 @pytest.mark.forked  # run this test in a subprocess (!)
 def test_my_addon():
@@ -55,14 +53,14 @@ python3 -m pytest tests
 
 ### License and Credits
 
-*anki-tests* is
+*pytest-anki* is
 
 *Copyright © 2017-2019 [Michal Krassowski](https://github.com/krassowski/anki_testing) (krassowski)*
 
-*Copyright © 2019 [Aristotelis P.](https://glutanimate.com/) (glutanimate)*
+*Copyright © 2019-2020 [Aristotelis P.](https://glutanimate.com/) (glutanimate)*
 
-Please note that my changes are only minor and simply seek to make a few things easier for my add-on development workflow (I initially planned on submitting them as a PR, but as these things often go, the codebase just started straying too far away at some point.) Michal far and away deserves the most credit for this project.
+All credits for the original idea for this project go to Michal. _pytest-anki_ would not exist without his work.
 
-_anki-tests_ is free and open-source software. Its source-code is released under the GNU GPLv3 license.
+_pytest-anki_ is free and open-source software. Its source-code is released under the GNU AGPLv3 license.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. Please see the license file for more details.

@@ -1,15 +1,49 @@
-# coding: utf-8
+# pytest-anki
+#
+# Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
+# Copyright (C)  2019-2020 Aristotelis P. <https://glutanimate.com/>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version, with the additions
+# listed at the end of the license file that accompanied this program.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# NOTE: This program is subject to certain additional terms pursuant to
+# Section 7 of the GNU Affero General Public License.  You should have
+# received a copy of these additional terms immediately following the
+# terms and conditions of the GNU Affero General Public License that
+# accompanied this program.
+#
+# If not, please request a copy through one of the means of contact
+# listed here: <https://glutanimate.com/contact/>.
+#
+# Any modifications to this file must keep this entire header intact.
+
+
+"""
+A simple pytest plugin for testing Anki add-ons
+"""
+
 import os
 import random
 import shutil
 import tempfile
 import uuid
-import shutil
 from argparse import Namespace
 from contextlib import contextmanager
 from typing import Any, List, Optional
 from warnings import warn
 
+import pytest
 from pyvirtualdisplay import abstractdisplay
 
 import aqt
@@ -18,11 +52,10 @@ from aqt.main import AnkiQt
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 
-
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
-__title__ = "anki-tests"
-__homepage__ = "https://github.com/glutanimate/anki-tests"
+__title__ = "pytest-anki"
+__homepage__ = "https://github.com/glutanimate/pytest-anki"
 
 
 # Ugly workaround: patch pyvirtualdisplay to allow for concurrent pytest-xdist tests
@@ -174,3 +207,10 @@ def mw_profile_loaded():
         pass
 
     mw.unloadProfile(do_nothing)
+
+
+@pytest.fixture
+def anki_mw():
+    with anki_running():
+        with mw_profile_loaded() as mw:
+            yield mw
