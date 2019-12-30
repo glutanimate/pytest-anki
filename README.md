@@ -19,13 +19,13 @@ This is still very much a work-in-progress. Neither the API, nor the implementat
 
 ### Installation
 
-1. Install `pytest-anki` into your testing environment:
+1. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add your local Anki source folder to your `PYTHONPATH` (so that both the `anki` and `aqt` packages can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
+
+2. Install `pytest-anki` into your testing environment:
 
     ```bash
     pip install --upgrade git+https://github.com/glutanimate/pytest-anki.git
     ```
-
-2. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add your local Anki source folder to your `PYTHONPATH` (so that both the `anki` and `aqt` packages can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
 
 ### Usage
 
