@@ -78,7 +78,7 @@ def test_profile_preloaded(anki_session: AnkiSession):
 
 
 @pytest.mark.forked
-def test_profile_hooks(anki_session):
+def test_profile_hooks(anki_session: AnkiSession):
     from anki.hooks import addHook
 
     foo = False

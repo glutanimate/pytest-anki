@@ -252,6 +252,28 @@ def anki_running(
 
 @pytest.fixture
 def anki_session(request) -> Iterator[AnkiSession]:
+    """Fixture that instantiates Anki, yielding an AnkiSession object
+    
+    Additional arguments may be passed to the fixture by using indirect parametrization,
+    e.g.:
+    
+    > @pytest.mark.parametrize("anki_session", [dict(profile_name="foo")],
+                               indirect=True)
+    
+    Full list of supported keyword arguments as parameters:
+        base_path {str} -- Path to write Anki base folder to
+                           (default: {tempfile.gettempdir()})
+        base_name {str} -- Base folder name (default: {"anki_base"})
+        profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
+        keep_profile {bool} -- Whether to preserve profile at context exit
+                               (default: {False})
+        load_profile {bool} -- Whether to return an Anki session with the user profile
+                               and collection fully preloaded (default: {False})
+        lang {str} -- Language to use for the user profile (default: {"en_US"})
+
+    Yields:
+        Iterator[AnkiSession] -- [description]
+    """
     # uses the pytest request fixture
     # https://docs.pytest.org/en/latest/reference.html#request
     param = getattr(request, "param", None)
