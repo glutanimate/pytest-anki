@@ -50,11 +50,11 @@ jobs:
 
       - name: Install pytest-anki and its dependencies
         run: |
-          . ~/pyenv/bin/activate
+          . ./anki_root/pyenv/bin/activate
           sudo apt-get install xvfb libxkbcommon-x11-0
           pip install .
 
       - name: Run tests
         run: |
-          . ~/pyenv/bin/activate
+          . ./anki_root/pyenv/bin/activate
           ./tools/run_tests.sh
