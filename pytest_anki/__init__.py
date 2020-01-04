@@ -41,14 +41,15 @@ import uuid
 from argparse import Namespace
 from contextlib import contextmanager
 from typing import Any, Iterator, List, NamedTuple, Optional
+from unittest.mock import Mock
 from warnings import warn
 
 import pytest
 from pyvirtualdisplay import abstractdisplay
 
+from anki.collection import _Collection
 from aqt import AnkiApp
 from aqt.main import AnkiQt
-from anki.collection import _Collection
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 
@@ -69,9 +70,6 @@ random.seed()
 def _nullcontext():
     yield None
 
-
-def _patched_null_method(self):
-    pass
 
 def _patched_ankiqt_init(
     self: AnkiQt,
@@ -106,22 +104,26 @@ def _patch_anki():
     - bypass blocking update dialog
     """
     from aqt.main import AnkiQt
+    from aqt import errors
     from aqt import AnkiApp
     from anki.utils import checksum
 
     old_init = AnkiQt.__init__
     old_key = AnkiApp.KEY
     old_setupAutoUpdate = AnkiQt.setupAutoUpdate
+    old_errorHandler = errors.ErrorHandler
 
     AnkiQt.__init__ = _patched_ankiqt_init
     AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
-    AnkiQt.setupAutoUpdate = _patched_null_method
+    AnkiQt.setupAutoUpdate = Mock()
+    errors.ErrorHandler = Mock()
 
     yield AnkiApp.KEY
 
     AnkiQt.__init__ = old_init
     AnkiApp.KEY = old_key
     AnkiQt.setupAutoUpdate = old_setupAutoUpdate
+    errors.ErrorHandler = old_errorHandler
 
 
 @contextmanager
