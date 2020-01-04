@@ -33,10 +33,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Set up python venv
-        run: |
-          python${{ matrix.python-version }} -m venv ~/pyenv
-
       - name: Set up node build dependency for anki
         uses: actions/setup-node@v1
         with:
@@ -45,14 +41,11 @@ jobs:
       - name: Set up protoc build dependency for anki
         uses: Arduino/actions/setup-protoc@master
 
+      # venv is automatically set up by this step
       - name: Install anki dependencies and build anki
         working-directory: anki_root
         run: |
-          . ~/pyenv/bin/activate
           sudo apt-get install portaudio19-dev gettext rename
-          pip install --upgrade setuptools pip
-          pip install -r requirements.txt
-          pip install -r requirements.qt
           make build BUILDFLAGS=""
 
       - name: Install pytest-anki and its dependencies
