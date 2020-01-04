@@ -70,6 +70,9 @@ def _nullcontext():
     yield None
 
 
+def _patched_null_method(self):
+    pass
+
 def _patched_ankiqt_init(
     self: AnkiQt,
     app: QApplication,
@@ -100,6 +103,7 @@ def _patch_anki():
     """Patch Anki to:
     - allow more fine-grained control of test execution environment
     - enable concurrent testing
+    - bypass blocking update dialog
     """
     from aqt.main import AnkiQt
     from aqt import AnkiApp
@@ -107,14 +111,17 @@ def _patch_anki():
 
     old_init = AnkiQt.__init__
     old_key = AnkiApp.KEY
+    old_setupAutoUpdate = AnkiQt.setupAutoUpdate
 
     AnkiQt.__init__ = _patched_ankiqt_init
     AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
+    AnkiQt.setupAutoUpdate = _patched_null_method
 
     yield AnkiApp.KEY
 
     AnkiQt.__init__ = old_init
     AnkiApp.KEY = old_key
+    AnkiQt.setupAutoUpdate = old_setupAutoUpdate
 
 
 @contextmanager
