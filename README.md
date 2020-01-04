@@ -124,6 +124,12 @@ def test_my_addon(anki_session):
 `pytest-anki` is designed to work well with continuous integration systems such as GitHub actions. For an example see `pytest-anki`'s own [GitHub workflows](./.github/workflows/tests.yml).
 
 
+### Troubleshooting
+
+#### pytest hanging when using xvfb
+
+Especially if you run your tests headlessly with `xvfb`, you might run into cases where pytest will sometimes appear to hang. Oftentimes this is due to blocking non-dismissable prompts that Anki might or your add-on code might invoke in some scenarios. If you suspect that might be the case, my advice would be to temporarily bypass `xvfb` locally via `pytest --no-xvfb` to debug the issue.
+
 ### License and Credits
 
 *pytest-anki* is
