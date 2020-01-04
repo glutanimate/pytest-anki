@@ -58,7 +58,6 @@ def test_anki_session_parametrization(anki_session: AnkiSession):
 
 @pytest.mark.forked
 def test_load_profile(anki_session: AnkiSession):
-    from pytest_anki import profile_loaded
     from anki.collection import _Collection
 
     assert anki_session.mw.col is None
