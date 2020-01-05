@@ -93,7 +93,7 @@ def _patched_ankiqt_init(
     self.pm = profileManager
     self.safeMode = False  # disable safe mode, of no use to us
     self.setupUI()
-    self.setupAddons()
+    self.setupAddons(args)
 
 
 @contextmanager
