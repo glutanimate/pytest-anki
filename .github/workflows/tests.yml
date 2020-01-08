@@ -13,12 +13,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.6]
 
     steps:
+      - name: Set up python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
 
