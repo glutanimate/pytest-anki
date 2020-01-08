@@ -40,7 +40,8 @@ import tempfile
 import uuid
 from argparse import Namespace
 from contextlib import contextmanager
-from typing import Any, Iterator, List, NamedTuple, Optional
+from pathlib import Path
+from typing import Any, Iterator, List, NamedTuple, Optional, Union
 from unittest.mock import Mock
 from warnings import warn
 
@@ -52,6 +53,8 @@ from aqt import AnkiApp
 from aqt.main import AnkiQt
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
+
+from .util import create_json, nullcontext
 
 __version__ = "0.4.1"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
@@ -65,10 +68,7 @@ abstractdisplay.RANDOMIZE_DISPLAY_NR = True
 abstractdisplay.random = random
 random.seed()
 
-
-@contextmanager
-def _nullcontext():
-    yield None
+# Pytest fixtures and supporting code
 
 
 def _patched_ankiqt_init(
@@ -204,6 +204,7 @@ def anki_running(
     profile_name: str = "__Temporary Test User__",
     keep_profile: bool = False,
     load_profile: bool = False,
+    force_early_profile_load: bool = False,
     lang: str = "en_US",
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
@@ -215,8 +216,11 @@ def anki_running(
         profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
         keep_profile {bool} -- Whether to preserve profile at context exit
                                (default: {False})
-        load_profile {bool} -- Whether to return an Anki session with the user profile
-                               and collection fully preloaded (default: {False})
+        load_profile {bool} -- Whether to preload Anki user profile (with collection)
+                               (default: {False})
+        force_early_profile_load {bool} -- Whether to load Anki profile
+            (without collection) at app init time. Replicates the behavior when
+            passing profile as a CLI argument (default: {False})
         lang {str} -- Language to use for the user profile (default: {"en_US"})
     
     Returns:
@@ -236,10 +240,17 @@ def anki_running(
             with _temporary_user(
                 base_dir, profile_name, lang, keep_profile
             ) as user_name:
-                app = _run(argv=["anki", "-p", user_name, "-b", base_dir], exec=False)
+                # Do not pass in -p <profile> in order to avoid profile loading.
+                # This helps replicate the profile availability at add-on init time
+                # for most users. Anki will automatically open the profile at
+                # mw.setupProfile time in single-profile setups
+                app = _run(argv=["anki", "-b", base_dir], exec=False)
                 mw = aqt.mw
 
-                with profile_loaded(mw) if load_profile else _nullcontext():
+                if force_early_profile_load:
+                    mw.pm.openProfile(profile_name)
+
+                with profile_loaded(mw) if load_profile else nullcontext():
                     yield AnkiSession(app=app, mw=mw, user=user_name, base=base_dir)
 
     # NOTE: clean up does not seem to work properly in all cases,
@@ -276,8 +287,11 @@ def anki_session(request) -> Iterator[AnkiSession]:
         profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
         keep_profile {bool} -- Whether to preserve profile at context exit
                                (default: {False})
-        load_profile {bool} -- Whether to return an Anki session with the user profile
-                               and collection fully preloaded (default: {False})
+        load_profile {bool} -- Whether to preload Anki user profile (with collection)
+                               (default: {False})
+        force_early_profile_load {bool} -- Whether to load Anki profile
+            (without collection) at app init time. Replicates the behavior when
+            passing profile as a CLI argument (default: {False})
         lang {str} -- Language to use for the user profile (default: {"en_US"})
 
     Yields:
