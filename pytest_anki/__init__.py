@@ -303,3 +303,59 @@ def anki_session(request) -> Iterator[AnkiSession]:
 
     with anki_running() if not param else anki_running(**param) as session:
         yield session
+
+
+# Other helpers
+
+
+class LocalConfigPaths(NamedTuple):
+    defaults: str
+    user: str
+
+
+@contextmanager
+def local_addon_config(
+    base: Union[str, Path],
+    module_name: str,
+    defaults: dict,
+    user: Optional[dict] = None,
+    keep: bool = False,
+) -> Iterator[LocalConfigPaths]:
+    """Context manager that creates a config.json (and optionally a meta.json) file
+    for an add-on and preloads them with the specified data
+
+    Arguments:
+        base {Union[str, Path]} -- base Anki path
+        module_name {str} -- add-on module name
+        defaults {dict} -- data to load into config.json (the default config file)
+        user {dict} -- data to load into meta.json (the user config file)
+
+    Keyword Arguments:
+        keep {bool} -- whether to keep created files after context exit
+                       (default: {False})
+
+    Yields:
+        Iterator[ConfigPaths] -- tuple of paths to config.json and meta.json
+    """
+    addon_path = Path(base) / "addons21" / module_name
+    addon_path.mkdir(parents=True, exist_ok=True)
+
+    defaults_path = addon_path / "config.json"
+    meta_path = addon_path / "meta.json"
+
+    create_json(defaults_path, defaults)
+
+    create_meta = user is not None
+
+    if create_meta:
+        create_json(meta_path, {"config": user})
+
+    yield LocalConfigPaths(str(defaults_path), str(meta_path))
+
+    if keep:
+        return
+
+    defaults_path.unlink()
+
+    if create_meta:
+        meta_path.unlink()
