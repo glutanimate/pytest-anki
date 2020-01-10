@@ -30,13 +30,14 @@
 
 import json
 from pathlib import Path
-from typing import Union, Iterator
+from typing import Union, Iterator, Any
+from functools import reduce
 
 from contextlib import contextmanager
 
 
 @contextmanager
-def nullcontext() -> Iterator[None]:
+def _nullcontext() -> Iterator[None]:
     yield None
 
 
@@ -57,3 +58,26 @@ def create_json(path: Union[str, Path], data: dict, keep: bool = False) -> str:
     with json_path.open("w") as f:
         f.write(json.dumps(data))
     return str(json_path)
+
+
+def _getNestedAttribute(obj: Any, attr: str, *args):
+    """
+    Gets nested attribute from "."-separated string
+
+    Arguments:
+        obj {object} -- object to parse
+        attr {string} -- attribute name, optionally including
+                         "."-characters to denote different levels
+                         of nesting
+
+    Returns:
+        Any -- object corresponding to attribute name
+
+    Credits:
+        https://gist.github.com/wonderbeyond/d293e7a2af1de4873f2d757edd580288
+    """
+
+    def _getattr(obj: Any, attr: str):
+        return getattr(obj, attr, *args)
+
+    return reduce(_getattr, [obj] + attr.split("."))

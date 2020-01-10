@@ -41,7 +41,7 @@ import uuid
 from argparse import Namespace
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator, List, NamedTuple, Optional, Union
+from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Union
 from unittest.mock import Mock
 from warnings import warn
 
@@ -54,7 +54,7 @@ from aqt.main import AnkiQt
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 
-from .util import create_json, nullcontext
+from .util import _getNestedAttribute, _nullcontext, create_json
 
 __version__ = "0.4.1"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
@@ -250,7 +250,7 @@ def anki_running(
                 if force_early_profile_load:
                     mw.pm.openProfile(profile_name)
 
-                with profile_loaded(mw) if load_profile else nullcontext():
+                with profile_loaded(mw) if load_profile else _nullcontext():
                     yield AnkiSession(app=app, mw=mw, user=user_name, base=base_dir)
 
     # NOTE: clean up does not seem to work properly in all cases,
@@ -359,3 +359,32 @@ def local_addon_config(
 
     if create_meta:
         meta_path.unlink()
+
+
+def update_anki_config(mw: AnkiQt, storage_name: str, data: dict) -> dict:
+    attr_paths: Dict[str, str] = {
+        "synced": "col.conf",
+        "profile": "pm.profile",
+        "meta": "pm.meta",
+    }
+
+    try:
+        attr_path = attr_paths[storage_name]
+    except KeyError:
+        raise ValueError(
+            f"Unsupported storage '{storage_name}'. Please select one of the following:"
+            f" {', '.join(attr_paths.keys())}"
+        )
+
+    try:
+        storage_object = _getNestedAttribute(mw, attr_path)
+    except AttributeError:
+        raise AttributeError(
+            f"Anki object not found under mw.{attr_path}. Is your Anki profile loaded?"
+        )
+
+    storage_object.update(data)
+    if "col" in attr_path.split("."):
+        mw.col.setMod()
+
+    return storage_object
