@@ -1,5 +1,6 @@
 # pytest-anki
-#
+
+# Copyright (C)  Ankitects Pty Ltd and contributors
 # Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
 # Copyright (C)  2019-2020 Aristotelis P. <https://glutanimate.com/>
 #

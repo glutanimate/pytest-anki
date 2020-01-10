@@ -134,6 +134,8 @@ Especially if you run your tests headlessly with `xvfb`, you might run into case
 
 *pytest-anki* is
 
+*Copyright © [Ankitects Pty Ltd and contributors](https://github.com/ankitects/)*
+
 *Copyright © 2017-2019 [Michal Krassowski](https://github.com/krassowski/anki_testing) (krassowski)*
 
 *Copyright © 2019-2020 [Aristotelis P.](https://glutanimate.com/) (glutanimate)*
