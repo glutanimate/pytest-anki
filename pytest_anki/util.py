@@ -41,16 +41,13 @@ def _nullcontext() -> Iterator[None]:
     yield None
 
 
-def create_json(path: Union[str, Path], data: dict, keep: bool = False) -> str:
+def create_json(path: Union[str, Path], data: dict) -> str:
     """Creates a JSON file at the specified path, preloading it with the specified data.
     
     Arguments:
         path {Union[str, Path]} -- path to JSON file
         data {dict} -- data to write to file
-    
-    Keyword Arguments:
-        keep {bool} -- whether to keep file after context exit (default: {False})
-    
+
     Returns:
         Path -- path to JSON file
     """
@@ -60,7 +57,7 @@ def create_json(path: Union[str, Path], data: dict, keep: bool = False) -> str:
     return str(json_path)
 
 
-def _getNestedAttribute(obj: Any, attr: str, *args):
+def _getNestedAttribute(obj: Any, attr: str, *args) -> Any:
     """
     Gets nested attribute from "."-separated string
 
