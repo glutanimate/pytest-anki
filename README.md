@@ -105,9 +105,13 @@ def test_my_addon(anki_session: AnkiSession):
     assert anki_session.mw.col is None  # safely unloaded again
 ```
 
+Additional helper functions and context managers are also available. Please refer to the source code for the latest feature-set.
+
 #### Other Notes
 
-I highly recommend running your tests in separate subprocesses using `pytest-forked` as that prevents state persisting across tests, which frequently happens with Anki and can lead to your tests crashing.
+Running your test in an Anki environment is expensive and introduces an additional layer of influencing factors, so I would recommend avoiding the `anki_session` fixture as much as possible, `mock`ing away Anki runtime dependencies where you can. The `anki_session` fixture is in many ways more suited towards integration testing rather than unit tests.
+
+If you do use `anki_session`, I would highly recommend running your tests in separate subprocesses using `pytest-forked`. Because of the way Anki works (e.g. in terms of monkey-patching, etc.) exiting out of the `anki_session` fixture is never quite clean, and so you run the risk of state persisting across to your next tests. This could lead to unexpected behavior, or worse still – especially if Qt components are involved – your tests crashing. Forking a new subprocess for each test bypasses those issues.
 
 Running a test in a separate subprocess is as easy as decorating it with `pytest.mark.forked`:
 
@@ -116,8 +120,6 @@ Running a test in a separate subprocess is as easy as decorating it with `pytest
 def test_my_addon(anki_session):
     # add some tests in here
 ```
-
-
 
 ### Automated Testing
 
