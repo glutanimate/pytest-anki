@@ -43,15 +43,12 @@ jobs:
         uses: Arduino/actions/setup-protoc@master
 
       # venv is automatically set up by this step
-      # FIXME: currently patches Makefile in order to execute pre-run build
-      # steps required for Anki to run.
       - name: Install anki dependencies and build anki
         working-directory: anki_root
         run: |
           sudo apt-get install portaudio19-dev gettext rename
           make build BUILDFLAGS=""
-          sed -i 's/qt\/runanki $(RUNFLAGS)//g' Makefile
-          make run
+          make develop
 
       - name: Install pytest-anki and its dependencies
         run: |
