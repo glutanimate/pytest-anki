@@ -4,7 +4,7 @@
 
 > a simple pytest plugin for testing Anki add-ons
 
-This project is largely based on [krassowski/anki_testing](https://github.com/glutanimate/pytest-anki/blob/master/.github/workflows/tests.yml) with a number of adjustments for use with pytest.
+This project is a rewrite of [krassowski/anki_testing](https://github.com/glutanimate/pytest-anki/blob/master/.github/workflows/tests.yml) as a pytest plugin, with a number of added convenience features and adjustments for more recent Anki releases.
 
 
 ### Disclaimer
@@ -109,9 +109,9 @@ Additional helper functions and context managers are also available. Please refe
 
 #### Other Notes
 
-Running your test in an Anki environment is expensive and introduces an additional layer of influencing factors, so I would recommend avoiding the `anki_session` fixture as much as possible, `mock`ing away Anki runtime dependencies where you can. The `anki_session` fixture is in many ways more suited towards integration testing rather than unit tests.
+Running your test in an Anki environment is expensive and introduces an additional layer of confounding factors, so I would recommend avoiding the `anki_session` fixture as much as possible, `mock`ing away Anki runtime dependencies where you can. The `anki_session` fixture is in many ways more suited towards end-to-end testing rather more fundamental tests in the test pyramid.
 
-If you do use `anki_session`, I would highly recommend running your tests in separate subprocesses using `pytest-forked`. Because of the way Anki works (e.g. in terms of monkey-patching, etc.) exiting out of the `anki_session` fixture is never quite clean, and so you run the risk of state persisting across to your next tests. This could lead to unexpected behavior, or worse still – especially if Qt components are involved – your tests crashing. Forking a new subprocess for each test bypasses those issues.
+If you do use `anki_session`, I would highly recommend running your tests in separate subprocesses using `pytest-forked`. Because of the way Anki works (e.g. in terms of monkey-patching, etc.) exiting out of the `anki_session` fixture is never quite clean, and so you run the risk of state persisting across to your next tests. This could lead to unexpected behavior, or worse still, your tests crashing. Forking a new subprocess for each test bypasses these limitations.
 
 Running a test in a separate subprocess is as easy as decorating it with `pytest.mark.forked`:
 
