@@ -29,6 +29,12 @@ jobs:
           repository: dae/anki
           path: anki_root
 
+      - name: Checkout latest Anki tag
+        working-directory: anki_root
+        run: |
+          git fetch --tags
+          git checkout $(git describe HEAD --tags --abbrev=0)
+
       - name: Set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
