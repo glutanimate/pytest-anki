@@ -21,6 +21,8 @@ This is still very much a work-in-progress. Neither the API, nor the implementat
 
 1. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add your local Anki source folder to your `PYTHONPATH` (so that both the `anki` and `aqt` packages can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
 
+    **The minimum supported Anki version currently is 2.1.17**
+
 2. Install `pytest-anki` into your testing environment:
 
     ```bash
