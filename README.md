@@ -4,7 +4,7 @@
 
 > a simple pytest plugin for testing Anki add-ons
 
-This project is a rewrite of [krassowski/anki_testing](https://github.com/glutanimate/pytest-anki/blob/master/.github/workflows/tests.yml) as a pytest plugin, with a number of added convenience features and adjustments for more recent Anki releases.
+This project is a rewrite of [krassowski/anki_testing](https://github.com/krassowski/anki_testing) as a pytest plugin, with a number of added convenience features and adjustments for more recent Anki releases.
 
 
 ### Disclaimer
