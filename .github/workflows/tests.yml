@@ -32,8 +32,8 @@ jobs:
       - name: Checkout latest Anki tag
         working-directory: anki_root
         run: |
-          git fetch --tags 
-          git checkout $(git describe HEAD --tags --abbrev=0)
+          git fetch --tags
+          git checkout $(git tag --sort=version:refname | tail -1)
 
       - name: Set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
@@ -49,10 +49,14 @@ jobs:
         uses: Arduino/actions/setup-protoc@master
 
       # venv is automatically set up by this step
+      # FIXME: currently bypassing pip installation due to a pip bug
+      # https://github.com/pypa/pip/issues/7217
       - name: Install anki dependencies and build anki
         working-directory: anki_root
         run: |
           sudo apt-get install portaudio19-dev gettext rename
+          sed -i 's/pip install --upgrade pip setuptools/true/g' Makefile
+          pip install --upgrade pip==19.3.1 setuptools==45.0.0
           make build BUILDFLAGS=""
           make develop
 
