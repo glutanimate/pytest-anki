@@ -57,7 +57,7 @@ from aqt.qt import QApplication, QMainWindow
 
 from .util import _getNestedAttribute, _nullcontext, create_json
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
 __title__ = "pytest-anki"
 __homepage__ = "https://github.com/glutanimate/pytest-anki"
