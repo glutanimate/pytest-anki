@@ -50,10 +50,13 @@ import pytest
 from pyvirtualdisplay import abstractdisplay
 
 from anki.collection import _Collection
+from anki.rsbackend import RustBackend
 from aqt import AnkiApp
 from aqt.main import AnkiQt
+from aqt.mediasync import MediaSyncer
 from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
+from aqt.taskman import TaskManager
 
 from .util import _getNestedAttribute, _nullcontext, create_json
 
@@ -76,6 +79,7 @@ def _patched_ankiqt_init(
     self: AnkiQt,
     app: QApplication,
     profileManager: ProfileManagerType,
+    backend: RustBackend,
     opts: Namespace,
     args: List[Any],
 ) -> None:
@@ -86,9 +90,12 @@ def _patched_ankiqt_init(
     import aqt
 
     QMainWindow.__init__(self)
+    self.backend = backend
     self.state = "startup"
     self.opts = opts
     self.col: Optional[_Collection] = None  # type: ignore
+    self.taskman = TaskManager()
+    self.media_syncer = MediaSyncer(self)
     aqt.mw = self
     self.app = app
     self.pm = profileManager
