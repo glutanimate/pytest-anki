@@ -94,7 +94,7 @@ def _patched_ankiqt_init(
     self.state = "startup"
     self.opts = opts
     self.col: Optional[_Collection] = None  # type: ignore
-    self.taskman = TaskManager()
+    self.taskman = TaskManager(self)
     self.media_syncer = MediaSyncer(self)
     aqt.mw = self
     self.app = app
