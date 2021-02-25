@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 
 with open("README.md") as f:
     long_description = f.read()
@@ -23,7 +23,8 @@ setup(
     keywords="anki development testing pytest",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_packages(),
+    package_data={"pytest_anki": ["py.typed"]},
+    packages=["pytest_anki"],
     python_requires=">=3.6",
     install_requires=[
         "pytest>=3.5.0",
@@ -33,4 +34,5 @@ setup(
         "pyvirtualdisplay",
     ],
     entry_points={"pytest11": ["anki = pytest_anki"]},
+    zip_safe=False,
 )
