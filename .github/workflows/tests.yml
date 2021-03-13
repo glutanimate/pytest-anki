@@ -13,61 +13,23 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
-      - name: Set up python
-        uses: actions/setup-python@v1
+      - name: Setup Python
+        uses: actions/setup-python@v2.2.1
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
 
-      - name: Checkout anki
-        uses: actions/checkout@v2
-        with:
-          repository: dae/anki
-          path: anki_root
-
-      - name: Checkout latest Anki tag
+      - name: Install anki
         working-directory: anki_root
         run: |
-          git fetch --tags
-          git checkout $(git tag --sort=version:refname | tail -1)
-
-      - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Set up node build dependency for anki
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-
-      - name: Set up protoc build dependency for anki
-        uses: arduino/setup-protoc@v1
-
-      # venv is automatically set up by this step
-      # FIXME: currently bypassing pip installation due to a pip bug
-      # https://github.com/pypa/pip/issues/7217
-      - name: Install anki dependencies and build anki
-        working-directory: anki_root
-        run: |
-          sudo apt-get install portaudio19-dev gettext rename
-          sed -i 's/pip install --upgrade pip setuptools/true/g' Makefile
-          pip install --upgrade pip==19.3.1 setuptools==45.0.0
-          make build BUILDFLAGS=""
-          make develop
-
-      - name: Install pytest-anki and its dependencies
-        run: |
-          . ./anki_root/pyenv/bin/activate
-          sudo apt-get install xvfb libxkbcommon-x11-0
+          pip install aqt
           pip install .
 
       - name: Run tests
         run: |
-          . ./anki_root/pyenv/bin/activate
           ./tools/run_tests.sh
