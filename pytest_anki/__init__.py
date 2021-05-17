@@ -2,7 +2,8 @@
 
 # Copyright (C)  Ankitects Pty Ltd and contributors
 # Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
-# Copyright (C)  2019-2020 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+#                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
