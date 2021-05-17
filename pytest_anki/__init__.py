@@ -43,7 +43,7 @@ import uuid
 from argparse import Namespace
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Union
+from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Union, TYPE_CHECKING
 from unittest.mock import Mock
 from warnings import warn
 
@@ -51,7 +51,6 @@ import pytest
 from pyvirtualdisplay import abstractdisplay
 
 from anki.collection import _Collection
-from anki.rsbackend import RustBackend
 from aqt import AnkiApp
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
@@ -60,6 +59,15 @@ from aqt.qt import QApplication, QMainWindow
 from aqt.taskman import TaskManager
 
 from .util import _getNestedAttribute, _nullcontext, create_json
+
+if TYPE_CHECKING:
+    try:
+        from anki.rsbackend import RustBackend
+    except (ImportError, ModuleNotFoundError):
+        from anki._backend import RustBackend
+    except Exception:
+        RustBackend = Any
+
 
 __version__ = "0.4.2"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
@@ -80,7 +88,7 @@ def _patched_ankiqt_init(
     self: AnkiQt,
     app: QApplication,
     profileManager: ProfileManagerType,
-    backend: RustBackend,
+    backend: "RustBackend",
     opts: Namespace,
     args: List[Any],
 ) -> None:
