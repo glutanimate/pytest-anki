@@ -50,11 +50,9 @@ from warnings import warn
 import pytest
 from pyvirtualdisplay import abstractdisplay
 
-from anki.collection import _Collection
 from aqt import AnkiApp
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
-from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 from aqt.taskman import TaskManager
 
@@ -67,7 +65,9 @@ if TYPE_CHECKING:
         from anki._backend import RustBackend
     except Exception:
         RustBackend = Any
-
+    
+    from aqt.profiles import ProfileManager as ProfileManagerType
+    from anki.collection import Collection
 
 __version__ = "0.4.2"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
@@ -87,7 +87,7 @@ random.seed()
 def _patched_ankiqt_init(
     self: AnkiQt,
     app: QApplication,
-    profileManager: ProfileManagerType,
+    profileManager: "ProfileManagerType",
     backend: "RustBackend",
     opts: Namespace,
     args: List[Any],
@@ -102,7 +102,7 @@ def _patched_ankiqt_init(
     self.backend = backend
     self.state = "startup"
     self.opts = opts
-    self.col: Optional[_Collection] = None  # type: ignore
+    self.col: Optional["Collection"] = None  # type: ignore
     self.taskman = TaskManager(self)
     self.media_syncer = MediaSyncer(self)
     aqt.mw = self
