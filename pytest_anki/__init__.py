@@ -59,13 +59,7 @@ from aqt.taskman import TaskManager
 from .util import _getNestedAttribute, _nullcontext, create_json
 
 if TYPE_CHECKING:
-    try:
-        from anki.rsbackend import RustBackend
-    except (ImportError, ModuleNotFoundError):
-        from anki._backend import RustBackend
-    except Exception:
-        RustBackend = Any
-    
+    from anki._backend import RustBackend
     from aqt.profiles import ProfileManager as ProfileManagerType
     from anki.collection import Collection
 
