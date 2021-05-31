@@ -50,7 +50,7 @@ import pytest
 from pyvirtualdisplay import abstractdisplay
 
 from anki.collection import _Collection
-from anki.rsbackend import RustBackend
+from anki._backend import RustBackend
 from aqt import AnkiApp
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
