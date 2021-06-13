@@ -1,8 +1,9 @@
 # pytest-anki
 
-# Copyright (C)  Ankitects Pty Ltd and contributors
+# Copyright (C)  2017-2021 Ankitects Pty Ltd and contributors
 # Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
-# Copyright (C)  2019-2020 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+#                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -42,23 +43,25 @@ import uuid
 from argparse import Namespace
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Union
+from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Union, TYPE_CHECKING
 from unittest.mock import Mock
 from warnings import warn
 
 import pytest
 from pyvirtualdisplay import abstractdisplay
 
-from anki.collection import _Collection
-from anki.rsbackend import RustBackend
 from aqt import AnkiApp
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
-from aqt.profiles import ProfileManager as ProfileManagerType
 from aqt.qt import QApplication, QMainWindow
 from aqt.taskman import TaskManager
 
 from .util import _getNestedAttribute, _nullcontext, create_json
+
+if TYPE_CHECKING:
+    from anki._backend import RustBackend
+    from aqt.profiles import ProfileManager as ProfileManagerType
+    from anki.collection import Collection
 
 __version__ = "0.4.2"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
@@ -78,8 +81,8 @@ random.seed()
 def _patched_ankiqt_init(
     self: AnkiQt,
     app: QApplication,
-    profileManager: ProfileManagerType,
-    backend: RustBackend,
+    profileManager: "ProfileManagerType",
+    backend: "RustBackend",
     opts: Namespace,
     args: List[Any],
 ) -> None:
@@ -93,7 +96,7 @@ def _patched_ankiqt_init(
     self.backend = backend
     self.state = "startup"
     self.opts = opts
-    self.col: Optional[_Collection] = None  # type: ignore
+    self.col: Optional["Collection"] = None  # type: ignore
     self.taskman = TaskManager(self)
     self.media_syncer = MediaSyncer(self)
     aqt.mw = self
