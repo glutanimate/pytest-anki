@@ -280,6 +280,8 @@ def anki_running(
     # remove hooks added during app initialization
     from anki import hooks
 
+    # FIXME: This will only work for legacy hooks. Proper teardown of hook subscriptions
+    # is currently NOT working!
     hooks._hooks = {}
 
     # test_nextIvl will fail on some systems if the locales are not restored
