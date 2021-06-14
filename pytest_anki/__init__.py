@@ -56,6 +56,8 @@ from aqt.mediasync import MediaSyncer
 from aqt.qt import QApplication, QMainWindow
 from aqt.taskman import TaskManager
 
+from aqt import gui_hooks
+
 from .util import _getNestedAttribute, _nullcontext, create_json
 
 if TYPE_CHECKING:
@@ -105,6 +107,10 @@ def _patched_ankiqt_init(
     self.safeMode = False  # disable safe mode, of no use to us
     self.setupUI()
     self.setupAddons(args)
+    try:
+        self.finish_ui_setup()
+    except AttributeError:  # legacy
+        pass
 
 
 @contextmanager
@@ -202,6 +208,7 @@ def profile_loaded(mw: AnkiQt) -> Iterator[AnkiQt]:
         AnkiQt -- Anki QMainWindow instance
     """
     mw.setupProfile()
+    gui_hooks.main_window_did_init()
 
     yield mw
 
@@ -273,6 +280,8 @@ def anki_running(
     # remove hooks added during app initialization
     from anki import hooks
 
+    # FIXME: This will only work for legacy hooks. Proper teardown of hook subscriptions
+    # is currently NOT working!
     hooks._hooks = {}
 
     # test_nextIvl will fail on some systems if the locales are not restored
