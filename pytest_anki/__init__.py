@@ -56,6 +56,8 @@ from aqt.mediasync import MediaSyncer
 from aqt.qt import QApplication, QMainWindow
 from aqt.taskman import TaskManager
 
+from aqt import gui_hooks
+
 from .util import _getNestedAttribute, _nullcontext, create_json
 
 if TYPE_CHECKING:
@@ -206,6 +208,7 @@ def profile_loaded(mw: AnkiQt) -> Iterator[AnkiQt]:
         AnkiQt -- Anki QMainWindow instance
     """
     mw.setupProfile()
+    gui_hooks.main_window_did_init()
 
     yield mw
 
