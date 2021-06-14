@@ -105,6 +105,10 @@ def _patched_ankiqt_init(
     self.safeMode = False  # disable safe mode, of no use to us
     self.setupUI()
     self.setupAddons(args)
+    try:
+        self.finish_ui_setup()
+    except AttributeError:  # legacy
+        pass
 
 
 @contextmanager
