@@ -28,9 +28,12 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+from pathlib import Path
+
 import pytest
 
 from pytest_anki import AnkiSession, profile_loaded
+from pytest_anki.decks import deck_installed
 
 
 @pytest.mark.forked
@@ -97,3 +100,17 @@ def test_profile_hooks(anki_session: AnkiSession):
         assert foo is True
 
     assert foo is False
+
+
+_deck_path = Path(__file__).parent / "samples" / "sample_deck.apkg"
+
+@pytest.mark.forked
+@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
+def test_deck_imported(anki_session: AnkiSession):
+    collection = anki_session.mw.col
+    with deck_installed(
+        file_path=_deck_path, collection=anki_session.mw.col
+    ) as deck_id:
+        deck = collection.decks.get(did=deck_id)
+        assert deck is not None
+        assert deck["id"] == deck_id
