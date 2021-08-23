@@ -40,7 +40,7 @@ from unittest.mock import Mock
 import aqt
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
-from aqt.qt import QApplication, QMainWindow
+from aqt.qt import QMainWindow
 from aqt.taskman import TaskManager
 
 from ._addons import (
@@ -55,19 +55,29 @@ if TYPE_CHECKING:
     from aqt.profiles import ProfileManager as ProfileManagerType
 
 
-class CustomAnkiQtInit:
-    def __init__(
-        self,
-        packed_addons: List[PathLike],
-        unpacked_addons: List[UnpackedAddon],
-        base_path: PathLike,
-    ):
-        self._packed_addons = packed_addons
-        self._unpacked_addons = unpacked_addons
-        self._base_path = base_path
+def custom_init_factory(
+    packed_addons: List[PathLike],
+    unpacked_addons: List[UnpackedAddon],
+    base_path: PathLike,
+):
+    def _setup_addons(main_window: AnkiQt):
+        main_window.addonManager = aqt.addons.AddonManager(main_window)
 
-    def __call__(
-        self,
+        for packed_addon in packed_addons:
+            install_addon_from_package(
+                addon_manager=main_window.addonManager, addon_path=packed_addon
+            )
+
+        for unpacked_addon in unpacked_addons:
+            install_addon_from_folder(
+                base_path=base_path,
+                addon_path=unpacked_addon.path,
+                package_name=unpacked_addon.package_name,
+            )
+
+        main_window.addonManager.loadAddons()
+
+    def custom_init(
         main_window: AnkiQt,
         app: aqt.AnkiApp,
         profileManager: "ProfileManagerType",
@@ -76,10 +86,6 @@ class CustomAnkiQtInit:
         args: List[Any],
         **kwargs,
     ):
-        """Terminates before profile initialization, replicating the
-        actual environment add-ons are loaded in and preventing
-        weird race conditions with QTimer
-        """
         import aqt
 
         QMainWindow.__init__(main_window)
@@ -91,6 +97,7 @@ class CustomAnkiQtInit:
         main_window.media_syncer = MediaSyncer(main_window)
         try:  # 2.1.45+
             from aqt.flags import FlagManager
+
             main_window.flags = FlagManager(main_window)
         except (ImportError, ModuleNotFoundError):
             pass
@@ -99,25 +106,10 @@ class CustomAnkiQtInit:
         main_window.pm = profileManager
         main_window.safeMode = False  # disable safe mode, of no use to us
         main_window.setupUI()
-        self._setup_addons(main_window)
+        _setup_addons(main_window)
         main_window.finish_ui_setup()
 
-    def _setup_addons(self, main_window: AnkiQt):
-        main_window.addonManager = aqt.addons.AddonManager(main_window)
-
-        for packed_addon in self._packed_addons:
-            install_addon_from_package(
-                addon_manager=main_window.addonManager, addon_path=packed_addon
-            )
-
-        for unpacked_addon in self._unpacked_addons:
-            install_addon_from_folder(
-                base_path=self._base_path,
-                addon_path=unpacked_addon.path,
-                package_name=unpacked_addon.package_name,
-            )
-
-        main_window.addonManager.loadAddons()
+    return custom_init
 
 
 @contextmanager
@@ -141,7 +133,7 @@ def patch_anki(
     old_maybe_check_for_addon_updates = AnkiQt.maybe_check_for_addon_updates
     old_errorHandler = errors.ErrorHandler
 
-    patched_ankiqt_init = CustomAnkiQtInit(
+    patched_ankiqt_init = custom_init_factory(
         packed_addons=packed_addons,
         unpacked_addons=unpacked_addons,
         base_path=base_dir,
