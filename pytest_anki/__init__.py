@@ -33,13 +33,13 @@
 A simple pytest plugin for testing Anki add-ons
 """
 
-from ._env import patch_pyvirtualdisplay
+from ._env import patch_pyvirtualdisplay as _patch_pyvirtualdisplay
 
-patch_pyvirtualdisplay()
+_patch_pyvirtualdisplay()
 
 from .fixtures import anki_session  # noqa: F401
 from .helpers import profile_loaded  # noqa: F401
-from .types import AnkiSession, UnpackagedAddon  # noqa: F401
+from .types import AnkiSession, UnpackedAddon  # noqa: F401
 from ._config import local_addon_config, update_anki_config  # noqa: F401
 from ._decks import deck_installed  # noqa: F401
 

@@ -40,7 +40,7 @@ from warnings import warn
 
 from ._patch import patch_anki
 from ._util import nullcontext
-from .types import AnkiSession, PathLike, UnpackagedAddon
+from .types import AnkiSession, PathLike, UnpackedAddon
 from .helpers import profile_loaded
 
 @contextmanager
@@ -90,8 +90,8 @@ def anki_running(
     load_profile: bool = False,
     force_early_profile_load: bool = False,
     lang: str = "en_US",
-    packaged_addons: Optional[List[PathLike]] = None,
-    unpackaged_addons: Optional[List[UnpackagedAddon]] = None,
+    packed_addons: Optional[List[PathLike]] = None,
+    unpacked_addons: Optional[List[UnpackedAddon]] = None,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
@@ -108,9 +108,9 @@ def anki_running(
             (without collection) at app init time. Replicates the behavior when
             passing profile as a CLI argument (default: {False})
         lang {str} -- Language to use for the user profile (default: {"en_US"})
-        packaged_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
+        packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
-        unpackaged_addons {Optional[List[UnpackagedAddons]]}: List of unpackaged add-ons
+        unpacked_addons {Optional[List[UnpackedAddons]]}: List of unpackaged add-ons
             that should be installed ahead of starting Anki, described via the
             UnpackagedAddon datatype as found in pytest_anki.types
 
@@ -129,8 +129,8 @@ def anki_running(
     with base_directory(base_path, base_name, keep_profile) as base_dir:
         with patch_anki(
             base_dir=base_dir,
-            packaged_addons=packaged_addons or [],
-            unpackaged_addons=unpackaged_addons or [],
+            packed_addons=packed_addons or [],
+            unpacked_addons=unpacked_addons or [],
         ):
             with temporary_user(
                 base_dir, profile_name, lang, keep_profile

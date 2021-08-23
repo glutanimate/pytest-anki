@@ -47,7 +47,7 @@ from ._addons import (
     install_addon_from_folder,
     install_addon_from_package,
 )
-from .types import PathLike, UnpackagedAddon
+from .types import PathLike, UnpackedAddon
 
 if TYPE_CHECKING:
     from anki._backend import RustBackend
@@ -58,12 +58,12 @@ if TYPE_CHECKING:
 class CustomAnkiQtInit:
     def __init__(
         self,
-        packaged_addons: List[PathLike],
-        unpackaged_addons: List[UnpackagedAddon],
+        packed_addons: List[PathLike],
+        unpacked_addons: List[UnpackedAddon],
         base_path: PathLike,
     ):
-        self._packaged_addons = packaged_addons
-        self._unpackaged_addons = unpackaged_addons
+        self._packed_addons = packed_addons
+        self._unpacked_addons = unpacked_addons
         self._base_path = base_path
 
     def __call__(
@@ -100,16 +100,16 @@ class CustomAnkiQtInit:
     def _setup_addons(self, main_window: AnkiQt):
         main_window.addonManager = aqt.addons.AddonManager(main_window)
 
-        for packaged_addon in self._packaged_addons:
+        for packed_addon in self._packed_addons:
             install_addon_from_package(
-                addon_manager=main_window.addonManager, addon_path=packaged_addon
+                addon_manager=main_window.addonManager, addon_path=packed_addon
             )
 
-        for unpackaged_addon in self._unpackaged_addons:
+        for unpacked_addon in self._unpacked_addons:
             install_addon_from_folder(
                 base_path=self._base_path,
-                addon_path=unpackaged_addon.path,
-                package_name=unpackaged_addon.package_name,
+                addon_path=unpacked_addon.path,
+                package_name=unpacked_addon.package_name,
             )
 
         main_window.addonManager.loadAddons()
@@ -118,8 +118,8 @@ class CustomAnkiQtInit:
 @contextmanager
 def patch_anki(
     base_dir: PathLike,
-    packaged_addons: List[PathLike],
-    unpackaged_addons: List[UnpackagedAddon],
+    packed_addons: List[PathLike],
+    unpacked_addons: List[UnpackedAddon],
 ) -> Iterator[str]:
     """Patch Anki to:
     - allow more fine-grained control of test execution environment
@@ -137,8 +137,8 @@ def patch_anki(
     old_errorHandler = errors.ErrorHandler
 
     patched_ankiqt_init = CustomAnkiQtInit(
-        packaged_addons=packaged_addons,
-        unpackaged_addons=unpackaged_addons,
+        packed_addons=packed_addons,
+        unpacked_addons=unpacked_addons,
         base_path=base_dir,
     )
 

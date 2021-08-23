@@ -56,6 +56,6 @@ class AnkiSession(NamedTuple):
 
 
 @dataclass
-class UnpackagedAddon:
+class UnpackedAddon:
     path: PathLike
     package_name: str
