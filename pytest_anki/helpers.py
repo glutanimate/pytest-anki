@@ -33,7 +33,6 @@ from typing import Iterator
 
 from aqt.main import AnkiQt
 
-__all__ = ["profile_loaded"]
 
 # TODO: should return collection rather than mw
 @contextmanager

@@ -34,8 +34,6 @@ import pytest
 
 from ._launch import AnkiSession, anki_running
 
-__all__ = ["anki_session"]
-
 
 @pytest.fixture
 def anki_session(request) -> Iterator[AnkiSession]:

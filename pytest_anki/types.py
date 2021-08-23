@@ -36,8 +36,6 @@ from typing import NamedTuple, Union
 from aqt import AnkiApp
 from aqt.main import AnkiQt
 
-__all__ = ["AnkiSession", "UnpackagedAddon"]
-
 PathLike = Union[str, Path]
 
 
