@@ -69,7 +69,7 @@ class CustomAnkiQtInit:
     def __call__(
         self,
         main_window: AnkiQt,
-        app: QApplication,
+        app: aqt.AnkiApp,
         profileManager: "ProfileManagerType",
         backend: "RustBackend",
         opts: Namespace,
@@ -89,6 +89,11 @@ class CustomAnkiQtInit:
         main_window.col: Optional["Collection"] = None  # type: ignore
         main_window.taskman = TaskManager(main_window)
         main_window.media_syncer = MediaSyncer(main_window)
+        try:  # 2.1.45+
+            from aqt.flags import FlagManager
+            main_window.flags = FlagManager(main_window)
+        except (ImportError, ModuleNotFoundError):
+            pass
         aqt.mw = main_window
         main_window.app = app
         main_window.pm = profileManager
