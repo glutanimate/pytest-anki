@@ -122,11 +122,13 @@ def _patch_anki():
     old_init = AnkiQt.__init__
     old_key = AnkiApp.KEY
     old_setupAutoUpdate = AnkiQt.setupAutoUpdate
+    old_maybe_check_for_addon_updates = AnkiQt.maybe_check_for_addon_updates
     old_errorHandler = errors.ErrorHandler
 
     AnkiQt.__init__ = _patched_ankiqt_init
     AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
     AnkiQt.setupAutoUpdate = Mock()
+    AnkiQt.maybe_check_for_addon_updates = Mock()
     errors.ErrorHandler = Mock()
 
     yield AnkiApp.KEY
@@ -134,6 +136,7 @@ def _patch_anki():
     AnkiQt.__init__ = old_init
     AnkiApp.KEY = old_key
     AnkiQt.setupAutoUpdate = old_setupAutoUpdate
+    AnkiQt.maybe_check_for_addon_updates = old_maybe_check_for_addon_updates
     errors.ErrorHandler = old_errorHandler
 
 
@@ -190,7 +193,7 @@ class AnkiSession(NamedTuple):
     user: str
     base: str
 
-
+# TODO: should return collection rather than mw
 @contextmanager
 def profile_loaded(mw: AnkiQt) -> Iterator[AnkiQt]:
     """Context manager that safely loads and unloads Anki profile
