@@ -58,17 +58,15 @@ def anki_session(request) -> Iterator[AnkiSession]:
             (without collection) at app init time. Replicates the behavior when
             passing profile as a CLI argument (default: {False})
         lang {str} -- Language to use for the user profile (default: {"en_US"})
-        packaged_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
+        packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
-        unpackaged_addons {Optional[List[UnpackagedAddons]]}: List of unpackaged add-ons
+        unpacked_addons {Optional[List[UnpackedAddons]]}: List of unpackaged add-ons
             that should be installed ahead of starting Anki, described via the
-            UnpackagedAddon datatype as found in pytest_anki.types
-
-    Yields:
-        Iterator[AnkiSession] -- [description]
-    """
-    # uses the pytest request fixture
+            UnpackagedApacked_addons Yields:
+        Iterator[AnkiSession] unpacked_addonsfixture
     # https://docs.pytest.org/en/latest/reference.html#request
+    """
+
     param = getattr(request, "param", None)
 
     with anki_running() if not param else anki_running(**param) as session:
