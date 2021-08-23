@@ -43,25 +43,31 @@ import uuid
 from argparse import Namespace
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, NamedTuple, Optional, Union
 from unittest.mock import Mock
 from warnings import warn
 
+import aqt
 import pytest
-from pyvirtualdisplay import abstractdisplay
-
 from aqt import AnkiApp
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
 from aqt.qt import QApplication, QMainWindow
 from aqt.taskman import TaskManager
+from pyvirtualdisplay import abstractdisplay
 
+from .addons import (
+    UnpackagedAddon,
+    install_addon_from_folder,
+    install_addon_from_package,
+)
+from .types import PathLike
 from .util import _getNestedAttribute, _nullcontext, create_json
 
 if TYPE_CHECKING:
     from anki._backend import RustBackend
-    from aqt.profiles import ProfileManager as ProfileManagerType
     from anki.collection import Collection
+    from aqt.profiles import ProfileManager as ProfileManagerType
 
 __version__ = "0.4.2"
 __author__ = "Michal Krassowski, Aristotelis P. (Glutanimate)"
@@ -78,47 +84,80 @@ random.seed()
 # Pytest fixtures and supporting code
 
 
-def _patched_ankiqt_init(
-    self: AnkiQt,
-    app: QApplication,
-    profileManager: "ProfileManagerType",
-    backend: "RustBackend",
-    opts: Namespace,
-    args: List[Any],
-) -> None:
-    """Terminates before profile initialization, replicating the
-    actual environment add-ons are loaded in and preventing
-    weird race conditions with QTimer
-    """
-    import aqt
+class _PatchedAnkiQtInit:
+    def __init__(
+        self,
+        packaged_addons: List[PathLike],
+        unpackaged_addons: List[UnpackagedAddon],
+        base_path: PathLike,
+    ):
+        self._packaged_addons = packaged_addons
+        self._unpackaged_addons = unpackaged_addons
+        self._base_path = base_path
 
-    QMainWindow.__init__(self)
-    self.backend = backend
-    self.state = "startup"
-    self.opts = opts
-    self.col: Optional["Collection"] = None  # type: ignore
-    self.taskman = TaskManager(self)
-    self.media_syncer = MediaSyncer(self)
-    aqt.mw = self
-    self.app = app
-    self.pm = profileManager
-    self.safeMode = False  # disable safe mode, of no use to us
-    self.setupUI()
-    self.setupAddons(args)
-    self.finish_ui_setup()
+    def __call__(
+        self,
+        main_window: AnkiQt,
+        app: QApplication,
+        profileManager: "ProfileManagerType",
+        backend: "RustBackend",
+        opts: Namespace,
+        args: List[Any],
+        **kwargs,
+    ):
+        """Terminates before profile initialization, replicating the
+        actual environment add-ons are loaded in and preventing
+        weird race conditions with QTimer
+        """
+        import aqt
+
+        QMainWindow.__init__(main_window)
+        main_window.backend = backend
+        main_window.state = "startup"
+        main_window.opts = opts
+        main_window.col: Optional["Collection"] = None  # type: ignore
+        main_window.taskman = TaskManager(main_window)
+        main_window.media_syncer = MediaSyncer(main_window)
+        aqt.mw = main_window
+        main_window.app = app
+        main_window.pm = profileManager
+        main_window.safeMode = False  # disable safe mode, of no use to us
+        main_window.setupUI()
+        self._setup_addons(main_window)
+        main_window.finish_ui_setup()
+
+    def _setup_addons(self, main_window: AnkiQt):
+        main_window.addonManager = aqt.addons.AddonManager(main_window)
+
+        for packaged_addon in self._packaged_addons:
+            install_addon_from_package(
+                addon_manager=main_window.addonManager, addon_path=packaged_addon
+            )
+
+        for unpackaged_addon in self._unpackaged_addons:
+            install_addon_from_folder(
+                base_path=self._base_path,
+                addon_path=unpackaged_addon.path,
+                package_name=unpackaged_addon.package_name,
+            )
+
+        main_window.addonManager.loadAddons()
 
 
 @contextmanager
-def _patch_anki():
+def _patch_anki(
+    base_dir: PathLike,
+    packaged_addons: List[PathLike],
+    unpackaged_addons: List[UnpackagedAddon],
+) -> Iterator[str]:
     """Patch Anki to:
     - allow more fine-grained control of test execution environment
     - enable concurrent testing
     - bypass blocking update dialog
     """
-    from aqt.main import AnkiQt
-    from aqt import errors
-    from aqt import AnkiApp
     from anki.utils import checksum
+    from aqt import AnkiApp, errors
+    from aqt.main import AnkiQt
 
     old_init = AnkiQt.__init__
     old_key = AnkiApp.KEY
@@ -126,7 +165,13 @@ def _patch_anki():
     old_maybe_check_for_addon_updates = AnkiQt.maybe_check_for_addon_updates
     old_errorHandler = errors.ErrorHandler
 
-    AnkiQt.__init__ = _patched_ankiqt_init
+    patched_ankiqt_init = _PatchedAnkiQtInit(
+        packaged_addons=packaged_addons,
+        unpackaged_addons=unpackaged_addons,
+        base_path=base_dir,
+    )
+
+    AnkiQt.__init__ = patched_ankiqt_init  # type: ignore
     AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
     AnkiQt.setupAutoUpdate = Mock()
     AnkiQt.maybe_check_for_addon_updates = Mock()
@@ -142,7 +187,7 @@ def _patch_anki():
 
 
 @contextmanager
-def _temporary_user(base_dir: str, name: str, lang: str, keep: bool):
+def _temporary_user(base_dir: str, name: str, lang: str, keep: bool) -> Iterator[str]:
 
     from aqt.profiles import ProfileManager
 
@@ -170,7 +215,7 @@ def _temporary_user(base_dir: str, name: str, lang: str, keep: bool):
 
 
 @contextmanager
-def _base_directory(base_path: str, base_name: str, keep: bool):
+def _base_directory(base_path: str, base_name: str, keep: bool) -> Iterator[str]:
     if not os.path.isdir(base_path):
         os.mkdir(base_path)
     path = tempfile.mkdtemp(prefix=f"{base_name}_", dir=base_path)
@@ -181,7 +226,7 @@ def _base_directory(base_path: str, base_name: str, keep: bool):
 
 class AnkiSession(NamedTuple):
     """Named tuple characterizing an Anki test session
-    
+
     Arguments:
         app {AnkiApp} -- Anki QApplication instance
         mw {AnkiQt} -- Anki QMainWindow instance
@@ -194,14 +239,15 @@ class AnkiSession(NamedTuple):
     user: str
     base: str
 
+
 # TODO: should return collection rather than mw
 @contextmanager
 def profile_loaded(mw: AnkiQt) -> Iterator[AnkiQt]:
     """Context manager that safely loads and unloads Anki profile
-    
+
     Arguments:
         mw {AnkiQt} -- Anki QMainWindow instance
-    
+
     Yields:
         AnkiQt -- Anki QMainWindow instance
     """
@@ -221,9 +267,11 @@ def anki_running(
     load_profile: bool = False,
     force_early_profile_load: bool = False,
     lang: str = "en_US",
+    packaged_addons: Optional[List[PathLike]] = None,
+    unpackaged_addons: Optional[List[UnpackagedAddon]] = None,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
-    
+
     Keyword Arguments:
         base_path {str} -- Path to write Anki base folder to
                            (default: {tempfile.gettempdir()})
@@ -237,10 +285,10 @@ def anki_running(
             (without collection) at app init time. Replicates the behavior when
             passing profile as a CLI argument (default: {False})
         lang {str} -- Language to use for the user profile (default: {"en_US"})
-    
+
     Returns:
         Iterator[AnkiSession] -- [description]
-    
+
     Yields:
         Iterator[AnkiSession] -- [description]
     """
@@ -250,8 +298,12 @@ def anki_running(
 
     # we need a new user for the test
 
-    with _patch_anki():
-        with _base_directory(base_path, base_name, keep_profile) as base_dir:
+    with _base_directory(base_path, base_name, keep_profile) as base_dir:
+        with _patch_anki(
+            base_dir=base_dir,
+            packaged_addons=packaged_addons or [],
+            unpackaged_addons=unpackaged_addons or [],
+        ):
             with _temporary_user(
                 base_dir, profile_name, lang, keep_profile
             ) as user_name:
@@ -288,13 +340,13 @@ def anki_running(
 @pytest.fixture
 def anki_session(request) -> Iterator[AnkiSession]:
     """Fixture that instantiates Anki, yielding an AnkiSession object
-    
+
     Additional arguments may be passed to the fixture by using indirect parametrization,
     e.g.:
-    
+
     > @pytest.mark.parametrize("anki_session", [dict(profile_name="foo")],
                                indirect=True)
-    
+
     Full list of supported keyword arguments as parameters:
         base_path {str} -- Path to write Anki base folder to
                            (default: {tempfile.gettempdir()})
