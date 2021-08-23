@@ -42,6 +42,7 @@ from ._patch import patch_anki
 from ._util import nullcontext
 from .types import AnkiSession, PathLike, UnpackedAddon
 from .helpers import profile_loaded
+from ._errors import AnkiLaunchException
 
 @contextmanager
 def temporary_user(base_dir: str, name: str, lang: str, keep: bool) -> Iterator[str]:
@@ -62,7 +63,7 @@ def temporary_user(base_dir: str, name: str, lang: str, keep: bool) -> Iterator[
 
     yield name
 
-    if not keep:
+    if not keep and pm.db:
         # reimplement pm.remove() to avoid trouble with trash
         p = pm.profileFolder()
         if os.path.exists(p):
@@ -141,6 +142,9 @@ def anki_running(
                 # mw.setupProfile time in single-profile setups
                 app = _run(argv=["anki", "-b", base_dir], exec=False)
                 mw = aqt.mw
+                
+                if mw is None or app is None:
+                    raise AnkiLaunchException("Main window not initialized correctly")
 
                 if force_early_profile_load:
                     mw.pm.openProfile(profile_name)
@@ -152,7 +156,8 @@ def anki_running(
     # so use pytest-forked for now
 
     # clean up what was spoiled
-    aqt.mw.cleanupAndExit()
+    if aqt.mw:
+        aqt.mw.cleanupAndExit()
 
     # remove hooks added during app initialization
     from anki import hooks
@@ -162,4 +167,4 @@ def anki_running(
     # test_nextIvl will fail on some systems if the locales are not restored
     import locale
 
-    locale.setlocale(locale.LC_ALL, locale.getdefaultlocale())
+    locale.setlocale(locale.LC_ALL, locale.getdefaultlocale())  # type: ignore

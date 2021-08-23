@@ -116,7 +116,7 @@ def update_anki_config(mw: AnkiQt, storage_name: str, data: dict) -> dict:
         )
 
     storage_object.update(data)
-    if "col" in attr_path.split("."):
+    if "col" in attr_path.split(".") and mw.col:
         mw.col.setMod()
 
     return storage_object
