@@ -1,7 +1,5 @@
 # pytest-anki
 #
-# Copyright (C)  2017-2021 Ankitects Pty Ltd and contributors
-# Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
 # Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
@@ -31,22 +29,11 @@
 # Any modifications to this file must keep this entire header intact.
 
 import shutil
-from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING
+
+from aqt.addons import AddonManager
 
 from .types import PathLike
-
-if TYPE_CHECKING:
-    from aqt.addons import AddonManager
-
-    from . import AnkiSession
-
-
-@dataclass
-class UnpackagedAddon:
-    path: PathLike
-    package_name: str
 
 
 def _to_path(path: PathLike) -> Path:

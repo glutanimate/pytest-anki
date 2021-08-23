@@ -28,22 +28,26 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+from contextlib import contextmanager
+from typing import Iterator
 
-"""
-A simple pytest plugin for testing Anki add-ons
-"""
+from aqt.main import AnkiQt
 
-from ._env import patch_pyvirtualdisplay
+__all__ = ["profile_loaded"]
 
-patch_pyvirtualdisplay()
+# TODO: should return collection rather than mw
+@contextmanager
+def profile_loaded(mw: AnkiQt) -> Iterator[AnkiQt]:
+    """Context manager that safely loads and unloads Anki profile
 
-from .fixtures import *  # noqa: F401
-from .helpers import *  # noqa: F401
-from .types import *  # noqa: F401
-from ._config import local_addon_config, update_anki_config  # noqa: F401
-from ._decks import deck_installed  # noqa: F401
+    Arguments:
+        mw {AnkiQt} -- Anki QMainWindow instance
 
-__version__ = "0.4.2"
-__author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
-__title__ = "pytest-anki"
-__homepage__ = "https://github.com/glutanimate/pytest-anki"
+    Yields:
+        AnkiQt -- Anki QMainWindow instance
+    """
+    mw.setupProfile()
+
+    yield mw
+
+    mw.unloadProfile(lambda *args, **kwargs: None)
