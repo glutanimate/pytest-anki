@@ -5,9 +5,9 @@ on:
     paths-ignore:
       - "README.md"
       - "docs/**"
-    push:
-      branches:
-        - main
+  push:
+    branches:
+      - main
 
 jobs:
   test:
