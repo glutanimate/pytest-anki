@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 setup(
     name="pytest_anki",
-    version="0.4.2",
+    version="1.0.0-dev.1",
     description="A pytest plugin for testing Anki 2.1 addons",
     author="Aristotelis P. (Glutanimate), Michal Krassowski",
     maintainer="Aristotelis P. (Glutanimate)",

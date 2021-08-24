@@ -43,7 +43,7 @@ from .types import AnkiSession, UnpackedAddon  # noqa: F401
 from ._config import local_addon_config, update_anki_config  # noqa: F401
 from ._decks import deck_installed  # noqa: F401
 
-__version__ = "0.4.2"
+__version__ = "1.0.0-dev.1"
 __author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
 __title__ = "pytest-anki"
 __homepage__ = "https://github.com/glutanimate/pytest-anki"
