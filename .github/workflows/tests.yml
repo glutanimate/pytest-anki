@@ -22,6 +22,9 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
       - name: Run tests
         run: |
           ./tools/run_tests.sh
