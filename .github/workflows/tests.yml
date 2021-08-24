@@ -31,6 +31,10 @@ jobs:
               python: 3.8.0
               pyqt: 5.15.0
               pyqtwebengine: 5.15.0
+            - anki: 2.1.26
+              python: 3.8.0
+              pyqt: 5.13.1
+              pyqtwebengine: 5.13.1
 
     steps:
       # Qt5 requires a number of X11-related dependencies to be installed system-wide
