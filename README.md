@@ -1,6 +1,6 @@
 ## pytest-anki
 
-[![](https://github.com/glutanimate/pytest-anki/workflows/tests/badge.svg)](https://github.com/glutanimate/pytest-anki/actions?query=workflow%3Atests)
+[![](https://github.com/glutanimate/pytest-anki/workflows/tests/badge.svg)](https://github.com/glutanimate/pytest-anki/actions/workflows/tests.yml/badge.svg)
 
 > a simple pytest plugin for testing Anki add-ons
 
