@@ -28,22 +28,36 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import shutil
+from pathlib import Path
 
-"""
-A simple pytest plugin for testing Anki add-ons
-"""
+from aqt.addons import AddonManager
 
-from ._env import patch_pyvirtualdisplay as _patch_pyvirtualdisplay
+from .types import PathLike
 
-_patch_pyvirtualdisplay()
 
-from .fixtures import anki_session  # noqa: F401
-from .helpers import profile_loaded  # noqa: F401
-from .types import AnkiSession, UnpackedAddon  # noqa: F401
-from ._config import local_addon_config, update_anki_config  # noqa: F401
-from ._decks import deck_installed  # noqa: F401
+def _to_path(path: PathLike) -> Path:
+    path_obj = Path(path)
+    if not path_obj.exists():
+        raise IOError("Provided path does not exist")
+    return path_obj
 
-__version__ = "0.4.2"
-__author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
-__title__ = "pytest-anki"
-__homepage__ = "https://github.com/glutanimate/pytest-anki"
+
+def install_addon_from_package(addon_manager: AddonManager, addon_path: PathLike):
+    addon_path = _to_path(addon_path)
+    if addon_path.suffix != ".ankiaddon":
+        raise ValueError("Provided path is not an .ankiaddon file")
+    addon_manager.install(str(addon_path))
+
+
+def install_addon_from_folder(
+    base_path: PathLike, addon_path: PathLike, package_name: str
+):
+    addon_path = _to_path(addon_path)
+    base_path = _to_path(base_path)
+    if not addon_path.is_dir() or not base_path.is_dir():
+        raise ValueError("Provided path is not a folder")
+    if not package_name:
+        raise ValueError("Package name must not be empty")
+    destination_path = base_path / "addons21" / package_name
+    shutil.copytree(src=addon_path, dst=destination_path, dirs_exist_ok=True)

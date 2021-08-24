@@ -1,6 +1,5 @@
 # pytest-anki
 #
-# Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
 # Copyright (C)  2019-2020 Aristotelis P. <https://glutanimate.com/>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -37,7 +36,7 @@ from contextlib import contextmanager
 
 
 @contextmanager
-def _nullcontext() -> Iterator[None]:
+def nullcontext() -> Iterator[None]:
     yield None
 
 
@@ -57,7 +56,7 @@ def create_json(path: Union[str, Path], data: dict) -> str:
     return str(json_path)
 
 
-def _getNestedAttribute(obj: Any, attr: str, *args) -> Any:
+def get_nested_attribute(obj: Any, attr: str, *args) -> Any:
     """
     Gets nested attribute from "."-separated string
 

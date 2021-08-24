@@ -28,22 +28,43 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+from contextlib import contextmanager
+from pathlib import Path
+from typing import TYPE_CHECKING, Iterator, List, Union
 
-"""
-A simple pytest plugin for testing Anki add-ons
-"""
+from anki.importing.apkg import AnkiPackageImporter
 
-from ._env import patch_pyvirtualdisplay as _patch_pyvirtualdisplay
+if TYPE_CHECKING:
+    from anki.collection import Collection
 
-_patch_pyvirtualdisplay()
 
-from .fixtures import anki_session  # noqa: F401
-from .helpers import profile_loaded  # noqa: F401
-from .types import AnkiSession, UnpackedAddon  # noqa: F401
-from ._config import local_addon_config, update_anki_config  # noqa: F401
-from ._decks import deck_installed  # noqa: F401
+@contextmanager
+def deck_installed(
+    file_path: Union[Path, str], collection: "Collection", keep: bool = False
+) -> Iterator[int]:
 
-__version__ = "0.4.2"
-__author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
-__title__ = "pytest-anki"
-__homepage__ = "https://github.com/glutanimate/pytest-anki"
+    old_ids = set(_get_deck_ids(collection=collection))
+
+    importer = AnkiPackageImporter(col=collection, file=str(file_path))
+    importer.run()
+
+    new_ids = set(_get_deck_ids(collection=collection))
+
+    deck_id = next(iter(new_ids - old_ids))
+
+    yield deck_id
+
+    if keep:
+        return
+
+    try:
+        collection.decks.remove([deck_id])
+    except AttributeError:  # legacy
+        collection.decks.rem(deck_id)
+
+
+def _get_deck_ids(collection: "Collection") -> List[int]:
+    try:
+        return [d.id for d in collection.decks.all_names_and_ids()]
+    except AttributeError:  # legacy
+        return collection.decks.allIds()

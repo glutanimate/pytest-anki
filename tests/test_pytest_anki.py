@@ -33,7 +33,7 @@ from pathlib import Path
 import pytest
 
 from pytest_anki import AnkiSession, profile_loaded
-from pytest_anki.decks import deck_installed
+from pytest_anki import deck_installed
 
 
 @pytest.mark.forked

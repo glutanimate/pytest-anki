@@ -29,21 +29,33 @@
 # Any modifications to this file must keep this entire header intact.
 
 
-"""
-A simple pytest plugin for testing Anki add-ons
-"""
+from dataclasses import dataclass
+from pathlib import Path
+from typing import NamedTuple, Union
 
-from ._env import patch_pyvirtualdisplay as _patch_pyvirtualdisplay
+from aqt import AnkiApp
+from aqt.main import AnkiQt
 
-_patch_pyvirtualdisplay()
+PathLike = Union[str, Path]
 
-from .fixtures import anki_session  # noqa: F401
-from .helpers import profile_loaded  # noqa: F401
-from .types import AnkiSession, UnpackedAddon  # noqa: F401
-from ._config import local_addon_config, update_anki_config  # noqa: F401
-from ._decks import deck_installed  # noqa: F401
 
-__version__ = "0.4.2"
-__author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
-__title__ = "pytest-anki"
-__homepage__ = "https://github.com/glutanimate/pytest-anki"
+class AnkiSession(NamedTuple):
+    """Named tuple characterizing an Anki test session
+
+    Arguments:
+        app {AnkiApp} -- Anki QApplication instance
+        mw {AnkiQt} -- Anki QMainWindow instance
+        user {str} -- User profile name (e.g. "User 1")
+        base {str} -- Path to Anki base directory
+    """
+
+    app: AnkiApp
+    mw: AnkiQt
+    user: str
+    base: str
+
+
+@dataclass
+class UnpackedAddon:
+    path: PathLike
+    package_name: str

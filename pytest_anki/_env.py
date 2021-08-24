@@ -28,22 +28,17 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import random
 
-"""
-A simple pytest plugin for testing Anki add-ons
-"""
 
-from ._env import patch_pyvirtualdisplay as _patch_pyvirtualdisplay
+def patch_pyvirtualdisplay():
+    """
+    Ugly workaround: patch pyvirtualdisplay to allow for concurrent pytest-xdist tests
+    cf. https://github.com/The-Compiler/pytest-xvfb/issues/16#issuecomment-355005600
+    """
+    from pyvirtualdisplay import abstractdisplay
 
-_patch_pyvirtualdisplay()
 
-from .fixtures import anki_session  # noqa: F401
-from .helpers import profile_loaded  # noqa: F401
-from .types import AnkiSession, UnpackedAddon  # noqa: F401
-from ._config import local_addon_config, update_anki_config  # noqa: F401
-from ._decks import deck_installed  # noqa: F401
-
-__version__ = "0.4.2"
-__author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
-__title__ = "pytest-anki"
-__homepage__ = "https://github.com/glutanimate/pytest-anki"
+    abstractdisplay.RANDOMIZE_DISPLAY_NR = True
+    abstractdisplay.random = random
+    random.seed()
