@@ -1,3 +1,3 @@
 #!/bin/bash
 poetry install
-pytest tests/
+pytest --no-xvfb tests/
