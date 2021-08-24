@@ -36,7 +36,6 @@ from pytest_anki import AnkiSession, profile_loaded
 from pytest_anki import deck_installed
 
 
-@pytest.mark.forked
 def test_anki_session_types(anki_session: AnkiSession):
     from aqt import AnkiApp
     from aqt.main import AnkiQt
@@ -47,64 +46,59 @@ def test_anki_session_types(anki_session: AnkiSession):
     assert isinstance(anki_session.base, str)
 
 
-# @pytest.mark.forked
-# @pytest.mark.parametrize("anki_session", [dict(profile_name="foo")], indirect=True)
-# def test_anki_session_parametrization(anki_session: AnkiSession):
-#     from aqt import AnkiApp
-#     from aqt.main import AnkiQt
+@pytest.mark.parametrize("anki_session", [dict(profile_name="foo")], indirect=True)
+def test_anki_session_parametrization(anki_session: AnkiSession):
+    from aqt import AnkiApp
+    from aqt.main import AnkiQt
 
-#     assert isinstance(anki_session.app, AnkiApp)
-#     assert isinstance(anki_session.mw, AnkiQt)
-#     assert isinstance(anki_session.user, str)
-#     assert isinstance(anki_session.base, str)
-
-
-# @pytest.mark.forked
-# def test_load_profile(anki_session: AnkiSession):
-#     from anki.collection import _Collection
-
-#     assert anki_session.mw.col is None
-
-#     with profile_loaded(anki_session.mw):
-#         assert isinstance(anki_session.mw.col, _Collection)
-
-#     assert anki_session.mw.col is None
+    assert isinstance(anki_session.app, AnkiApp)
+    assert isinstance(anki_session.mw, AnkiQt)
+    assert isinstance(anki_session.user, str)
+    assert isinstance(anki_session.base, str)
 
 
-# @pytest.mark.forked
-# @pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
-# def test_profile_preloaded(anki_session: AnkiSession):
-#     from anki.collection import _Collection
+def test_load_profile(anki_session: AnkiSession):
+    from anki.collection import _Collection
 
-#     assert isinstance(anki_session.mw.col, _Collection)
+    assert anki_session.mw.col is None
 
+    with profile_loaded(anki_session.mw):
+        assert isinstance(anki_session.mw.col, _Collection)
 
-# @pytest.mark.forked
-# def test_profile_hooks(anki_session: AnkiSession):
-#     from anki.hooks import addHook
-
-#     foo = False
-
-#     def onProfileLoaded():
-#         nonlocal foo
-#         foo = True
-
-#     def onProfileUnload():
-#         nonlocal foo
-#         foo = False
-
-#     addHook("profileLoaded", onProfileLoaded)
-#     addHook("unloadProfile", onProfileUnload)
-
-#     with profile_loaded(anki_session.mw):
-#         assert foo is True
-
-#     assert foo is False
+    assert anki_session.mw.col is None
 
 
-# _deck_path = Path(__file__).parent / "samples" / "sample_deck.apkg"
+@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
+def test_profile_preloaded(anki_session: AnkiSession):
+    from anki.collection import _Collection
 
-# @pytest.mark.forked
+    assert isinstance(anki_session.mw.col, _Collection)
+
+
+def test_profile_hooks(anki_session: AnkiSession):
+    from anki.hooks import addHook
+
+    foo = False
+
+    def onProfileLoaded():
+        nonlocal foo
+        foo = True
+
+    def onProfileUnload():
+        nonlocal foo
+        foo = False
+
+    addHook("profileLoaded", onProfileLoaded)
+    addHook("unloadProfile", onProfileUnload)
+
+    with profile_loaded(anki_session.mw):
+        assert foo is True
+
+    assert foo is False
+
+
+_deck_path = Path(__file__).parent / "samples" / "sample_deck.apkg"
+
 # @pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
 # def test_deck_imported(anki_session: AnkiSession):
 #     collection = anki_session.mw.col
