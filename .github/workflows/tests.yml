@@ -10,7 +10,11 @@ jobs:
   test:
     runs-on: ubuntu-18.04
     steps:
-      - name: Install xvfb dependencies
+      # Qt5 requires a number of X11-related dependencies to be installed system-wide
+      # Rather than installing each individually, we install libqt5 system-wide which
+      # in turn takes care of installing all deps also needed for the pypi-version of
+      # Qt5
+      - name: Install xvfb / qt dependencies
         run: |
           sudo apt-get install libqt5gui5
 
