@@ -22,12 +22,6 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Install anki
-        run: |
-          python -m pip install --upgrade pip
-          pip install aqt
-          pip install .
-
       - name: Run tests
         run: |
           ./tools/run_tests.sh
