@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Install xvfb dependencies
         run: |
-          sudo apt-get install xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-render-util0 libxcb-image0 libxcb-keysyms1 libqt5gui5
+          sudo apt-get install libqt5gui5
 
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
