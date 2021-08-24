@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  test:
+  pytest:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
@@ -27,6 +27,10 @@ jobs:
               python: 3.8.0
               pyqt: 5.14.2
               pyqtwebengine: 5.14.0
+            - anki: 2.1.28
+              python: 3.8.0
+              pyqt: 5.15.0
+              pyqtwebengine: 5.15.0
 
     steps:
       # Qt5 requires a number of X11-related dependencies to be installed system-wide
@@ -58,7 +62,7 @@ jobs:
       - name: Set up Anki ${{ matrix.anki }}
         run: |
           pip install --upgrade setuptools pip
-          pip install PyQt5==${{ matrix.pyqt }} PyQtWebEngine==${{ matrix.pyqtwebengine }} anki==${{ matrix.anki }} aqt==${{ matrix.anki }}
+          pip install --upgrade PyQt5==${{ matrix.pyqt }} PyQtWebEngine==${{ matrix.pyqtwebengine }} anki==${{ matrix.anki }} aqt==${{ matrix.anki }}
 
       - name: Run tests for Anki ${{ matrix.anki }}
         run: |
