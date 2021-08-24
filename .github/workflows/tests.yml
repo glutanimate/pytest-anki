@@ -35,6 +35,10 @@ jobs:
           version: 1.1.8
           virtualenvs-create: false
 
+      - name: Set up pytest-anki
+        run: |
+          make install
+
       - name: Run tests
         run: |
-          ./tools/run_tests.sh
+          make test
