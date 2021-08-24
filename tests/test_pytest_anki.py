@@ -68,43 +68,43 @@ def test_load_profile(anki_session: AnkiSession):
     assert anki_session.mw.col is None
 
 
-@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
-def test_profile_preloaded(anki_session: AnkiSession):
-    from anki.collection import _Collection
+# @pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
+# def test_profile_preloaded(anki_session: AnkiSession):
+#     from anki.collection import _Collection
 
-    assert isinstance(anki_session.mw.col, _Collection)
-
-
-def test_profile_hooks(anki_session: AnkiSession):
-    from anki.hooks import addHook
-
-    foo = False
-
-    def onProfileLoaded():
-        nonlocal foo
-        foo = True
-
-    def onProfileUnload():
-        nonlocal foo
-        foo = False
-
-    addHook("profileLoaded", onProfileLoaded)
-    addHook("unloadProfile", onProfileUnload)
-
-    with profile_loaded(anki_session.mw):
-        assert foo is True
-
-    assert foo is False
+#     assert isinstance(anki_session.mw.col, _Collection)
 
 
-_deck_path = Path(__file__).parent / "samples" / "sample_deck.apkg"
+# def test_profile_hooks(anki_session: AnkiSession):
+#     from anki.hooks import addHook
 
-@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
-def test_deck_imported(anki_session: AnkiSession):
-    collection = anki_session.mw.col
-    with deck_installed(
-        file_path=_deck_path, collection=anki_session.mw.col
-    ) as deck_id:
-        deck = collection.decks.get(did=deck_id)
-        assert deck is not None
-        assert deck["id"] == deck_id
+#     foo = False
+
+#     def onProfileLoaded():
+#         nonlocal foo
+#         foo = True
+
+#     def onProfileUnload():
+#         nonlocal foo
+#         foo = False
+
+#     addHook("profileLoaded", onProfileLoaded)
+#     addHook("unloadProfile", onProfileUnload)
+
+#     with profile_loaded(anki_session.mw):
+#         assert foo is True
+
+#     assert foo is False
+
+
+# _deck_path = Path(__file__).parent / "samples" / "sample_deck.apkg"
+
+# @pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
+# def test_deck_imported(anki_session: AnkiSession):
+#     collection = anki_session.mw.col
+#     with deck_installed(
+#         file_path=_deck_path, collection=anki_session.mw.col
+#     ) as deck_id:
+#         deck = collection.decks.get(did=deck_id)
+#         assert deck is not None
+#         assert deck["id"] == deck_id
