@@ -138,13 +138,17 @@ Especially if you run your tests headlessly with `xvfb`, you might run into case
 
 *pytest-anki* is
 
-*Copyright © [Ankitects Pty Ltd and contributors](https://github.com/ankitects/)*
+*Copyright © 2017-2021 [Ankitects Pty Ltd and contributors](https://github.com/ankitects/)*
 
-*Copyright © 2017-2019 [Michal Krassowski](https://github.com/krassowski/anki_testing) (krassowski)*
+*Copyright © 2017-2019 [Michal Krassowski](https://github.com/krassowski/anki_testing)*
 
-*Copyright © 2019-2020 [Aristotelis P.](https://glutanimate.com/) (glutanimate)*
+*Copyright © 2019-2021 [Aristotelis P.](https://glutanimate.com/contact/) (Glutanimate)*
+
+and other [contributors](./CONTRIBUTORS).
 
 All credits for the original idea for this project go to Michal. _pytest-anki_ would not exist without his work.
+
+I would also like to extend a special thanks to [AMBOSS](https://github.com/amboss-mededu/) for sponsoring the development of this project.
 
 _pytest-anki_ is free and open-source software. Its source-code is released under the GNU AGPLv3 license, extended by a number of additional terms. For more information please see the [license file](https://github.com/glutanimate/pytest-anki/blob/master/LICENSE) that accompanies this program.
 
