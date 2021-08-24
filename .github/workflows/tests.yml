@@ -8,8 +8,12 @@ on:
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: ubuntu-18.04
     steps:
+      - name: Install xvfb dependencies
+        run: |
+          sudo apt-get install xvfb libxkbcommon-x11-0
+
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
 
