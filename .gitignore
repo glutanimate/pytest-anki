@@ -101,3 +101,9 @@ ENV/
 # mypy
 .mypy_cache/
 anki_bases/
+
+
+# Other
+.directory
+.vscode/
+research/

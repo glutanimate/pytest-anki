@@ -40,7 +40,7 @@ from pytest_anki import deck_installed
 def test_anki_session_types(anki_session: AnkiSession):
     from aqt import AnkiApp
     from aqt.main import AnkiQt
-
+    
     assert isinstance(anki_session.app, AnkiApp)
     assert isinstance(anki_session.mw, AnkiQt)
     assert isinstance(anki_session.user, str)
