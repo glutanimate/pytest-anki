@@ -1,3 +1,4 @@
 #!/bin/bash
 poetry install
-pytest tests/
+export QT_DEBUG_PLUGINS=1
+QT_DEBUG_PLUGINS=1 pytest tests/
