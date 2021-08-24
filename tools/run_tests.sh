@@ -1,3 +1,3 @@
 #!/bin/bash
-export PYTHONPATH="${PYTHONPATH}:anki_root"
+poetry install
 python -m pytest -n4 tests/
