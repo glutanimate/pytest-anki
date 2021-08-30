@@ -34,13 +34,13 @@ import os
 import shutil
 import tempfile
 from contextlib import contextmanager
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Tuple
 from warnings import warn
 
 from ._errors import AnkiLaunchException
 from ._patch import patch_anki
 from ._session import AnkiSession
-from ._types import PathLike, UnpackedAddon
+from ._types import PathLike
 from ._util import nullcontext
 
 
@@ -92,7 +92,7 @@ def anki_running(
     force_early_profile_load: bool = False,
     lang: str = "en_US",
     packed_addons: Optional[List[PathLike]] = None,
-    unpacked_addons: Optional[List[UnpackedAddon]] = None,
+    unpacked_addons: Optional[List[Tuple[PathLike, str]]] = None,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
@@ -111,9 +111,10 @@ def anki_running(
         lang {str} -- Language to use for the user profile (default: {"en_US"})
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
-        unpacked_addons {Optional[List[UnpackedAddons]]}: List of unpackaged add-ons
-            that should be installed ahead of starting Anki, described via the
-            UnpackagedAddon datatype as found in pytest_anki.types
+        unpacked_addons {Optional[List[Tuple[PathLike, str]]]}:
+            List of unpacked add-ons that should be installed ahead of starting Anki.
+            Add-ons need to be specified as tuple of the path to the add-on directory
+            and the package name under which they should be installed.
 
     Returns:
         Iterator[AnkiSession] -- [description]

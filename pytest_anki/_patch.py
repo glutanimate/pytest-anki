@@ -68,8 +68,8 @@ def custom_init_factory(
         for unpacked_addon in unpacked_addons:
             install_addon_from_folder(
                 base_path=base_path,
-                addon_path=unpacked_addon.path,
-                package_name=unpacked_addon.package_name,
+                addon_path=unpacked_addon[0],
+                package_name=unpacked_addon[1],
             )
 
         main_window.addonManager.loadAddons()

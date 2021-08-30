@@ -40,8 +40,8 @@ from ._session import AnkiSession
 def anki_session(request) -> Iterator[AnkiSession]:
     """Fixture that instantiates Anki, yielding an AnkiSession object
 
-    Additional arguments may be passed to the fixture by using indirect parametrization,
-    e.g.:
+    Additional arguments may be passed to the fixture by using indirect parametrization.
+    E.g., to specify a custom profile name you would do:
 
     > @pytest.mark.parametrize("anki_session", [dict(profile_name="foo")],
                                indirect=True)
@@ -61,10 +61,11 @@ def anki_session(request) -> Iterator[AnkiSession]:
         lang {str} -- Language to use for the user profile (default: {"en_US"})
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
-        unpacked_addons {Optional[List[UnpackedAddons]]}: List of unpackaged add-ons
-            that should be installed ahead of starting Anki, described via the
-            UnpackagedApacked_addons Yields:
-        Iterator[AnkiSession] unpacked_addonsfixture
+        unpacked_addons {Optional[List[Tuple[PathLike, str]]]}:
+            List of unpacked add-ons that should be installed ahead of starting Anki.
+            Add-ons need to be specified as tuple of the path to the add-on directory
+            and the package name under which they should be installed.
+    
     # https://docs.pytest.org/en/latest/reference.html#request
     """
 

@@ -31,6 +31,7 @@
 from contextlib import contextmanager
 from enum import Enum
 from pathlib import Path
+from types import ModuleType
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -42,7 +43,6 @@ from typing import (
     Optional,
     Union,
 )
-from types import ModuleType
 
 from anki.importing.apkg import AnkiPackageImporter
 

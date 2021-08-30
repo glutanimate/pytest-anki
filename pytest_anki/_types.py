@@ -29,13 +29,8 @@
 # Any modifications to this file must keep this entire header intact.
 
 
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Union
+from typing import Tuple, Union
 
 PathLike = Union[str, Path]
-
-@dataclass
-class UnpackedAddon:
-    path: PathLike
-    package_name: str
+UnpackedAddon = Tuple[PathLike, str]  # path to add-on folder, package name
