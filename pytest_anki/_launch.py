@@ -78,10 +78,10 @@ def temporary_user(
 def base_directory(base_path: str, base_name: str, keep: bool) -> Iterator[str]:
     if not os.path.isdir(base_path):
         os.mkdir(base_path)
-    path = tempfile.mkdtemp(prefix=f"{base_name}_", dir=base_path)
-    yield path
+    anki_base_dir = tempfile.mkdtemp(prefix=f"{base_name}_", dir=base_path)
+    yield anki_base_dir
     if not keep:
-        shutil.rmtree(path)
+        shutil.rmtree(anki_base_dir)
 
 
 @contextmanager
