@@ -10,8 +10,32 @@ on:
       - main
 
 jobs:
-  test:
+  pytest:
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+            - anki: 2.1.47
+              python: 3.8.1
+              pyqt: 5.15.1
+              pyqtwebengine: 5.15.1
+            - anki: 2.1.44
+              python: 3.8.1
+              pyqt: 5.14.2
+              pyqtwebengine: 5.14.0
+            - anki: 2.1.35
+              python: 3.8.0
+              pyqt: 5.14.2
+              pyqtwebengine: 5.14.0
+            - anki: 2.1.28
+              python: 3.8.0
+              pyqt: 5.15.0
+              pyqtwebengine: 5.15.0
+            - anki: 2.1.26
+              python: 3.8.0
+              pyqt: 5.13.1
+              pyqtwebengine: 5.13.1
+
     steps:
       # Qt5 requires a number of X11-related dependencies to be installed system-wide
       # Rather than installing each individually, we install libqt5 system-wide which
@@ -24,10 +48,10 @@ jobs:
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
 
-      - name: Setup Python
+      - name: Setup Python ${{ matrix.python }}
         uses: actions/setup-python@v2.2.1
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python }}
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -35,6 +59,15 @@ jobs:
           version: 1.1.8
           virtualenvs-create: false
 
-      - name: Run tests
+      - name: Set up pytest-anki
         run: |
-          ./tools/run_tests.sh
+          make install
+
+      - name: Set up Anki ${{ matrix.anki }}
+        run: |
+          pip install --upgrade setuptools pip
+          pip install --upgrade PyQt5==${{ matrix.pyqt }} PyQtWebEngine==${{ matrix.pyqtwebengine }} anki==${{ matrix.anki }} aqt==${{ matrix.anki }}
+
+      - name: Run tests for Anki ${{ matrix.anki }}
+        run: |
+          make test

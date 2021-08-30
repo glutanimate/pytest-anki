@@ -52,7 +52,8 @@ def deck_installed(
 
     deck_id = next(iter(new_ids - old_ids))
 
-    yield deck_id
+    # deck_id is str on <= 2.1.26
+    yield int(deck_id)
 
     if keep:
         return

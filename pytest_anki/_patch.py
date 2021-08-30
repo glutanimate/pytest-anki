@@ -93,21 +93,32 @@ def custom_init_factory(
         main_window.state = "startup"
         main_window.opts = opts
         main_window.col: Optional["Collection"] = None  # type: ignore
-        main_window.taskman = TaskManager(main_window)
+
+        try:  # 2.1.28+
+            main_window.taskman = TaskManager(main_window)
+        except TypeError:
+            main_window.taskman = TaskManager()  # type: ignore
+
         main_window.media_syncer = MediaSyncer(main_window)
+        
         try:  # 2.1.45+
             from aqt.flags import FlagManager
 
             main_window.flags = FlagManager(main_window)
         except (ImportError, ModuleNotFoundError):
             pass
+        
         aqt.mw = main_window
         main_window.app = app
         main_window.pm = profileManager
         main_window.safeMode = False  # disable safe mode, of no use to us
         main_window.setupUI()
         _setup_addons(main_window)
-        main_window.finish_ui_setup()
+        
+        try:  # 2.1.28+
+            main_window.finish_ui_setup()
+        except AttributeError:
+            pass
 
     return custom_init
 
