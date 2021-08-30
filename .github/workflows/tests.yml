@@ -16,11 +16,11 @@ jobs:
       matrix:
         include:
             - anki: 2.1.47
-              python: 3.8.6
+              python: 3.8.1
               pyqt: 5.15.1
               pyqtwebengine: 5.15.1
             - anki: 2.1.44
-              python: 3.8.6
+              python: 3.8.1
               pyqt: 5.14.2
               pyqtwebengine: 5.14.0
             - anki: 2.1.35
