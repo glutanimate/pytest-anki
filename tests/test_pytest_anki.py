@@ -34,6 +34,8 @@ import pytest
 
 from pytest_anki import AnkiSession
 
+# TODO: Extend test cases for new AnkiSession APIs
+
 
 @pytest.mark.forked
 def test_anki_session_types(anki_session: AnkiSession):
