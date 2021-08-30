@@ -98,15 +98,15 @@ def anki_running(
 
     Keyword Arguments:
         base_path {str} -- Path to write Anki base folder to
-                           (default: {tempfile.gettempdir()})
+            (default: system-wide temporary directory)
         base_name {str} -- Base folder name (default: {"anki_base"})
         profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
         keep_profile {bool} -- Whether to preserve profile at context exit
-                               (default: {False})
+            (default: {False})
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
-                               (default: {False})
-        force_early_profile_load {bool} -- Whether to load Anki profile
-            (without collection) at app init time. Replicates the behavior when
+            (default: {False})
+        force_early_profile_load {bool} -- Whether to load Anki profile at app
+            initialization time (without collection). Replicates the behavior when
             passing profile as a CLI argument (default: {False})
         lang {str} -- Language to use for the user profile (default: {"en_US"})
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
