@@ -53,8 +53,8 @@ from ._addons import (
     install_addon_from_folder,
     install_addon_from_package,
 )
-from ._types import PathLike
 from ._anki import PresetAnkiState, apply_anki_meta_state
+from ._types import PathLike
 
 PostUISetupCallbackType = Callable[[AnkiQt], None]
 

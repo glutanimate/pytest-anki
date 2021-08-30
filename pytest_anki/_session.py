@@ -30,19 +30,20 @@
 
 from contextlib import contextmanager
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 
 from anki.importing.apkg import AnkiPackageImporter
 
 from ._addons import ConfigPaths, create_addon_config
+from ._anki import (
+    AnkiStorageObject,
+    PresetAnkiState,
+    apply_anki_state,
+    get_anki_object,
+    get_collection,
+)
 from ._errors import AnkiSessionError
 from ._types import PathLike
-from ._anki import (
-    get_collection,
-    set_anki_object_data,
-    get_anki_object,
-    AnkiStorageObject,
-)
 
 if TYPE_CHECKING:
     from anki.collection import Collection
@@ -216,19 +217,5 @@ class AnkiSession:
 
     # Anki config object handling ####
 
-    def set_anki_object_data(
-        self, storage_object: AnkiStorageObject, data: dict
-    ) -> Union[Dict[str, Any], "ConfigManager"]:
-        """Update the data of a specified Anki storage object
-
-        This may be used to simulate specific Anki and/or add-on states
-        during testing."""
-        return set_anki_object_data(
-            main_window=self._mw, storage_object=storage_object, data=data
-        )
-
-    def get_anki_object(
-        self, storage_object: AnkiStorageObject
-    ) -> Union[Dict[str, Any], "ConfigManager"]:
-        """Get Anki object for specified AnkiStorageObject type"""
-        return get_anki_object(main_window=self._mw, storage_object=storage_object)
+    def apply_anki_state(self, preset_anki_state: PresetAnkiState):
+        apply_anki_state(main_window=self._mw, preset_anki_state=preset_anki_state)
