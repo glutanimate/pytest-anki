@@ -30,36 +30,21 @@
 
 from contextlib import contextmanager
 from enum import Enum
-from pathlib import Path
 from types import ModuleType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Iterator,
-    List,
-    NamedTuple,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Union
 
 from anki.importing.apkg import AnkiPackageImporter
 
+from ._addons import ConfigPaths, create_addon_config
 from ._errors import AnkiSessionError
 from ._types import PathLike
-from ._util import create_json, get_nested_attribute
+from ._util import get_nested_attribute
 
 if TYPE_CHECKING:
     from anki.collection import Collection
     from anki.config import ConfigManager
     from aqt import AnkiApp
     from aqt.main import AnkiQt
-
-
-class ConfigPaths(NamedTuple):
-    default_config: Path
-    user_config: Optional[Path]
 
 
 class AnkiStorageObject(Enum):
@@ -204,20 +189,12 @@ class AnkiSession:
     ) -> ConfigPaths:
         """Create and populate the config.json and meta.json configuration
         files for an add-on, as specified by its package name"""
-        addon_path = Path(self._base) / "addons21" / package_name
-        addon_path.mkdir(parents=True, exist_ok=True)
-
-        defaults_path = addon_path / "config.json"
-
-        create_json(defaults_path, default_config)
-
-        if user_config is not None:
-            meta_path = addon_path / "meta.json"
-            create_json(meta_path, {"config": user_config})
-        else:
-            meta_path = None
-
-        return ConfigPaths(defaults_path, meta_path)
+        return create_addon_config(
+            anki_base_dir=self._base,
+            package_name=package_name,
+            default_config=default_config,
+            user_config=user_config,
+        )
 
     @contextmanager
     def addon_config_created(
@@ -237,7 +214,7 @@ class AnkiSession:
 
         yield config_paths
 
-        if config_paths.default_config.exists():
+        if config_paths.default_config and config_paths.default_config.exists():
             config_paths.default_config.unlink()
 
         if config_paths.user_config and config_paths.user_config.exists():

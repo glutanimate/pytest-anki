@@ -45,7 +45,7 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
 
     All keyword arguments below may be passed to the fixture by using indirect
     parametrization.
-    
+
     E.g., to specify a custom profile name you would decorate your test method with:
 
     > @pytest.mark.parametrize("anki_session", [dict(profile_name="foo")],
@@ -66,10 +66,16 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
         lang {str} -- Language to use for the user profile (default: {"en_US"})
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
-        unpacked_addons {Optional[List[Tuple[PathLike, str]]]}:
+        unpacked_addons {Optional[List[Tuple[str, PathLike]]]}:
             List of unpacked add-ons that should be installed ahead of starting Anki.
-            Add-ons need to be specified as tuple of the path to the add-on directory
-            and the package name under which they should be installed.
+            Add-ons need to be specified as tuple of the add-on package name under which
+            to install the add-on, and the path to the source folder (the package
+            folder containing the add-on __init__.py)
+        addon_configs {Optional[List[Tuple[str, Dict[str, Any]]]]}:
+            List of add-on package names and config values to set the user configuration
+            for the specified add-on to. Useful for simulating specific config set-ups.
+            Each list member needs to be specified as a tuple of add-on package name
+            and dictionary of user configuration values to set.
 
     # https://docs.pytest.org/en/latest/reference.html#request
     """

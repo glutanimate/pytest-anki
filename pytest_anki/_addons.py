@@ -30,10 +30,17 @@
 
 import shutil
 from pathlib import Path
+from typing import (
+    Any,
+    Dict,
+    NamedTuple,
+    Optional,
+)
 
 from aqt.addons import AddonManager
 
 from ._types import PathLike
+from ._util import create_json
 
 
 def _to_path(path: PathLike) -> Path:
@@ -51,13 +58,42 @@ def install_addon_from_package(addon_manager: AddonManager, addon_path: PathLike
 
 
 def install_addon_from_folder(
-    base_path: PathLike, addon_path: PathLike, package_name: str
+    anki_base_dir: PathLike,
+    package_name: str,
+    addon_path: PathLike,
 ):
     addon_path = _to_path(addon_path)
-    base_path = _to_path(base_path)
-    if not addon_path.is_dir() or not base_path.is_dir():
+    anki_base_dir = _to_path(anki_base_dir)
+    if not addon_path.is_dir() or not anki_base_dir.is_dir():
         raise ValueError("Provided path is not a folder")
     if not package_name:
         raise ValueError("Package name must not be empty")
-    destination_path = base_path / "addons21" / package_name
+    destination_path = anki_base_dir / "addons21" / package_name
     shutil.copytree(src=addon_path, dst=destination_path, dirs_exist_ok=True)
+
+
+class ConfigPaths(NamedTuple):
+    default_config: Optional[Path]
+    user_config: Optional[Path]
+
+
+def create_addon_config(
+    anki_base_dir: PathLike,
+    package_name: str,
+    default_config: Optional[Dict[str, Any]] = None,
+    user_config: Optional[Dict[str, Any]] = None,
+) -> ConfigPaths:
+    addon_path = Path(anki_base_dir) / "addons21" / package_name
+    addon_path.mkdir(parents=True, exist_ok=True)
+
+    defaults_path = meta_path = None
+
+    if default_config:
+        defaults_path = addon_path / "config.json"
+        create_json(defaults_path, default_config)
+
+    if user_config:
+        meta_path = addon_path / "meta.json"
+        create_json(meta_path, {"config": user_config})
+
+    return ConfigPaths(defaults_path, meta_path)
