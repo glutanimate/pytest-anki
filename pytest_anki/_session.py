@@ -30,6 +30,7 @@
 
 from contextlib import contextmanager
 from enum import Enum
+
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -37,6 +38,7 @@ from typing import (
     Callable,
     Dict,
     Iterator,
+    List,
     NamedTuple,
     Optional,
     Union,
@@ -44,6 +46,8 @@ from typing import (
 
 from ._errors import AnkiSessionError
 from ._util import create_json, get_nested_attribute
+from .types import PathLike
+from anki.importing.apkg import AnkiPackageImporter
 
 if TYPE_CHECKING:
     from anki.collection import Collection
@@ -125,6 +129,40 @@ class AnkiSession:
         yield collection
 
         self.unload_profile()
+
+    # Deck management ####
+
+    def install_deck(self, file_path: PathLike) -> int:
+        old_ids = set(self._get_deck_ids())
+
+        importer = AnkiPackageImporter(col=self.collection, file=str(file_path))
+        importer.run()
+
+        new_ids = set(self._get_deck_ids())
+
+        deck_id = next(iter(new_ids - old_ids))
+
+        return deck_id
+
+    def remove_deck(self, deck_id: int):
+        try:  # 2.1.28+
+            self.collection.decks.remove([deck_id])
+        except AttributeError:  # legacy
+            self.collection.decks.rem(deck_id)
+
+    @contextmanager
+    def deck_installed(self, file_path: PathLike) -> Iterator[int]:
+        deck_id = self.install_deck(file_path=file_path)
+
+        yield deck_id
+
+        self.remove_deck(deck_id=deck_id)
+
+    def _get_deck_ids(self) -> List[int]:
+        try:  # 2.1.28+
+            return [d.id for d in self.collection.decks.all_names_and_ids()]
+        except AttributeError:  # legacy
+            return self.collection.decks.allIds()
 
     # Add-on config handling
 
