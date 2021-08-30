@@ -42,6 +42,7 @@ from typing import (
     Optional,
     Union,
 )
+from types import ModuleType
 
 from anki.importing.apkg import AnkiPackageImporter
 
@@ -163,6 +164,12 @@ class AnkiSession:
             return [d.id for d in self.collection.decks.all_names_and_ids()]
         except AttributeError:  # legacy
             return self.collection.decks.allIds()
+
+    # Add-on loading ####
+
+    def load_addon(self, package_name: str) -> ModuleType:
+        addon_package = __import__(package_name)
+        return addon_package
 
     # Add-on config handling ####
 
