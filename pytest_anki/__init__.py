@@ -38,7 +38,6 @@ from ._env import patch_pyvirtualdisplay as _patch_pyvirtualdisplay
 _patch_pyvirtualdisplay()
 
 from .fixtures import anki_session  # noqa: F401
-from .helpers import profile_loaded  # noqa: F401
 from .types import UnpackedAddon  # noqa: F401
 from ._session import AnkiSession  # noqa: F401
 
