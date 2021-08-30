@@ -34,7 +34,7 @@
 import uuid
 from argparse import Namespace
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Iterator, List, Optional, Tuple, Dict
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Tuple
 from unittest.mock import Mock
 
 import aqt
@@ -48,12 +48,12 @@ if TYPE_CHECKING:
     from anki.collection import Collection
     from aqt.profiles import ProfileManager as ProfileManagerType
 
-from ._types import PathLike
 from ._addons import (
+    create_addon_config,
     install_addon_from_folder,
     install_addon_from_package,
-    create_addon_config,
 )
+from ._types import PathLike
 
 PostUISetupCallbackType = Callable[[AnkiQt], None]
 

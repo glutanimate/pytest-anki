@@ -34,7 +34,7 @@ import os
 import shutil
 import tempfile
 from contextlib import contextmanager
-from typing import Iterator, List, Optional, Tuple, Dict, Any
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 from warnings import warn
 
 from ._errors import AnkiLaunchException

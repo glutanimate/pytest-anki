@@ -30,12 +30,7 @@
 
 import shutil
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    NamedTuple,
-    Optional,
-)
+from typing import Any, Dict, NamedTuple, Optional
 
 from aqt.addons import AddonManager
 

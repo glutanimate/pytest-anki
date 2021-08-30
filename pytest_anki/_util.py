@@ -41,7 +41,7 @@ def nullcontext() -> Iterator[None]:
 
 def create_json(path: Union[str, Path], data: dict) -> str:
     """Creates a JSON file at the specified path, preloading it with the specified data.
-    
+
     Arguments:
         path {Union[str, Path]} -- path to JSON file
         data {dict} -- data to write to file
