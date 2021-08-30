@@ -28,16 +28,19 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
-from typing import Iterator
+from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional
 
 import pytest
+
+if TYPE_CHECKING:
+    from pytest import FixtureRequest
 
 from ._launch import anki_running
 from ._session import AnkiSession
 
 
 @pytest.fixture
-def anki_session(request) -> Iterator[AnkiSession]:
+def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
     """Fixture that instantiates Anki, yielding an AnkiSession object
 
     Additional arguments may be passed to the fixture by using indirect parametrization.
@@ -65,11 +68,13 @@ def anki_session(request) -> Iterator[AnkiSession]:
             List of unpacked add-ons that should be installed ahead of starting Anki.
             Add-ons need to be specified as tuple of the path to the add-on directory
             and the package name under which they should be installed.
-    
+
     # https://docs.pytest.org/en/latest/reference.html#request
     """
 
-    param = getattr(request, "param", None)
+    indirect_parameters: Optional[Dict[str, Any]] = getattr(request, "param", None)
 
-    with anki_running() if not param else anki_running(**param) as session:
+    with anki_running() if not indirect_parameters else anki_running(
+        **indirect_parameters
+    ) as session:
         yield session
