@@ -28,20 +28,28 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from ._errors import AnkiSessionError
 from ._util import get_nested_attribute
 
 if TYPE_CHECKING:
+    from anki.collection import Collection
     from anki.config import ConfigManager
     from aqt.main import AnkiQt
-    from anki.collection import Collection
+
+
+@dataclass
+class PresetAnkiState:
+    colconf_storage: Optional[Dict[str, Any]] = None
+    profile_storage: Optional[Dict[str, Any]] = None
+    meta_storage: Optional[Dict[str, Any]] = None
 
 
 class AnkiStorageObject(Enum):
-    synced_storage = "col.conf"
+    colconf_storage = "col.conf"
     profile_storage = "pm.profile"
     meta_storage = "pm.meta"
 
@@ -52,6 +60,42 @@ def get_collection(main_window: "AnkiQt") -> "Collection":
             "Collection has not been loaded, yet. Please use load_profile()."
         )
     return collection
+
+
+def apply_anki_profile_state(main_window: "AnkiQt", preset_anki_state: PresetAnkiState):
+    apply_anki_state(
+        main_window=main_window,
+        storage_object=AnkiStorageObject.profile_storage,
+        preset_anki_state=preset_anki_state,
+    )
+
+
+def apply_anki_meta_state(main_window: "AnkiQt", preset_anki_state: PresetAnkiState):
+    apply_anki_state(
+        main_window=main_window,
+        storage_object=AnkiStorageObject.meta_storage,
+        preset_anki_state=preset_anki_state,
+    )
+
+
+def apply_anki_colconf_state(main_window: "AnkiQt", preset_anki_state: PresetAnkiState):
+    apply_anki_state(
+        main_window=main_window,
+        storage_object=AnkiStorageObject.colconf_storage,
+        preset_anki_state=preset_anki_state,
+    )
+
+
+def apply_anki_state(
+    main_window: "AnkiQt",
+    storage_object: AnkiStorageObject,
+    preset_anki_state: PresetAnkiState,
+):
+    data: Optional[Dict[str, Any]] = getattr(preset_anki_state, storage_object.name)
+    if data:
+        set_anki_object_data(
+            main_window=main_window, storage_object=storage_object, data=data
+        )
 
 
 def set_anki_object_data(

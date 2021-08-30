@@ -42,7 +42,7 @@ from ._patch import patch_anki, post_ui_setup_callback_factory
 from ._session import AnkiSession
 from ._types import PathLike
 from ._util import nullcontext
-from ._anki import AnkiStorageObject
+from ._anki import PresetAnkiState, apply_anki_colconf_state, apply_anki_profile_state
 
 
 @contextmanager
@@ -97,7 +97,7 @@ def anki_running(
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
-    anki_configs: Optional[List[Tuple[AnkiStorageObject, Dict[str, Any]]]] = None
+    preset_anki_state: Optional[PresetAnkiState] = None,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
@@ -126,7 +126,7 @@ def anki_running(
             for the specified add-on to. Useful for simulating specific config set-ups.
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
-        anki_configs 
+        anki_configs
 
     Returns:
         Iterator[AnkiSession] -- [description]
@@ -136,24 +136,49 @@ def anki_running(
     """
 
     import aqt
+    from aqt import gui_hooks
     from aqt import _run
 
     with base_directory(base_path, base_name, keep_profile) as anki_base_dir:
 
         # Callback to run between main UI initialization and finishing steps of UI
         # initialization (add-on loading time)
+
         post_ui_setup_callback = post_ui_setup_callback_factory(
             anki_base_dir=anki_base_dir,
             packed_addons=packed_addons,
             unpacked_addons=unpacked_addons,
             addon_configs=addon_configs,
-            anki_configs=anki_configs
+            preset_anki_state=preset_anki_state,
         )
+
+        # Apply preset Anki profile and collection.conf storage on profile load
+
+        def profile_loaded_callback():
+            if not aqt.mw or not preset_anki_state:
+                return
+            apply_anki_profile_state(
+                main_window=aqt.mw, preset_anki_state=preset_anki_state
+            )
+            apply_anki_colconf_state(
+                main_window=aqt.mw, preset_anki_state=preset_anki_state
+            )
+
+        if preset_anki_state and (
+            preset_anki_state.colconf_storage or preset_anki_state.profile_storage
+        ):
+            gui_hooks.profile_did_open.append(profile_loaded_callback)
+            profile_hooked = True
+        else:
+            profile_hooked = False
+
+        # Start Anki session
 
         with patch_anki(post_ui_setup_callback=post_ui_setup_callback):
             with temporary_user(
                 anki_base_dir, profile_name, lang, keep_profile
             ) as user_name:
+
                 # We don't pass in -p <profile> in order to avoid profile loading.
                 # This helps replicate the profile availability at add-on init time
                 # for most users. Anki will automatically open the profile at
@@ -180,6 +205,11 @@ def anki_running(
     # clean up what was spoiled
     if aqt.mw:
         aqt.mw.cleanupAndExit()
+
+    # remove hooks added by pytest-anki
+
+    if profile_hooked:
+        gui_hooks.profile_did_open.remove(profile_loaded_callback)
 
     # remove hooks added during app initialization
     from anki import hooks
