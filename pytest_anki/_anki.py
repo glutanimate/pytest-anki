@@ -121,7 +121,7 @@ def set_anki_object_data(
         main_window=main_window, storage_object=storage_object
     )
 
-    if storage_object == AnkiStorageObject.synced_storage:
+    if storage_object == AnkiStorageObject.colconf_storage:
         # mw.col.conf dict API is deprecated in favor of ConfigManager API
         collection = get_collection(main_window=main_window)
         for key, value in data.items():
