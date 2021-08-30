@@ -31,3 +31,6 @@
 
 class AnkiLaunchException(Exception):
     pass
+
+class AnkiSessionError(Exception):
+    pass

@@ -37,12 +37,12 @@ from contextlib import contextmanager
 from typing import Iterator, List, Optional
 from warnings import warn
 
-
-from ._patch import patch_anki
-from ._util import nullcontext
-from .types import AnkiSession, PathLike, UnpackedAddon
-from .helpers import profile_loaded
 from ._errors import AnkiLaunchException
+from ._patch import patch_anki
+from ._session import AnkiSession
+from ._types import PathLike, UnpackedAddon
+from ._util import nullcontext
+
 
 @contextmanager
 def temporary_user(base_dir: str, name: str, lang: str, keep: bool) -> Iterator[str]:
@@ -142,15 +142,19 @@ def anki_running(
                 # mw.setupProfile time in single-profile setups
                 app = _run(argv=["anki", "-b", base_dir], exec=False)
                 mw = aqt.mw
-                
+
                 if mw is None or app is None:
                     raise AnkiLaunchException("Main window not initialized correctly")
 
                 if force_early_profile_load:
                     mw.pm.openProfile(profile_name)
 
-                with profile_loaded(mw) if load_profile else nullcontext():
-                    yield AnkiSession(app=app, mw=mw, user=user_name, base=base_dir)
+                anki_session = AnkiSession(
+                    app=app, mw=mw, user=user_name, base=base_dir
+                )
+
+                with anki_session.profile_loaded() if load_profile else nullcontext():
+                    yield anki_session
 
     # NOTE: clean up does not seem to work properly in all cases,
     # so use pytest-forked for now

@@ -43,11 +43,8 @@ from aqt.mediasync import MediaSyncer
 from aqt.qt import QMainWindow
 from aqt.taskman import TaskManager
 
-from ._addons import (
-    install_addon_from_folder,
-    install_addon_from_package,
-)
-from .types import PathLike, UnpackedAddon
+from ._addons import install_addon_from_folder, install_addon_from_package
+from ._types import PathLike, UnpackedAddon
 
 if TYPE_CHECKING:
     from anki._backend import RustBackend

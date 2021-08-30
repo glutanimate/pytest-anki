@@ -33,7 +33,7 @@ from pathlib import Path
 
 from aqt.addons import AddonManager
 
-from .types import PathLike
+from ._types import PathLike
 
 
 def _to_path(path: PathLike) -> Path:

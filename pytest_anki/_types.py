@@ -28,44 +28,14 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
-from contextlib import contextmanager
+
+from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterator, List, Union
+from typing import Union
 
-from anki.importing.apkg import AnkiPackageImporter
+PathLike = Union[str, Path]
 
-if TYPE_CHECKING:
-    from anki.collection import Collection
-
-
-@contextmanager
-def deck_installed(
-    file_path: Union[Path, str], collection: "Collection", keep: bool = False
-) -> Iterator[int]:
-
-    old_ids = set(_get_deck_ids(collection=collection))
-
-    importer = AnkiPackageImporter(col=collection, file=str(file_path))
-    importer.run()
-
-    new_ids = set(_get_deck_ids(collection=collection))
-
-    deck_id = next(iter(new_ids - old_ids))
-
-    # deck_id is str on <= 2.1.26
-    yield int(deck_id)
-
-    if keep:
-        return
-
-    try:
-        collection.decks.remove([deck_id])
-    except AttributeError:  # legacy
-        collection.decks.rem(deck_id)
-
-
-def _get_deck_ids(collection: "Collection") -> List[int]:
-    try:
-        return [d.id for d in collection.decks.all_names_and_ids()]
-    except AttributeError:  # legacy
-        return collection.decks.allIds()
+@dataclass
+class UnpackedAddon:
+    path: PathLike
+    package_name: str
