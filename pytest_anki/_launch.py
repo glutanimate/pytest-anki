@@ -42,6 +42,7 @@ from ._patch import patch_anki, post_ui_setup_callback_factory
 from ._session import AnkiSession
 from ._types import PathLike
 from ._util import nullcontext
+from ._anki import AnkiStorageObject
 
 
 @contextmanager
@@ -96,6 +97,7 @@ def anki_running(
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
+    anki_configs: Optional[List[Tuple[AnkiStorageObject, Dict[str, Any]]]] = None
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
@@ -124,6 +126,7 @@ def anki_running(
             for the specified add-on to. Useful for simulating specific config set-ups.
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
+        anki_configs 
 
     Returns:
         Iterator[AnkiSession] -- [description]
@@ -144,6 +147,7 @@ def anki_running(
             packed_addons=packed_addons,
             unpacked_addons=unpacked_addons,
             addon_configs=addon_configs,
+            anki_configs=anki_configs
         )
 
         with patch_anki(post_ui_setup_callback=post_ui_setup_callback):

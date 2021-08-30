@@ -29,7 +29,6 @@
 # Any modifications to this file must keep this entire header intact.
 
 from contextlib import contextmanager
-from enum import Enum
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Union
 
@@ -38,19 +37,18 @@ from anki.importing.apkg import AnkiPackageImporter
 from ._addons import ConfigPaths, create_addon_config
 from ._errors import AnkiSessionError
 from ._types import PathLike
-from ._util import get_nested_attribute
+from ._anki import (
+    get_collection,
+    set_anki_object_data,
+    get_anki_object,
+    AnkiStorageObject,
+)
 
 if TYPE_CHECKING:
     from anki.collection import Collection
     from anki.config import ConfigManager
     from aqt import AnkiApp
     from aqt.main import AnkiQt
-
-
-class AnkiStorageObject(Enum):
-    synced_storage = "col.conf"
-    profile_storage = "pm.profile"
-    meta_storage = "pm.meta"
 
 
 class AnkiSession:
@@ -99,11 +97,7 @@ class AnkiSession:
     @property
     def collection(self) -> "Collection":
         """Returns current Anki collection if loaded"""
-        if self._mw.col is None:
-            raise AnkiSessionError(
-                "Collection has not been loaded, yet. Please use load_profile()."
-            )
-        return self._mw.col
+        return get_collection(self._mw)
 
     def load_profile(self) -> "Collection":
         """Load Anki profile, returning user collection
@@ -229,28 +223,12 @@ class AnkiSession:
 
         This may be used to simulate specific Anki and/or add-on states
         during testing."""
-
-        anki_object = self.get_anki_object(storage_object=storage_object)
-
-        if storage_object == AnkiStorageObject.synced_storage:
-            # mw.col.conf dict API is deprecated in favor of ConfigManager API
-            collection = self.collection
-            for key, value in data.items():
-                collection.set_config(key, value)
-        else:
-            anki_object.update(data)  # type: ignore
-
-        return anki_object
+        return set_anki_object_data(
+            main_window=self._mw, storage_object=storage_object, data=data
+        )
 
     def get_anki_object(
         self, storage_object: AnkiStorageObject
     ) -> Union[Dict[str, Any], "ConfigManager"]:
         """Get Anki object for specified AnkiStorageObject type"""
-        attribute_path = storage_object.value
-        try:
-            return get_nested_attribute(obj=self._mw, attr=attribute_path)
-        except Exception as e:
-            raise AnkiSessionError(
-                f"Anki storage object {storage_object.name} could not be accessed:"
-                f" {str(e)}"
-            )
+        return get_anki_object(main_window=self._mw, storage_object=storage_object)
