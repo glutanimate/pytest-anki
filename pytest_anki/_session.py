@@ -29,14 +29,21 @@
 # Any modifications to this file must keep this entire header intact.
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Callable, Iterator, Optional
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, NamedTuple, Optional
 
 from ._errors import AnkiSessionError
+from ._util import create_json
 
 if TYPE_CHECKING:
     from anki.collection import Collection
     from aqt import AnkiApp
     from aqt.main import AnkiQt
+
+
+class ConfigPaths(NamedTuple):
+    default_config: Path
+    user_config: Optional[Path]
 
 
 class AnkiSession:
@@ -55,6 +62,8 @@ class AnkiSession:
         self._user = user
         self._base = base
 
+    # Key session properties ####
+
     @property
     def app(self) -> "AnkiApp":
         return self._app
@@ -70,6 +79,8 @@ class AnkiSession:
     @property
     def base(self) -> str:
         return self._base
+
+    # Collection and profiles ####
 
     @property
     def collection(self) -> "Collection":
@@ -97,3 +108,47 @@ class AnkiSession:
         yield collection
 
         self.unload_profile()
+
+    # Add-on config handling
+
+    def create_addon_config(
+        self,
+        addon_package: str,
+        default_config: Dict[str, Any],
+        user_config: Optional[Dict[str, Any]],
+    ) -> ConfigPaths:
+        addon_path = Path(self._base) / "addons21" / addon_package
+        addon_path.mkdir(parents=True, exist_ok=True)
+
+        defaults_path = addon_path / "config.json"
+
+        create_json(defaults_path, default_config)
+
+        if user_config is not None:
+            meta_path = addon_path / "meta.json"
+            create_json(meta_path, {"config": user_config})
+        else:
+            meta_path = None
+
+        return ConfigPaths(defaults_path, meta_path)
+
+    @contextmanager
+    def addon_config_created(
+        self,
+        addon_package: str,
+        default_config: Dict[str, Any],
+        user_config: Dict[str, Any],
+    ) -> Iterator[ConfigPaths]:
+        config_paths = self.create_addon_config(
+            addon_package=addon_package,
+            default_config=default_config,
+            user_config=user_config,
+        )
+
+        yield config_paths
+
+        if config_paths.default_config.exists():
+            config_paths.default_config.unlink()
+
+        if config_paths.user_config and config_paths.user_config.exists():
+            config_paths.user_config.unlink()

@@ -40,7 +40,7 @@ _patch_pyvirtualdisplay()
 from .fixtures import anki_session  # noqa: F401
 from .helpers import profile_loaded  # noqa: F401
 from .types import UnpackedAddon  # noqa: F401
-from ._config import local_addon_config, update_anki_config  # noqa: F401
+from ._config import update_anki_config  # noqa: F401
 from ._decks import deck_installed  # noqa: F401
 from ._session import AnkiSession  # noqa: F401
 
