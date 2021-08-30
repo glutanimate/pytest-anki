@@ -164,15 +164,15 @@ class AnkiSession:
         except AttributeError:  # legacy
             return self.collection.decks.allIds()
 
-    # Add-on config handling
+    # Add-on config handling ####
 
     def create_addon_config(
         self,
-        addon_package: str,
+        package_name: str,
         default_config: Dict[str, Any],
         user_config: Optional[Dict[str, Any]],
     ) -> ConfigPaths:
-        addon_path = Path(self._base) / "addons21" / addon_package
+        addon_path = Path(self._base) / "addons21" / package_name
         addon_path.mkdir(parents=True, exist_ok=True)
 
         defaults_path = addon_path / "config.json"
@@ -190,12 +190,12 @@ class AnkiSession:
     @contextmanager
     def addon_config_created(
         self,
-        addon_package: str,
+        package_name: str,
         default_config: Dict[str, Any],
         user_config: Dict[str, Any],
     ) -> Iterator[ConfigPaths]:
         config_paths = self.create_addon_config(
-            addon_package=addon_package,
+            package_name=package_name,
             default_config=default_config,
             user_config=user_config,
         )
