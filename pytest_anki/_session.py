@@ -70,7 +70,10 @@ class AnkiStorageObject(Enum):
 
 class AnkiSession:
     def __init__(self, app: "AnkiApp", mw: "AnkiQt", user: str, base: str):
-        """Anki test session
+        """Anki test session object, returned by anki_session fixture.
+
+        Contains a number of helpful properties and methods to characterize and
+        interact with a running Anki test session.
 
         Arguments:
             app {AnkiApp} -- Anki QApplication instance
@@ -88,24 +91,29 @@ class AnkiSession:
 
     @property
     def app(self) -> "AnkiApp":
+        """Anki's current QApplication instance"""
         return self._app
 
     @property
     def mw(self) -> "AnkiQt":
+        """Anki's current main window instance"""
         return self._mw
 
     @property
     def user(self) -> str:
+        """The current user profile name (e.g. 'User 1')"""
         return self._user
 
     @property
     def base(self) -> str:
+        """Path to Anki base directory"""
         return self._base
 
     # Collection and profiles ####
 
     @property
     def collection(self) -> "Collection":
+        """Returns current Anki collection if loaded"""
         if self._mw.col is None:
             raise AnkiSessionError(
                 "Collection has not been loaded, yet. Please use load_profile()."
@@ -113,18 +121,27 @@ class AnkiSession:
         return self._mw.col
 
     def load_profile(self) -> "Collection":
+        """Load Anki profile, returning user collection
+
+        Note: In a multi-profile configuration this method will raise the profile
+        selection dialog, blocking until a profile is selected via UI interaction
+        """
         self._mw.setupProfile()
         if self._mw.col is None:
             raise AnkiSessionError("Could not load collection")
         return self._mw.col
 
     def unload_profile(self, on_profile_unloaded: Optional[Callable] = None):
+        """Unload current profile, optionally running a callback when profile
+        unload complete"""
         if on_profile_unloaded is None:
             on_profile_unloaded = lambda *args, **kwargs: None  # noqa: E731
         self._mw.unloadProfile(on_profile_unloaded)
 
     @contextmanager
     def profile_loaded(self) -> Iterator["Collection"]:
+        """Context manager that takes care of loading and then tearing down
+        user profile"""
         collection = self.load_profile()
 
         yield collection
@@ -134,6 +151,7 @@ class AnkiSession:
     # Deck management ####
 
     def install_deck(self, path: PathLike) -> int:
+        """Install deck from specified .apkg file, returning deck ID"""
         old_ids = set(self._get_deck_ids())
 
         importer = AnkiPackageImporter(col=self.collection, file=str(path))
@@ -146,6 +164,7 @@ class AnkiSession:
         return deck_id
 
     def remove_deck(self, deck_id: int):
+        """Remove deck as specified by provided deck ID"""
         try:  # 2.1.28+
             self.collection.decks.remove([deck_id])
         except AttributeError:  # legacy
@@ -153,6 +172,8 @@ class AnkiSession:
 
     @contextmanager
     def deck_installed(self, path: PathLike) -> Iterator[int]:
+        """Context manager that takes care of installing deck and then removing
+        it upon context completion"""
         deck_id = self.install_deck(path=path)
 
         yield deck_id
@@ -168,6 +189,7 @@ class AnkiSession:
     # Add-on loading ####
 
     def load_addon(self, package_name: str) -> ModuleType:
+        """Dynamically import an add-on as specified by its package name"""
         addon_package = __import__(package_name)
         return addon_package
 
@@ -179,6 +201,8 @@ class AnkiSession:
         default_config: Dict[str, Any],
         user_config: Optional[Dict[str, Any]],
     ) -> ConfigPaths:
+        """Create and populate the config.json and meta.json configuration
+        files for an add-on, as specified by its package name"""
         addon_path = Path(self._base) / "addons21" / package_name
         addon_path.mkdir(parents=True, exist_ok=True)
 
@@ -201,6 +225,9 @@ class AnkiSession:
         default_config: Dict[str, Any],
         user_config: Dict[str, Any],
     ) -> Iterator[ConfigPaths]:
+        """Context manager that takes care of creating the configuration files
+        for an add-on, as specified by its package name, and then deleting them
+        upon context exit."""
         config_paths = self.create_addon_config(
             package_name=package_name,
             default_config=default_config,
@@ -215,9 +242,15 @@ class AnkiSession:
         if config_paths.user_config and config_paths.user_config.exists():
             config_paths.user_config.unlink()
 
+    # Anki config object handling ####
+
     def set_anki_object_data(
         self, storage_object: AnkiStorageObject, data: dict
     ) -> Union[Dict[str, Any], "ConfigManager"]:
+        """Update the data of a specified Anki storage object
+
+        This may be used to simulate specific Anki and/or add-on states
+        during testing."""
 
         anki_object = self.get_anki_object(storage_object=storage_object)
 
@@ -234,6 +267,7 @@ class AnkiSession:
     def get_anki_object(
         self, storage_object: AnkiStorageObject
     ) -> Union[Dict[str, Any], "ConfigManager"]:
+        """Get Anki object for specified AnkiStorageObject type"""
         attribute_path = storage_object.value
         try:
             return get_nested_attribute(obj=self._mw, attr=attribute_path)
