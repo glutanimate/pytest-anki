@@ -46,7 +46,7 @@ from typing import (
 
 from ._errors import AnkiSessionError
 from ._util import create_json, get_nested_attribute
-from .types import PathLike
+from ._types import PathLike
 from anki.importing.apkg import AnkiPackageImporter
 
 if TYPE_CHECKING:
