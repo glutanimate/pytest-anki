@@ -159,7 +159,8 @@ class AnkiSession:
 
         new_ids = set(self._get_deck_ids())
 
-        deck_id = next(iter(new_ids - old_ids))
+        # deck IDs are strings on <=2.1.26
+        deck_id = int(next(iter(new_ids - old_ids)))
 
         return deck_id
 
