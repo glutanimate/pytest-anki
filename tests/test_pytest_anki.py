@@ -32,8 +32,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_anki import AnkiSession, profile_loaded
-from pytest_anki import deck_installed
+from pytest_anki import AnkiSession
 
 
 @pytest.mark.forked
@@ -65,7 +64,7 @@ def test_load_profile(anki_session: AnkiSession):
 
     assert anki_session.mw.col is None
 
-    with profile_loaded(anki_session.mw):
+    with anki_session.profile_loaded():
         assert isinstance(anki_session.mw.col, _Collection)
 
     assert anki_session.mw.col is None
@@ -96,7 +95,7 @@ def test_profile_hooks(anki_session: AnkiSession):
     addHook("profileLoaded", onProfileLoaded)
     addHook("unloadProfile", onProfileUnload)
 
-    with profile_loaded(anki_session.mw):
+    with anki_session.profile_loaded():
         assert foo is True
 
     assert foo is False
@@ -109,7 +108,7 @@ _deck_path = Path(__file__).parent / "samples" / "sample_deck.apkg"
 @pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
 def test_deck_imported(anki_session: AnkiSession):
     collection = anki_session.collection
-    with deck_installed(file_path=_deck_path, collection=collection) as deck_id:
+    with anki_session.deck_installed(path=_deck_path) as deck_id:
         deck = collection.decks.get(did=deck_id)
         assert deck is not None
         assert deck["id"] == deck_id

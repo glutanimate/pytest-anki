@@ -47,7 +47,7 @@ from ._addons import (
     install_addon_from_folder,
     install_addon_from_package,
 )
-from .types import PathLike, UnpackedAddon
+from ._types import PathLike, UnpackedAddon
 
 if TYPE_CHECKING:
     from anki._backend import RustBackend

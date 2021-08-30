@@ -210,7 +210,7 @@ class AnkiSession:
 
     def set_anki_object_data(
         self, storage_object: AnkiStorageObject, data: dict
-    ) -> Union[Dict[str, Any], ConfigManager]:
+    ) -> Union[Dict[str, Any], "ConfigManager"]:
 
         anki_object = self.get_anki_object(storage_object=storage_object)
 
@@ -226,7 +226,7 @@ class AnkiSession:
 
     def get_anki_object(
         self, storage_object: AnkiStorageObject
-    ) -> Union[Dict[str, Any], ConfigManager]:
+    ) -> Union[Dict[str, Any], "ConfigManager"]:
         attribute_path = storage_object.value
         try:
             return get_nested_attribute(obj=self._mw, attr=attribute_path)
