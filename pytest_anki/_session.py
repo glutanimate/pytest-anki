@@ -30,7 +30,6 @@
 
 from contextlib import contextmanager
 from enum import Enum
-
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -44,10 +43,11 @@ from typing import (
     Union,
 )
 
-from ._errors import AnkiSessionError
-from ._util import create_json, get_nested_attribute
-from ._types import PathLike
 from anki.importing.apkg import AnkiPackageImporter
+
+from ._errors import AnkiSessionError
+from ._types import PathLike
+from ._util import create_json, get_nested_attribute
 
 if TYPE_CHECKING:
     from anki.collection import Collection

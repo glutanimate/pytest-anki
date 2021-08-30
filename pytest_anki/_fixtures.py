@@ -35,6 +35,7 @@ import pytest
 from ._launch import anki_running
 from ._session import AnkiSession
 
+
 @pytest.fixture
 def anki_session(request) -> Iterator[AnkiSession]:
     """Fixture that instantiates Anki, yielding an AnkiSession object

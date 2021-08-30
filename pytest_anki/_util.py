@@ -28,11 +28,10 @@
 # Any modifications to this file must keep this entire header intact.
 
 import json
-from pathlib import Path
-from typing import Union, Iterator, Any
-from functools import reduce
-
 from contextlib import contextmanager
+from functools import reduce
+from pathlib import Path
+from typing import Any, Iterator, Union
 
 
 @contextmanager
