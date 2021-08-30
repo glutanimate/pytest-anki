@@ -29,14 +29,25 @@
 # Any modifications to this file must keep this entire header intact.
 
 from contextlib import contextmanager
+from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, NamedTuple, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    NamedTuple,
+    Optional,
+    Union,
+)
 
 from ._errors import AnkiSessionError
-from ._util import create_json
+from ._util import create_json, get_nested_attribute
 
 if TYPE_CHECKING:
     from anki.collection import Collection
+    from anki.config import ConfigManager
     from aqt import AnkiApp
     from aqt.main import AnkiQt
 
@@ -44,6 +55,12 @@ if TYPE_CHECKING:
 class ConfigPaths(NamedTuple):
     default_config: Path
     user_config: Optional[Path]
+
+
+class AnkiStorageObject(Enum):
+    synced_storage = "col.conf"
+    profile_storage = "pm.profile"
+    meta_storage = "pm.meta"
 
 
 class AnkiSession:
@@ -152,3 +169,31 @@ class AnkiSession:
 
         if config_paths.user_config and config_paths.user_config.exists():
             config_paths.user_config.unlink()
+
+    def set_anki_object_data(
+        self, storage_object: AnkiStorageObject, data: dict
+    ) -> Union[Dict[str, Any], ConfigManager]:
+
+        anki_object = self.get_anki_object(storage_object=storage_object)
+
+        if storage_object == AnkiStorageObject.synced_storage:
+            # mw.col.conf dict API is deprecated in favor of ConfigManager API
+            collection = self.collection
+            for key, value in data.items():
+                collection.set_config(key, value)
+        else:
+            anki_object.update(data)  # type: ignore
+
+        return anki_object
+
+    def get_anki_object(
+        self, storage_object: AnkiStorageObject
+    ) -> Union[Dict[str, Any], ConfigManager]:
+        attribute_path = storage_object.value
+        try:
+            return get_nested_attribute(obj=self._mw, attr=attribute_path)
+        except Exception as e:
+            raise AnkiSessionError(
+                f"Anki storage object {storage_object.name} could not be accessed:"
+                f" {str(e)}"
+            )
