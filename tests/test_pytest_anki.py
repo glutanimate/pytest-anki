@@ -40,7 +40,7 @@ from pytest_anki import deck_installed
 def test_anki_session_types(anki_session: AnkiSession):
     from aqt import AnkiApp
     from aqt.main import AnkiQt
-    
+
     assert isinstance(anki_session.app, AnkiApp)
     assert isinstance(anki_session.mw, AnkiQt)
     assert isinstance(anki_session.user, str)
@@ -104,13 +104,12 @@ def test_profile_hooks(anki_session: AnkiSession):
 
 _deck_path = Path(__file__).parent / "samples" / "sample_deck.apkg"
 
+
 @pytest.mark.forked
 @pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
 def test_deck_imported(anki_session: AnkiSession):
-    collection = anki_session.mw.col
-    with deck_installed(
-        file_path=_deck_path, collection=anki_session.mw.col
-    ) as deck_id:
+    collection = anki_session.collection
+    with deck_installed(file_path=_deck_path, collection=collection) as deck_id:
         deck = collection.decks.get(did=deck_id)
         assert deck is not None
         assert deck["id"] == deck_id

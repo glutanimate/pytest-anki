@@ -71,6 +71,14 @@ class AnkiSession:
     def base(self) -> str:
         return self._base
 
+    @property
+    def collection(self) -> "Collection":
+        if self._mw.col is None:
+            raise AnkiSessionError(
+                "Collection has not been loaded, yet. Please use load_profile()."
+            )
+        return self._mw.col
+
     def load_profile(self) -> "Collection":
         self._mw.setupProfile()
         if self._mw.col is None:
