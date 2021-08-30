@@ -132,10 +132,10 @@ class AnkiSession:
 
     # Deck management ####
 
-    def install_deck(self, file_path: PathLike) -> int:
+    def install_deck(self, path: PathLike) -> int:
         old_ids = set(self._get_deck_ids())
 
-        importer = AnkiPackageImporter(col=self.collection, file=str(file_path))
+        importer = AnkiPackageImporter(col=self.collection, file=str(path))
         importer.run()
 
         new_ids = set(self._get_deck_ids())
@@ -151,8 +151,8 @@ class AnkiSession:
             self.collection.decks.rem(deck_id)
 
     @contextmanager
-    def deck_installed(self, file_path: PathLike) -> Iterator[int]:
-        deck_id = self.install_deck(file_path=file_path)
+    def deck_installed(self, path: PathLike) -> Iterator[int]:
+        deck_id = self.install_deck(path=path)
 
         yield deck_id
 
