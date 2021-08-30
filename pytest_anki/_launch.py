@@ -104,29 +104,55 @@ def anki_running(
     Keyword Arguments:
         base_path {str} -- Path to write Anki base folder to
             (default: system-wide temporary directory)
+        
         base_name {str} -- Base folder name (default: {"anki_base"})
+        
         profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
+        
         keep_profile {bool} -- Whether to preserve profile at context exit
             (default: {False})
+        
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
+        
         force_early_profile_load {bool} -- Whether to load Anki profile at app
             initialization time (without collection). Replicates the behavior when
             passing profile as a CLI argument (default: {False})
+        
         lang {str} -- Language to use for the user profile (default: {"en_US"})
+        
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
+        
         unpacked_addons {Optional[List[Tuple[str, PathLike]]]}:
             List of unpacked add-ons that should be installed ahead of starting Anki.
             Add-ons need to be specified as tuple of the add-on package name under which
             to install the add-on, and the path to the source folder (the package
             folder containing the add-on __init__.py)
+        
         addon_configs {Optional[List[Tuple[str, Dict[str, Any]]]]}:
             List of add-on package names and config values to set the user configuration
             for the specified add-on to. Useful for simulating specific config set-ups.
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
-        anki_configs
+        
+        preset_anki_state Optional[PresetAnkiState]:
+            Allows pre-configuring Anki object state, as described by a PresetAnkiState
+            dataclass. This includes the three main configuration storages used by
+            add-ons, mw.col.conf (colconf_strage), mw.pm.profile (profile_storage),
+            and mw.pm.meta (meta_storage).
+            
+            The provided data is applied on top of the existing data in each case
+            (i.e. in the same way as dict.update(new_data) would).
+            
+            State specified in this manner is guaranteed to be pre-configured ahead of
+            add-on load time (in the case of meta_storage), or ahead of
+            gui_hooks.profile_did_open fire time (in the case of colconf_storage and
+            profile_storage).
+            
+            Please note that, in the case of colconf_storage and profile_storage, the
+            caller is responsible for either passing 'load_profile=True', or manually
+            loading the profile at a later stage.
 
     Returns:
         Iterator[AnkiSession] -- [description]

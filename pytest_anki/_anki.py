@@ -43,6 +43,17 @@ if TYPE_CHECKING:
 
 @dataclass
 class PresetAnkiState:
+    
+    """
+    Specifies Anki object state to be pre-configured for the test session.
+    
+    This includes the three main configuration storages used by add-ons:
+    
+    - mw.col.conf (colconf_storage), available at profile load time
+    - mw.pm.profile (profile_storage), available at profile load time
+    - mw.pm.meta (meta_storage), available at add-on load time
+    """
+    
     colconf_storage: Optional[Dict[str, Any]] = None
     profile_storage: Optional[Dict[str, Any]] = None
     meta_storage: Optional[Dict[str, Any]] = None
