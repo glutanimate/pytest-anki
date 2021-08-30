@@ -39,7 +39,7 @@ from ._session import AnkiSession  # noqa: F401
 
 # Argument types:
 
-from ._anki import PresetAnkiState  # noqa: F401
+from ._anki import PresetAnkiState, AnkiStorageObject  # noqa: F401
 
 __version__ = "1.0.0-dev.1"
 __author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
