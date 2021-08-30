@@ -40,9 +40,10 @@ from warnings import warn
 
 from ._patch import patch_anki
 from ._util import nullcontext
-from .types import AnkiSession, PathLike, UnpackedAddon
+from .types import PathLike, UnpackedAddon
 from .helpers import profile_loaded
 from ._errors import AnkiLaunchException
+from ._session import AnkiSession
 
 @contextmanager
 def temporary_user(base_dir: str, name: str, lang: str, keep: bool) -> Iterator[str]:

@@ -31,29 +31,9 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import NamedTuple, Union
-
-from aqt import AnkiApp
-from aqt.main import AnkiQt
+from typing import Union
 
 PathLike = Union[str, Path]
-
-
-class AnkiSession(NamedTuple):
-    """Named tuple characterizing an Anki test session
-
-    Arguments:
-        app {AnkiApp} -- Anki QApplication instance
-        mw {AnkiQt} -- Anki QMainWindow instance
-        user {str} -- User profile name (e.g. "User 1")
-        base {str} -- Path to Anki base directory
-    """
-
-    app: AnkiApp
-    mw: AnkiQt
-    user: str
-    base: str
-
 
 @dataclass
 class UnpackedAddon:
