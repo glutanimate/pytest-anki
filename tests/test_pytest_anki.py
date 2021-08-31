@@ -34,7 +34,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_anki import AnkiSession
+from pytest_anki import AnkiSession, AnkiStateUpdate
 
 # General tests ####
 
@@ -119,11 +119,7 @@ for path in _simple_addons_path.iterdir():
 @pytest.mark.forked
 @pytest.mark.parametrize(
     "anki_session",
-    [
-        dict(
-            packed_addons=_packed_addons, unpacked_addons=_unpacked_addons
-        )
-    ],
+    [dict(packed_addons=_packed_addons, unpacked_addons=_unpacked_addons)],
     indirect=True,
 )
 def test_can_install_addons(anki_session: AnkiSession):
@@ -136,7 +132,8 @@ def test_can_install_addons(anki_session: AnkiSession):
         assert getattr(main_window, package) is True
 
 
-_state_checker_addon_path = _addons_path / "advanced" / "state_checker_addon"
+_state_checker_addon_package = "state_checker_addon"
+_state_checker_addon_path = _addons_path / "advanced" / _state_checker_addon_package
 
 _unpacked_addons = []
 _addon_configs = []
@@ -144,10 +141,8 @@ _addon_configs = []
 _config_key = "foo"
 
 for addon_copy in range(2):
-    package_name = f"state_checker_addon_{addon_copy}"
-    config = {
-        _config_key: addon_copy
-    }
+    package_name = f"{_state_checker_addon_package}_{addon_copy}"
+    config = {_config_key: addon_copy}
     _unpacked_addons.append((package_name, _state_checker_addon_path))
     _addon_configs.append((package_name, config))
 
@@ -161,9 +156,42 @@ for addon_copy in range(2):
 def test_can_configure_addons(anki_session: AnkiSession):
     addon_manager = anki_session.mw.addonManager
     for package_name, config in _addon_configs:
-        addon_package = __import__(package_name)
-        assert addon_package.config == config
+        addon = __import__(package_name)
+        assert addon.config == config
         assert addon_manager.getConfig(package_name) == config
+
+
+_my_anki_state = AnkiStateUpdate(
+    meta_storage={_state_checker_addon_package: True},
+)
+
+
+@pytest.mark.forked
+@pytest.mark.parametrize(
+    "anki_session",
+    [
+        dict(
+            unpacked_addons=[(_state_checker_addon_package, _state_checker_addon_path)],
+        )
+    ],
+    indirect=True,
+)
+def test_can_preset_anki_state(anki_session: AnkiSession):
+    # We want to assert that the pre-configured state reaches add-ons, so we
+    # use a sample add-on to record all state at its execution time and
+    # then run our assertions against that.
+
+    addon = __import__(_state_checker_addon_package)
+
+    # assert addon.meta_storage == _my_anki_state.meta_storage
+
+    # Profile and collection are not loaded, yet:
+    assert addon.profile_storage is None
+    assert addon.colconf_storage is None
+
+    with anki_session.profile_loaded():
+        assert addon.profile_storage == _my_anki_state.profile_storage
+        assert addon.colconf_storage == _my_anki_state.colconf_storage
 
 
 ########
