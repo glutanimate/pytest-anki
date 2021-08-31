@@ -14,6 +14,7 @@ check:
 
 lint:
 	python -m flake8 $(PACKAGE)
+	python -m black --check $(PACKAGE)
 
 format:
 	python -m isort $(PACKAGE)
