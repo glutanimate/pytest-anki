@@ -1,5 +1,14 @@
 name: tests
 
+env:
+  # LATEST variables specify the set-up for the latest tested Anki version
+  # TODO: have these automatically be updated once a new Anki tag is pushed
+  # and it passes pytest_anki's test suite
+  LATEST_ANKI: 2.1.47
+  LATEST_PYTHON: 3.8.1
+  LATEST_PYQT: 5.15.1
+  LATEST_PYQTWEBENGINE: 5.15.1
+
 on:
   pull_request:
     paths-ignore:
@@ -15,32 +24,31 @@ jobs:
     strategy:
       matrix:
         include:
-            - anki: 2.1.47
-              python: 3.8.1
-              pyqt: 5.15.1
-              pyqtwebengine: 5.15.1
-            - anki: 2.1.44
-              python: 3.8.1
-              pyqt: 5.14.2
-              pyqtwebengine: 5.14.0
-            - anki: 2.1.35
-              python: 3.8.0
-              pyqt: 5.14.2
-              pyqtwebengine: 5.14.0
-            - anki: 2.1.28
-              python: 3.8.0
-              pyqt: 5.15.0
-              pyqtwebengine: 5.15.0
-            - anki: 2.1.26
-              python: 3.8.0
-              pyqt: 5.13.1
-              pyqtwebengine: 5.13.1
+          - anki: ${{ env.LATEST_ANKI }}
+            python: ${{ env.LATEST_PYTHON }}
+            pyqt: ${{ env.LATEST_PYQT }}
+            pyqtwebengine: ${{ env.LATEST_PYQTWEBENGINE }}
+          - anki: 2.1.44
+            python: 3.8.1
+            pyqt: 5.14.2
+            pyqtwebengine: 5.14.0
+          - anki: 2.1.35
+            python: 3.8.0
+            pyqt: 5.14.2
+            pyqtwebengine: 5.14.0
+          - anki: 2.1.28
+            python: 3.8.0
+            pyqt: 5.15.0
+            pyqtwebengine: 5.15.0
+          - anki: 2.1.26
+            python: 3.8.0
+            pyqt: 5.13.1
+            pyqtwebengine: 5.13.1
 
     steps:
-      # Qt5 requires a number of X11-related dependencies to be installed system-wide
-      # Rather than installing each individually, we install libqt5 system-wide which
-      # in turn takes care of installing all deps also needed for the pypi-version of
-      # Qt5
+      # Qt5 requires a number of X11-related dependencies to be installed system-wide.
+      # Rather than installing each individually, we install libqt5 on the machine which
+      # in turn takes care of installing all deps also needed for the PyPI version of Qt5
       - name: Install xvfb / qt dependencies
         run: |
           sudo apt-get install libqt5gui5
@@ -71,3 +79,44 @@ jobs:
       - name: Run tests for Anki ${{ matrix.anki }}
         run: |
           make test
+
+  lint-and-check:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          - anki: ${{ env.LATEST_ANKI }}
+            python: ${{ env.LATEST_PYTHON }}
+            pyqt: ${{ env.LATEST_PYQT }}
+            pyqtwebengine: ${{ env.LATEST_PYQTWEBENGINE }}
+    steps:
+      - name: Checkout pytest-anki
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.1.8
+          virtualenvs-create: false
+
+      - name: Set up pytest-anki
+        run: |
+          make install
+
+      - name: Set up Anki ${{ matrix.anki }}
+        run: |
+          pip install --upgrade setuptools pip
+          pip install --upgrade PyQt5==${{ matrix.pyqt }} PyQtWebEngine==${{ matrix.pyqtwebengine }} anki==${{ matrix.anki }} aqt==${{ matrix.anki }}
+
+      - name: Run type checker for Anki ${{ matrix.anki }}
+        run: |
+          make check
+
+      - name: Run linter for Anki ${{ matrix.anki }}
+        run: |
+          make lint
