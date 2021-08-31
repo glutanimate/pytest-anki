@@ -36,10 +36,8 @@ from anki.importing.apkg import AnkiPackageImporter
 
 from ._addons import ConfigPaths, create_addon_config
 from ._anki import (
-    AnkiStorageObject,
-    PresetAnkiState,
-    apply_anki_state,
-    get_anki_object,
+    AnkiStateUpdate,
+    update_anki_state,
     get_collection,
 )
 from ._errors import AnkiSessionError
@@ -47,7 +45,6 @@ from ._types import PathLike
 
 if TYPE_CHECKING:
     from anki.collection import Collection
-    from anki.config import ConfigManager
     from aqt import AnkiApp
     from aqt.main import AnkiQt
 
@@ -217,5 +214,5 @@ class AnkiSession:
 
     # Anki config object handling ####
 
-    def apply_anki_state(self, preset_anki_state: PresetAnkiState):
-        apply_anki_state(main_window=self._mw, preset_anki_state=preset_anki_state)
+    def update_anki_state(self, anki_state_update: AnkiStateUpdate):
+        update_anki_state(main_window=self._mw, anki_state_update=anki_state_update)

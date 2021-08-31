@@ -53,7 +53,7 @@ from ._addons import (
     install_addon_from_folder,
     install_addon_from_package,
 )
-from ._anki import PresetAnkiState, apply_anki_meta_state
+from ._anki import AnkiStateUpdate, update_anki_meta_state
 from ._types import PathLike
 
 PostUISetupCallbackType = Callable[[AnkiQt], None]
@@ -64,7 +64,7 @@ def post_ui_setup_callback_factory(
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
-    preset_anki_state: Optional[PresetAnkiState] = None,
+    preset_anki_state: Optional[AnkiStateUpdate] = None,
 ):
     def post_ui_setup_callback(main_window: AnkiQt):
         """Initialize add-on manager, install add-ons, load add-ons"""
@@ -93,8 +93,8 @@ def post_ui_setup_callback_factory(
                 )
 
         if preset_anki_state and preset_anki_state.meta_storage:
-            apply_anki_meta_state(
-                main_window=main_window, preset_anki_state=preset_anki_state
+            update_anki_meta_state(
+                main_window=main_window, anki_state_update=preset_anki_state
             )
 
         main_window.addonManager.loadAddons()

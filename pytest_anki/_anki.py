@@ -42,7 +42,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class PresetAnkiState:
+class AnkiStateUpdate:
 
     """
     Specifies Anki object state to be pre-configured for the test session.
@@ -73,56 +73,56 @@ def get_collection(main_window: "AnkiQt") -> "Collection":
     return collection
 
 
-def apply_anki_profile_state(main_window: "AnkiQt", preset_anki_state: PresetAnkiState):
-    _apply_single_anki_state(
+def update_anki_profile_state(main_window: "AnkiQt", anki_state_update: AnkiStateUpdate):
+    _update_single_anki_state(
         main_window=main_window,
         storage_object=AnkiStorageObject.profile_storage,
-        preset_anki_state=preset_anki_state,
+        anki_state_update=anki_state_update,
     )
 
 
-def apply_anki_meta_state(main_window: "AnkiQt", preset_anki_state: PresetAnkiState):
-    _apply_single_anki_state(
+def update_anki_meta_state(main_window: "AnkiQt", anki_state_update: AnkiStateUpdate):
+    _update_single_anki_state(
         main_window=main_window,
         storage_object=AnkiStorageObject.meta_storage,
-        preset_anki_state=preset_anki_state,
+        anki_state_update=anki_state_update,
     )
 
 
-def apply_anki_colconf_state(main_window: "AnkiQt", preset_anki_state: PresetAnkiState):
-    _apply_single_anki_state(
+def update_anki_colconf_state(main_window: "AnkiQt", anki_state_update: AnkiStateUpdate):
+    _update_single_anki_state(
         main_window=main_window,
         storage_object=AnkiStorageObject.colconf_storage,
-        preset_anki_state=preset_anki_state,
+        anki_state_update=anki_state_update,
     )
 
 
-def _apply_single_anki_state(
+def _update_single_anki_state(
     main_window: "AnkiQt",
     storage_object: AnkiStorageObject,
-    preset_anki_state: PresetAnkiState,
+    anki_state_update: AnkiStateUpdate,
 ):
-    data: Optional[Dict[str, Any]] = getattr(preset_anki_state, storage_object.name)
+    data: Optional[Dict[str, Any]] = getattr(anki_state_update, storage_object.name)
     if data:
         set_anki_object_data(
             main_window=main_window, storage_object=storage_object, data=data
         )
 
 
-def apply_anki_state(main_window: "AnkiQt", preset_anki_state: PresetAnkiState):
-    if preset_anki_state.meta_storage:
-        apply_anki_meta_state(
-            main_window=main_window, preset_anki_state=preset_anki_state
+def update_anki_state(main_window: "AnkiQt", anki_state_update: AnkiStateUpdate):
+    if anki_state_update.meta_storage:
+        update_anki_meta_state(
+            main_window=main_window, anki_state_update=anki_state_update
         )
 
-    if preset_anki_state.profile_storage:
-        apply_anki_profile_state(
-            main_window=main_window, preset_anki_state=preset_anki_state
+    if anki_state_update.profile_storage:
+        update_anki_profile_state(
+            main_window=main_window, anki_state_update=anki_state_update
         )
 
-    if preset_anki_state.colconf_storage:
-        apply_anki_colconf_state(
-            main_window=main_window, preset_anki_state=preset_anki_state
+    if anki_state_update.colconf_storage:
+        update_anki_colconf_state(
+            main_window=main_window, anki_state_update=anki_state_update
         )
 
 

@@ -86,7 +86,7 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
 
-        preset_anki_state Optional[PresetAnkiState]:
+        preset_anki_state {Optional[pytest_anki.AnkiStateUpdate]}:
             Allows pre-configuring Anki object state, as described by a PresetAnkiState
             dataclass. This includes the three main configuration storages used by
             add-ons, mw.col.conf (colconf_strage), mw.pm.profile (profile_storage),

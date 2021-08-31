@@ -37,7 +37,7 @@ from contextlib import contextmanager
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 from warnings import warn
 
-from ._anki import PresetAnkiState, apply_anki_colconf_state, apply_anki_profile_state
+from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
 from ._errors import AnkiLaunchException
 from ._patch import patch_anki, post_ui_setup_callback_factory
 from ._session import AnkiSession
@@ -97,7 +97,7 @@ def anki_running(
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
-    preset_anki_state: Optional[PresetAnkiState] = None,
+    preset_anki_state: Optional[AnkiStateUpdate] = None,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
@@ -136,7 +136,7 @@ def anki_running(
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
 
-        preset_anki_state Optional[PresetAnkiState]:
+        preset_anki_state {Optional[pytest_anki.AnkiStateUpdate]}:
             Allows pre-configuring Anki object state, as described by a PresetAnkiState
             dataclass. This includes the three main configuration storages used by
             add-ons, mw.col.conf (colconf_strage), mw.pm.profile (profile_storage),
@@ -182,11 +182,11 @@ def anki_running(
         def profile_loaded_callback():
             if not aqt.mw or not preset_anki_state:
                 return
-            apply_anki_profile_state(
-                main_window=aqt.mw, preset_anki_state=preset_anki_state
+            update_anki_profile_state(
+                main_window=aqt.mw, anki_state_update=preset_anki_state
             )
-            apply_anki_colconf_state(
-                main_window=aqt.mw, preset_anki_state=preset_anki_state
+            update_anki_colconf_state(
+                main_window=aqt.mw, anki_state_update=preset_anki_state
             )
 
         if preset_anki_state and (
