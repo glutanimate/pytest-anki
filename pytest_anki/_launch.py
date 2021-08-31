@@ -82,9 +82,8 @@ def anki_running(
     base_path: str = tempfile.gettempdir(),
     base_name: str = "anki_base",
     profile_name: str = "User 1",
-    load_profile: bool = False,
-    force_early_profile_load: bool = False,
     lang: str = "en_US",
+    load_profile: bool = False,
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
@@ -102,10 +101,6 @@ def anki_running(
 
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
-
-        force_early_profile_load {bool} -- Whether to load Anki profile at app
-            initialization time (without collection). Replicates the behavior when
-            passing profile as a CLI argument (default: {False})
 
         lang {str} -- Language to use for the user profile (default: {"en_US"})
 
@@ -202,15 +197,13 @@ def anki_running(
                 if mw is None or app is None:
                     raise AnkiLaunchException("Main window not initialized correctly")
 
-                if force_early_profile_load:
-                    mw.pm.openProfile(profile_name)
-
                 anki_session = AnkiSession(
                     app=app, mw=mw, user=user_name, base=anki_base_dir
                 )
 
                 if not load_profile:
                     yield anki_session
+                
                 else:
                     with anki_session.profile_loaded():
                         yield anki_session
