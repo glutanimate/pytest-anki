@@ -38,10 +38,14 @@ pylint = "^2.10.2"
 mypy = "^0.910"
 isort = "^5.9.3"
 flake8 = "^3.9.2"
+pytest-qt = "^4.0.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+qt_api = "pyqt5"
 
 [tool.mypy]
 show_error_codes = true

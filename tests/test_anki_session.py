@@ -32,14 +32,20 @@
 Tests for all pytest fixtures provided by the plug-in
 """
 
+from typing import TYPE_CHECKING
+
 from pathlib import Path
 
 import pytest
 
 from pytest_anki import AnkiSession, AnkiSessionError
 
+if TYPE_CHECKING:
+    from pytestqt.qtbot import QtBot
+
 
 # General tests ####
+
 
 @pytest.mark.forked
 def test_anki_session_launches(anki_session: AnkiSession):
@@ -52,15 +58,14 @@ def test_anki_session_launches(anki_session: AnkiSession):
     assert isinstance(anki_session.base, str)
 
 
-
 # AnkiSession API ####
 
 
 @pytest.mark.forked
-def test_collection_loading_unloading(anki_session: AnkiSession):
+def test_collection_loading_unloading(anki_session: AnkiSession, qtbot: "QtBot"):
     from anki.collection import Collection
     from aqt import gui_hooks
-    
+
     is_profile_loaded = False
 
     def on_profile_did_open():
@@ -70,16 +75,16 @@ def test_collection_loading_unloading(anki_session: AnkiSession):
     def on_profile_will_close():
         nonlocal is_profile_loaded
         is_profile_loaded = False
-    
+
     gui_hooks.profile_did_open.append(on_profile_did_open)
     gui_hooks.profile_will_close.append(on_profile_will_close)
-    
+
     with pytest.raises(AnkiSessionError) as exception_info:
         _ = anki_session.collection
     assert "Collection has not been loaded" in str(exception_info.value)
-    
+
     assert is_profile_loaded is False
-    
+
     with anki_session.profile_loaded():
         assert isinstance(anki_session.collection, Collection)
         assert is_profile_loaded is True
@@ -87,6 +92,17 @@ def test_collection_loading_unloading(anki_session: AnkiSession):
     assert anki_session.mw.col is None
     assert is_profile_loaded is False
 
+    collection = anki_session.load_profile()
+
+    assert collection is not None
+    assert anki_session.mw.col == collection
+    assert is_profile_loaded is True
+
+    with qtbot.wait_callback() as callback:
+        anki_session.unload_profile(on_profile_unloaded=callback)
+
+    callback.assert_called_with()
+    assert is_profile_loaded is False
 
 
 _deck_path = Path(__file__).parent / "samples" / "decks" / "sample_deck.apkg"
