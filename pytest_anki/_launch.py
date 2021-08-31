@@ -42,7 +42,6 @@ from ._errors import AnkiLaunchException
 from ._patch import patch_anki, post_ui_setup_callback_factory
 from ._session import AnkiSession
 from ._types import PathLike
-from ._util import nullcontext
 
 
 @contextmanager
@@ -221,8 +220,11 @@ def anki_running(
                     app=app, mw=mw, user=user_name, base=anki_base_dir
                 )
 
-                with anki_session.profile_loaded() if load_profile else nullcontext():
+                if not load_profile:
                     yield anki_session
+                else:
+                    with anki_session.profile_loaded():
+                        yield anki_session
 
     # NOTE: clean up does not seem to work properly in all cases,
     # so use pytest-forked for now
