@@ -47,7 +47,6 @@ if TYPE_CHECKING:
 # General tests ####
 
 
-@pytest.mark.forked
 def test_anki_session_launches(anki_session: AnkiSession):
     from aqt import AnkiApp
     from aqt.main import AnkiQt
@@ -61,7 +60,6 @@ def test_anki_session_launches(anki_session: AnkiSession):
 # AnkiSession API ####
 
 
-@pytest.mark.forked
 def test_collection_loading_unloading(anki_session: AnkiSession, qtbot: "QtBot"):
     from anki.collection import Collection
     from aqt import gui_hooks
@@ -108,7 +106,6 @@ def test_collection_loading_unloading(anki_session: AnkiSession, qtbot: "QtBot")
 _deck_path = Path(__file__).parent / "samples" / "decks" / "sample_deck.apkg"
 
 
-@pytest.mark.forked
 @pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
 def test_deck_imported(anki_session: AnkiSession):
     collection = anki_session.collection

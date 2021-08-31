@@ -51,7 +51,6 @@ _profile_name = "foo"
 _lang = "de_DE"
 
 
-@pytest.mark.forked
 @pytest.mark.parametrize(
     "anki_session",
     [
@@ -78,7 +77,6 @@ def test_can_set_anki_session_properties(anki_session: AnkiSession):
 # Preloading Anki state
 
 
-@pytest.mark.forked
 @pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
 def test_can_preload_profile(anki_session: AnkiSession):
     from anki.collection import _Collection
@@ -107,7 +105,6 @@ for path in _simple_addons_path.iterdir():
         _packages.append(package_name)
 
 
-@pytest.mark.forked
 @pytest.mark.parametrize(
     "anki_session",
     [dict(packed_addons=_packed_addons, unpacked_addons=_unpacked_addons)],
@@ -138,7 +135,6 @@ for addon_copy in range(2):
     _addon_configs.append((package_name, config))
 
 
-@pytest.mark.forked
 @pytest.mark.parametrize(
     "anki_session",
     [dict(unpacked_addons=_unpacked_addons, addon_configs=_addon_configs)],
@@ -159,7 +155,6 @@ _my_anki_state = AnkiStateUpdate(
 )
 
 
-@pytest.mark.forked
 @pytest.mark.parametrize(
     "anki_session",
     [
