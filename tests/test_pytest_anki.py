@@ -55,27 +55,41 @@ def test_anki_session_launches(anki_session: AnkiSession):
 
 _base_path = str(Path(tempfile.gettempdir()) / "custom_base")
 _base_name = "custom_base_name"
+_profile_name = "foo"
+_lang = "de_DE"
 
 
 @pytest.mark.forked
 @pytest.mark.parametrize(
-    "anki_session", [dict(base_path=_base_path, base_name=_base_name)], indirect=True
+    "anki_session",
+    [
+        dict(
+            base_path=_base_path,
+            base_name=_base_name,
+            profile_name=_profile_name,
+            lang=_lang,
+        )
+    ],
+    indirect=True,
 )
-def test_can_specify_base_path_and_name(anki_session: AnkiSession):
+def test_can_set_anki_session_properties(anki_session: AnkiSession):
+    import anki
+    
     assert anki_session.base.startswith(_base_path)
     assert Path(anki_session.base).name.startswith(_base_name)
-
-
-_profile_name = "foo"
+    
+    with anki_session.profile_loaded():
+        assert anki_session.mw.pm.name == _profile_name
+        assert anki.lang.currentLang == _lang.split("_")[0]
 
 
 @pytest.mark.forked
-@pytest.mark.parametrize("anki_session", [dict(profile_name="foo")], indirect=True)
-def test_can_specify_profile_name(anki_session: AnkiSession):
-    assert anki_session.user == _profile_name
-    with anki_session.profile_loaded():
-        assert anki_session.mw.pm.name == _profile_name
+@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
+def test_can_preload_profile(anki_session: AnkiSession):
+    from anki.collection import _Collection
 
+    assert anki_session.mw.pm.profile is not None
+    assert isinstance(anki_session.mw.col, _Collection)
 
 @pytest.mark.forked
 def test_load_profile(anki_session: AnkiSession):
@@ -89,12 +103,7 @@ def test_load_profile(anki_session: AnkiSession):
     assert anki_session.mw.col is None
 
 
-@pytest.mark.forked
-@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
-def test_profile_preloaded(anki_session: AnkiSession):
-    from anki.collection import _Collection
 
-    assert isinstance(anki_session.mw.col, _Collection)
 
 
 @pytest.mark.forked
