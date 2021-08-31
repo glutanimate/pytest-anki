@@ -57,7 +57,7 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
 
         base_name {str} -- Base folder name (default: {"anki_base"})
 
-        profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
+        profile_name {str} -- User profile name (default: {"User 1"})
 
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})

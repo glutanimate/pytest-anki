@@ -53,11 +53,7 @@ def temporary_user(anki_base_dir: str, name: str, lang: str) -> Iterator[str]:
 
     pm.setupMeta()
     pm.setLang(lang)
-
-    if name in pm.profiles():
-        warn(f"Temporary user named {name} already exists")
-    else:
-        pm.create(name)
+    pm.create(name)
 
     pm.name = name
 
@@ -85,7 +81,7 @@ def base_directory(base_path: str, base_name: str) -> Iterator[str]:
 def anki_running(
     base_path: str = tempfile.gettempdir(),
     base_name: str = "anki_base",
-    profile_name: str = "__Temporary Test User__",
+    profile_name: str = "User 1",
     load_profile: bool = False,
     force_early_profile_load: bool = False,
     lang: str = "en_US",
@@ -102,7 +98,7 @@ def anki_running(
 
         base_name {str} -- Base folder name (default: {"anki_base"})
 
-        profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
+        profile_name {str} -- User profile name (default: {"User 1"})
 
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
