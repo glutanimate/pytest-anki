@@ -163,6 +163,8 @@ def test_can_configure_addons(anki_session: AnkiSession):
 
 _my_anki_state = AnkiStateUpdate(
     meta_storage={_state_checker_addon_package: True},
+    profile_storage={_state_checker_addon_package: True},
+    colconf_storage={_state_checker_addon_package: True},
 )
 
 
@@ -172,6 +174,7 @@ _my_anki_state = AnkiStateUpdate(
     [
         dict(
             unpacked_addons=[(_state_checker_addon_package, _state_checker_addon_path)],
+            preset_anki_state=_my_anki_state,
         )
     ],
     indirect=True,
@@ -180,8 +183,9 @@ def test_can_preset_anki_state(anki_session: AnkiSession):
     # We want to assert that the pre-configured state reaches add-ons, so we
     # use a sample add-on to record all state at its execution time and
     # then run our assertions against that.
+    package_name = _state_checker_addon_package
 
-    addon = __import__(_state_checker_addon_package)
+    addon = __import__(package_name)
 
     # assert addon.meta_storage == _my_anki_state.meta_storage
 
@@ -190,8 +194,14 @@ def test_can_preset_anki_state(anki_session: AnkiSession):
     assert addon.colconf_storage is None
 
     with anki_session.profile_loaded():
-        assert addon.profile_storage == _my_anki_state.profile_storage
-        assert addon.colconf_storage == _my_anki_state.colconf_storage
+        assert (
+            addon.profile_storage
+            == _my_anki_state.profile_storage[package_name]  # type: ignore
+        )
+        assert (
+            addon.colconf_storage
+            == _my_anki_state.colconf_storage[package_name]  # type: ignore
+        )
 
 
 ########
