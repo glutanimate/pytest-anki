@@ -34,7 +34,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_anki import AnkiSession, AnkiStateUpdate
+from pytest_anki import AnkiSession, AnkiStateUpdate, AnkiSessionError
 
 # General tests ####
 
@@ -204,42 +204,40 @@ def test_can_preset_anki_state(anki_session: AnkiSession):
         )
 
 
-########
+# AnkiSession API ####
 
 
 @pytest.mark.forked
-def test_load_profile(anki_session: AnkiSession):
-    from anki.collection import _Collection
+def test_collection_loading_unloading(anki_session: AnkiSession):
+    from anki.collection import Collection
+    from aqt import gui_hooks
+    
+    is_profile_loaded = False
+
+    def on_profile_did_open():
+        nonlocal is_profile_loaded
+        is_profile_loaded = True
+
+    def on_profile_will_close():
+        nonlocal is_profile_loaded
+        is_profile_loaded = False
+    
+    gui_hooks.profile_did_open.append(on_profile_did_open)
+    gui_hooks.profile_will_close.append(on_profile_will_close)
+    
+    with pytest.raises(AnkiSessionError) as exception_info:
+        _ = anki_session.collection
+    assert "Collection has not been loaded" in str(exception_info.value)
+    
+    assert is_profile_loaded is False
+    
+    with anki_session.profile_loaded():
+        assert isinstance(anki_session.collection, Collection)
+        assert is_profile_loaded is True
 
     assert anki_session.mw.col is None
+    assert is_profile_loaded is False
 
-    with anki_session.profile_loaded():
-        assert isinstance(anki_session.mw.col, _Collection)
-
-    assert anki_session.mw.col is None
-
-
-@pytest.mark.forked
-def test_profile_hooks(anki_session: AnkiSession):
-    from anki.hooks import addHook
-
-    foo = False
-
-    def onProfileLoaded():
-        nonlocal foo
-        foo = True
-
-    def onProfileUnload():
-        nonlocal foo
-        foo = False
-
-    addHook("profileLoaded", onProfileLoaded)
-    addHook("unloadProfile", onProfileUnload)
-
-    with anki_session.profile_loaded():
-        assert foo is True
-
-    assert foo is False
 
 
 _deck_path = Path(__file__).parent / "samples" / "decks" / "sample_deck.apkg"
