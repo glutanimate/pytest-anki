@@ -40,8 +40,8 @@ from unittest.mock import Mock
 import aqt
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
-from aqt.qt import QMainWindow
 from aqt.taskman import TaskManager
+from PyQt5.QtWidgets import QMainWindow
 
 if TYPE_CHECKING:
     from anki._backend import RustBackend
