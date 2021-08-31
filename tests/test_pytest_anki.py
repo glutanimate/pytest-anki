@@ -99,12 +99,13 @@ def test_can_preload_profile(anki_session: AnkiSession):
 # Installing and configuring add-ons
 
 _addons_path = Path(__file__).parent / "samples" / "add-ons"
+_simple_addons_path = _addons_path / "simple"
 
 _packed_addons = []
 _unpacked_addons = []
 _packages = []
 
-for path in _addons_path.iterdir():
+for path in _simple_addons_path.iterdir():
     if path.is_dir():
         package_name = path.name
         _unpacked_addons.append((package_name, path))
@@ -118,7 +119,11 @@ for path in _addons_path.iterdir():
 @pytest.mark.forked
 @pytest.mark.parametrize(
     "anki_session",
-    [dict(packed_addons=_packed_addons, unpacked_addons=_unpacked_addons)],
+    [
+        dict(
+            packed_addons=_packed_addons, unpacked_addons=_unpacked_addons
+        )
+    ],
     indirect=True,
 )
 def test_can_install_addons(anki_session: AnkiSession):
@@ -129,6 +134,36 @@ def test_can_install_addons(anki_session: AnkiSession):
         assert package in all_addons
         assert package in sys.modules
         assert getattr(main_window, package) is True
+
+
+_state_checker_addon_path = _addons_path / "advanced" / "state_checker_addon"
+
+_unpacked_addons = []
+_addon_configs = []
+
+_config_key = "foo"
+
+for addon_copy in range(2):
+    package_name = f"state_checker_addon_{addon_copy}"
+    config = {
+        _config_key: addon_copy
+    }
+    _unpacked_addons.append((package_name, _state_checker_addon_path))
+    _addon_configs.append((package_name, config))
+
+
+@pytest.mark.forked
+@pytest.mark.parametrize(
+    "anki_session",
+    [dict(unpacked_addons=_unpacked_addons, addon_configs=_addon_configs)],
+    indirect=True,
+)
+def test_can_configure_addons(anki_session: AnkiSession):
+    addon_manager = anki_session.mw.addonManager
+    for package_name, config in _addon_configs:
+        addon_package = __import__(package_name)
+        assert addon_package.config == config
+        assert addon_manager.getConfig(package_name) == config
 
 
 ########
