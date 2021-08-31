@@ -45,9 +45,7 @@ from ._types import PathLike
 
 
 @contextmanager
-def temporary_user(
-    anki_base_dir: str, name: str, lang: str
-) -> Iterator[str]:
+def temporary_user(anki_base_dir: str, name: str, lang: str) -> Iterator[str]:
 
     from aqt.profiles import ProfileManager
 
