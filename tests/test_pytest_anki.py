@@ -34,11 +34,14 @@ import pytest
 
 from pytest_anki import AnkiSession
 
-# TODO: Extend test cases for new AnkiSession APIs
+import tempfile
+
+
+# General overaching tests ####
 
 
 @pytest.mark.forked
-def test_anki_session_types(anki_session: AnkiSession):
+def test_anki_session_launches(anki_session: AnkiSession):
     from aqt import AnkiApp
     from aqt.main import AnkiQt
 
@@ -46,18 +49,32 @@ def test_anki_session_types(anki_session: AnkiSession):
     assert isinstance(anki_session.mw, AnkiQt)
     assert isinstance(anki_session.user, str)
     assert isinstance(anki_session.base, str)
+
+
+# Indirect parametrization / Fixture arguments ####
+
+_base_path = str(Path(tempfile.gettempdir()) / "custom_base")
+_base_name = "custom_base_name"
+
+
+@pytest.mark.forked
+@pytest.mark.parametrize(
+    "anki_session", [dict(base_path=_base_path, base_name=_base_name)], indirect=True
+)
+def test_can_specify_base_path_and_name(anki_session: AnkiSession):
+    assert anki_session.base.startswith(_base_path)
+    assert Path(anki_session.base).name.startswith(_base_name)
+
+
+_profile_name = "foo"
 
 
 @pytest.mark.forked
 @pytest.mark.parametrize("anki_session", [dict(profile_name="foo")], indirect=True)
-def test_anki_session_parametrization(anki_session: AnkiSession):
-    from aqt import AnkiApp
-    from aqt.main import AnkiQt
-
-    assert isinstance(anki_session.app, AnkiApp)
-    assert isinstance(anki_session.mw, AnkiQt)
-    assert isinstance(anki_session.user, str)
-    assert isinstance(anki_session.base, str)
+def test_can_specify_profile_name(anki_session: AnkiSession):
+    assert anki_session.user == _profile_name
+    with anki_session.profile_loaded():
+        assert anki_session.mw.pm.name == _profile_name
 
 
 @pytest.mark.forked
