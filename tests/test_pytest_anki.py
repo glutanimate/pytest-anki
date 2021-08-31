@@ -114,8 +114,6 @@ for path in _addons_path.iterdir():
         package_name = path.stem
         _packages.append(package_name)
 
-import time
-
 
 @pytest.mark.forked
 @pytest.mark.parametrize(
@@ -126,8 +124,6 @@ import time
 def test_can_install_addons(anki_session: AnkiSession):
     main_window = anki_session.mw
     all_addons = anki_session.mw.addonManager.allAddons()
-
-    time.sleep(600)
 
     for package in _packages:
         assert package in all_addons
