@@ -99,10 +99,10 @@ def anki_running(
 
         profile_name {str} -- User profile name (default: {"User 1"})
 
+        lang {str} -- Language to use for the user profile (default: {"en_US"})
+
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
-
-        lang {str} -- Language to use for the user profile (default: {"en_US"})
 
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
