@@ -73,7 +73,9 @@ def get_collection(main_window: "AnkiQt") -> "Collection":
     return collection
 
 
-def update_anki_profile_state(main_window: "AnkiQt", anki_state_update: AnkiStateUpdate):
+def update_anki_profile_state(
+    main_window: "AnkiQt", anki_state_update: AnkiStateUpdate
+):
     _update_single_anki_state(
         main_window=main_window,
         storage_object=AnkiStorageObject.profile_storage,
@@ -89,7 +91,9 @@ def update_anki_meta_state(main_window: "AnkiQt", anki_state_update: AnkiStateUp
     )
 
 
-def update_anki_colconf_state(main_window: "AnkiQt", anki_state_update: AnkiStateUpdate):
+def update_anki_colconf_state(
+    main_window: "AnkiQt", anki_state_update: AnkiStateUpdate
+):
     _update_single_anki_state(
         main_window=main_window,
         storage_object=AnkiStorageObject.colconf_storage,

@@ -35,11 +35,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 from anki.importing.apkg import AnkiPackageImporter
 
 from ._addons import ConfigPaths, create_addon_config
-from ._anki import (
-    AnkiStateUpdate,
-    update_anki_state,
-    get_collection,
-)
+from ._anki import AnkiStateUpdate, get_collection, update_anki_state
 from ._errors import AnkiSessionError
 from ._types import PathLike
 
@@ -144,7 +140,10 @@ class AnkiSession:
     def remove_deck(self, deck_id: int):
         """Remove deck as specified by provided deck ID"""
         try:  # 2.1.28+
-            self.collection.decks.remove([deck_id])
+            # Deck methods on 2.1.45 and up use a DeckId NewType derived from int.
+            # This only makes a difference at type-check time, so we stick with
+            # passing in an int for now.
+            self.collection.decks.remove([deck_id])  # type: ignore[list-item]
         except AttributeError:  # legacy
             self.collection.decks.rem(deck_id)
 
@@ -162,7 +161,7 @@ class AnkiSession:
         try:  # 2.1.28+
             return [d.id for d in self.collection.decks.all_names_and_ids()]
         except AttributeError:  # legacy
-            return self.collection.decks.allIds()
+            return self.collection.decks.allIds()  # type: ignore[attr-defined]
 
     # Add-on loading ####
 

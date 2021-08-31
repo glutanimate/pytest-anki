@@ -175,14 +175,16 @@ def patch_anki(
 
     AnkiQt.__init__ = patched_ankiqt_init  # type: ignore
     AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
-    AnkiQt.setupAutoUpdate = Mock()
-    AnkiQt.maybe_check_for_addon_updates = Mock()
-    errors.ErrorHandler = Mock()
+    AnkiQt.setupAutoUpdate = Mock()  # type: ignore[assignment]
+    AnkiQt.maybe_check_for_addon_updates = Mock()  # type: ignore[assignment]
+    errors.ErrorHandler = Mock()  # type: ignore[misc]
 
     yield AnkiApp.KEY
 
-    AnkiQt.__init__ = old_init
-    AnkiApp.KEY = old_key
-    AnkiQt.setupAutoUpdate = old_setupAutoUpdate
-    AnkiQt.maybe_check_for_addon_updates = old_maybe_check_for_addon_updates
-    errors.ErrorHandler = old_errorHandler
+    AnkiQt.__init__ = old_init  # type: ignore[assignment]
+    AnkiApp.KEY = old_key  # type: ignore[assignment]
+    AnkiQt.setupAutoUpdate = old_setupAutoUpdate  # type: ignore[assignment]
+    AnkiQt.maybe_check_for_addon_updates = (  # type: ignore[assignment]
+        old_maybe_check_for_addon_updates
+    )
+    errors.ErrorHandler = old_errorHandler  # type: ignore[misc]
