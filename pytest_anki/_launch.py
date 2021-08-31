@@ -38,7 +38,7 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple
 from warnings import warn
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
-from ._errors import AnkiLaunchException
+from ._errors import AnkiSessionError
 from ._patch import patch_anki, post_ui_setup_callback_factory
 from ._session import AnkiSession
 from ._types import PathLike
@@ -195,7 +195,7 @@ def anki_running(
                 mw = aqt.mw
 
                 if mw is None or app is None:
-                    raise AnkiLaunchException("Main window not initialized correctly")
+                    raise AnkiSessionError("Main window not initialized correctly")
 
                 anki_session = AnkiSession(
                     app=app, mw=mw, user=user_name, base=anki_base_dir
