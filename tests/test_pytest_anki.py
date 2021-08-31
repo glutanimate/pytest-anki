@@ -28,16 +28,15 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import sys
+import tempfile
 from pathlib import Path
 
 import pytest
 
 from pytest_anki import AnkiSession
 
-import tempfile
-
-
-# General overaching tests ####
+# General tests ####
 
 
 @pytest.mark.forked
@@ -51,7 +50,9 @@ def test_anki_session_launches(anki_session: AnkiSession):
     assert isinstance(anki_session.base, str)
 
 
-# Indirect parametrization / Fixture arguments ####
+# Indirect parametrization ####
+
+# Session parameters
 
 _base_path = str(Path(tempfile.gettempdir()) / "custom_base")
 _base_name = "custom_base_name"
@@ -74,13 +75,16 @@ _lang = "de_DE"
 )
 def test_can_set_anki_session_properties(anki_session: AnkiSession):
     import anki
-    
+
     assert anki_session.base.startswith(_base_path)
     assert Path(anki_session.base).name.startswith(_base_name)
-    
+
     with anki_session.profile_loaded():
         assert anki_session.mw.pm.name == _profile_name
         assert anki.lang.currentLang == _lang.split("_")[0]
+
+
+# Preloading Anki state
 
 
 @pytest.mark.forked
@@ -90,6 +94,49 @@ def test_can_preload_profile(anki_session: AnkiSession):
 
     assert anki_session.mw.pm.profile is not None
     assert isinstance(anki_session.mw.col, _Collection)
+
+
+# Installing and configuring add-ons
+
+_addons_path = Path(__file__).parent / "samples" / "add-ons"
+
+_packed_addons = []
+_unpacked_addons = []
+_packages = []
+
+for path in _addons_path.iterdir():
+    if path.is_dir():
+        package_name = path.name
+        _unpacked_addons.append((package_name, path))
+        _packages.append(package_name)
+    elif path.suffix == ".ankiaddon":
+        _packed_addons.append(path)
+        package_name = path.stem
+        _packages.append(package_name)
+
+import time
+
+
+@pytest.mark.forked
+@pytest.mark.parametrize(
+    "anki_session",
+    [dict(packed_addons=_packed_addons, unpacked_addons=_unpacked_addons)],
+    indirect=True,
+)
+def test_can_install_addons(anki_session: AnkiSession):
+    main_window = anki_session.mw
+    all_addons = anki_session.mw.addonManager.allAddons()
+
+    time.sleep(600)
+
+    for package in _packages:
+        assert package in all_addons
+        assert package in sys.modules
+        assert getattr(main_window, package) is True
+
+
+########
+
 
 @pytest.mark.forked
 def test_load_profile(anki_session: AnkiSession):
@@ -101,9 +148,6 @@ def test_load_profile(anki_session: AnkiSession):
         assert isinstance(anki_session.mw.col, _Collection)
 
     assert anki_session.mw.col is None
-
-
-
 
 
 @pytest.mark.forked
@@ -129,7 +173,7 @@ def test_profile_hooks(anki_session: AnkiSession):
     assert foo is False
 
 
-_deck_path = Path(__file__).parent / "samples" / "sample_deck.apkg"
+_deck_path = Path(__file__).parent / "samples" / "decks" / "sample_deck.apkg"
 
 
 @pytest.mark.forked
