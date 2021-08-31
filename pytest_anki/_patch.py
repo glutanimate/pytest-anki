@@ -34,7 +34,7 @@
 import uuid
 from argparse import Namespace
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Tuple
 from unittest.mock import Mock
 
 import aqt
@@ -43,37 +43,66 @@ from aqt.mediasync import MediaSyncer
 from aqt.qt import QMainWindow
 from aqt.taskman import TaskManager
 
-from ._addons import install_addon_from_folder, install_addon_from_package
-from ._types import PathLike, UnpackedAddon
-
 if TYPE_CHECKING:
     from anki._backend import RustBackend
     from anki.collection import Collection
     from aqt.profiles import ProfileManager as ProfileManagerType
 
+from ._addons import (
+    create_addon_config,
+    install_addon_from_folder,
+    install_addon_from_package,
+)
+from ._anki import AnkiStateUpdate, update_anki_meta_state
+from ._types import PathLike
 
-def custom_init_factory(
-    packed_addons: List[PathLike],
-    unpacked_addons: List[UnpackedAddon],
-    base_path: PathLike,
+PostUISetupCallbackType = Callable[[AnkiQt], None]
+
+
+def post_ui_setup_callback_factory(
+    anki_base_dir: PathLike,
+    packed_addons: Optional[List[PathLike]] = None,
+    unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
+    addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
+    preset_anki_state: Optional[AnkiStateUpdate] = None,
 ):
-    def _setup_addons(main_window: AnkiQt):
+    def post_ui_setup_callback(main_window: AnkiQt):
+        """Initialize add-on manager, install add-ons, load add-ons"""
         main_window.addonManager = aqt.addons.AddonManager(main_window)
 
-        for packed_addon in packed_addons:
-            install_addon_from_package(
-                addon_manager=main_window.addonManager, addon_path=packed_addon
-            )
+        if packed_addons:
+            for packed_addon in packed_addons:
+                install_addon_from_package(
+                    addon_manager=main_window.addonManager, addon_path=packed_addon
+                )
 
-        for unpacked_addon in unpacked_addons:
-            install_addon_from_folder(
-                base_path=base_path,
-                addon_path=unpacked_addon.path,
-                package_name=unpacked_addon.package_name,
+        if unpacked_addons:
+            for package_name, addon_path in unpacked_addons:
+                install_addon_from_folder(
+                    anki_base_dir=anki_base_dir,
+                    package_name=package_name,
+                    addon_path=addon_path,
+                )
+
+        if addon_configs:
+            for package_name, config_values in addon_configs:
+                create_addon_config(
+                    anki_base_dir=anki_base_dir,
+                    package_name=package_name,
+                    user_config=config_values,
+                )
+
+        if preset_anki_state and preset_anki_state.meta_storage:
+            update_anki_meta_state(
+                main_window=main_window, anki_state_update=preset_anki_state
             )
 
         main_window.addonManager.loadAddons()
 
+    return post_ui_setup_callback
+
+
+def custom_init_factory(post_ui_setup_callback: PostUISetupCallbackType):
     def custom_init(
         main_window: AnkiQt,
         app: aqt.AnkiApp,
@@ -97,21 +126,22 @@ def custom_init_factory(
             main_window.taskman = TaskManager()  # type: ignore
 
         main_window.media_syncer = MediaSyncer(main_window)
-        
+
         try:  # 2.1.45+
             from aqt.flags import FlagManager
 
             main_window.flags = FlagManager(main_window)
         except (ImportError, ModuleNotFoundError):
             pass
-        
+
         aqt.mw = main_window
         main_window.app = app
         main_window.pm = profileManager
         main_window.safeMode = False  # disable safe mode, of no use to us
         main_window.setupUI()
-        _setup_addons(main_window)
-        
+
+        post_ui_setup_callback(main_window)
+
         try:  # 2.1.28+
             main_window.finish_ui_setup()
         except AttributeError:
@@ -122,9 +152,7 @@ def custom_init_factory(
 
 @contextmanager
 def patch_anki(
-    base_dir: PathLike,
-    packed_addons: List[PathLike],
-    unpacked_addons: List[UnpackedAddon],
+    post_ui_setup_callback: PostUISetupCallbackType,
 ) -> Iterator[str]:
     """Patch Anki to:
     - allow more fine-grained control of test execution environment
@@ -142,9 +170,7 @@ def patch_anki(
     old_errorHandler = errors.ErrorHandler
 
     patched_ankiqt_init = custom_init_factory(
-        packed_addons=packed_addons,
-        unpacked_addons=unpacked_addons,
-        base_path=base_dir,
+        post_ui_setup_callback=post_ui_setup_callback
     )
 
     AnkiQt.__init__ = patched_ankiqt_init  # type: ignore

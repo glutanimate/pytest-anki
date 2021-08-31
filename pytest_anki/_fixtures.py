@@ -28,47 +28,86 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
-from typing import Iterator
+from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional
 
 import pytest
+
+if TYPE_CHECKING:
+    from pytest import FixtureRequest
 
 from ._launch import anki_running
 from ._session import AnkiSession
 
 
 @pytest.fixture
-def anki_session(request) -> Iterator[AnkiSession]:
+def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
     """Fixture that instantiates Anki, yielding an AnkiSession object
 
-    Additional arguments may be passed to the fixture by using indirect parametrization,
-    e.g.:
+    All keyword arguments below may be passed to the fixture by using indirect
+    parametrization.
+
+    E.g., to specify a custom profile name you would decorate your test method with:
 
     > @pytest.mark.parametrize("anki_session", [dict(profile_name="foo")],
                                indirect=True)
 
-    Full list of supported keyword arguments as parameters:
+    Keyword Arguments:
         base_path {str} -- Path to write Anki base folder to
-                           (default: {tempfile.gettempdir()})
+            (default: system-wide temporary directory)
+
         base_name {str} -- Base folder name (default: {"anki_base"})
+
         profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
+
         keep_profile {bool} -- Whether to preserve profile at context exit
-                               (default: {False})
+            (default: {False})
+
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
-                               (default: {False})
-        force_early_profile_load {bool} -- Whether to load Anki profile
-            (without collection) at app init time. Replicates the behavior when
+            (default: {False})
+
+        force_early_profile_load {bool} -- Whether to load Anki profile at app
+            initialization time (without collection). Replicates the behavior when
             passing profile as a CLI argument (default: {False})
+
         lang {str} -- Language to use for the user profile (default: {"en_US"})
+
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
-        unpacked_addons {Optional[List[UnpackedAddons]]}: List of unpackaged add-ons
-            that should be installed ahead of starting Anki, described via the
-            UnpackagedApacked_addons Yields:
-        Iterator[AnkiSession] unpacked_addonsfixture
-    # https://docs.pytest.org/en/latest/reference.html#request
+
+        unpacked_addons {Optional[List[Tuple[str, PathLike]]]}:
+            List of unpacked add-ons that should be installed ahead of starting Anki.
+            Add-ons need to be specified as tuple of the add-on package name under which
+            to install the add-on, and the path to the source folder (the package
+            folder containing the add-on __init__.py)
+
+        addon_configs {Optional[List[Tuple[str, Dict[str, Any]]]]}:
+            List of add-on package names and config values to set the user configuration
+            for the specified add-on to. Useful for simulating specific config set-ups.
+            Each list member needs to be specified as a tuple of add-on package name
+            and dictionary of user configuration values to set.
+
+        preset_anki_state {Optional[pytest_anki.AnkiStateUpdate]}:
+            Allows pre-configuring Anki object state, as described by a PresetAnkiState
+            dataclass. This includes the three main configuration storages used by
+            add-ons, mw.col.conf (colconf_strage), mw.pm.profile (profile_storage),
+            and mw.pm.meta (meta_storage).
+
+            The provided data is applied on top of the existing data in each case
+            (i.e. in the same way as dict.update(new_data) would).
+
+            State specified in this manner is guaranteed to be pre-configured ahead of
+            add-on load time (in the case of meta_storage), or ahead of
+            gui_hooks.profile_did_open fire time (in the case of colconf_storage and
+            profile_storage).
+
+            Please note that, in the case of colconf_storage and profile_storage, the
+            caller is responsible for either passing 'load_profile=True', or manually
+            loading the profile at a later stage.
     """
 
-    param = getattr(request, "param", None)
+    indirect_parameters: Optional[Dict[str, Any]] = getattr(request, "param", None)
 
-    with anki_running() if not param else anki_running(**param) as session:
+    with anki_running() if not indirect_parameters else anki_running(
+        **indirect_parameters
+    ) as session:
         yield session

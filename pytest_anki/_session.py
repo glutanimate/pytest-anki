@@ -29,43 +29,24 @@
 # Any modifications to this file must keep this entire header intact.
 
 from contextlib import contextmanager
-from enum import Enum
-from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Iterator,
-    List,
-    NamedTuple,
-    Optional,
-    Union,
-)
 from types import ModuleType
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
 
 from anki.importing.apkg import AnkiPackageImporter
 
+from ._addons import ConfigPaths, create_addon_config
+from ._anki import (
+    AnkiStateUpdate,
+    update_anki_state,
+    get_collection,
+)
 from ._errors import AnkiSessionError
 from ._types import PathLike
-from ._util import create_json, get_nested_attribute
 
 if TYPE_CHECKING:
     from anki.collection import Collection
-    from anki.config import ConfigManager
     from aqt import AnkiApp
     from aqt.main import AnkiQt
-
-
-class ConfigPaths(NamedTuple):
-    default_config: Path
-    user_config: Optional[Path]
-
-
-class AnkiStorageObject(Enum):
-    synced_storage = "col.conf"
-    profile_storage = "pm.profile"
-    meta_storage = "pm.meta"
 
 
 class AnkiSession:
@@ -114,11 +95,7 @@ class AnkiSession:
     @property
     def collection(self) -> "Collection":
         """Returns current Anki collection if loaded"""
-        if self._mw.col is None:
-            raise AnkiSessionError(
-                "Collection has not been loaded, yet. Please use load_profile()."
-            )
-        return self._mw.col
+        return get_collection(self._mw)
 
     def load_profile(self) -> "Collection":
         """Load Anki profile, returning user collection
@@ -204,20 +181,12 @@ class AnkiSession:
     ) -> ConfigPaths:
         """Create and populate the config.json and meta.json configuration
         files for an add-on, as specified by its package name"""
-        addon_path = Path(self._base) / "addons21" / package_name
-        addon_path.mkdir(parents=True, exist_ok=True)
-
-        defaults_path = addon_path / "config.json"
-
-        create_json(defaults_path, default_config)
-
-        if user_config is not None:
-            meta_path = addon_path / "meta.json"
-            create_json(meta_path, {"config": user_config})
-        else:
-            meta_path = None
-
-        return ConfigPaths(defaults_path, meta_path)
+        return create_addon_config(
+            anki_base_dir=self._base,
+            package_name=package_name,
+            default_config=default_config,
+            user_config=user_config,
+        )
 
     @contextmanager
     def addon_config_created(
@@ -237,7 +206,7 @@ class AnkiSession:
 
         yield config_paths
 
-        if config_paths.default_config.exists():
+        if config_paths.default_config and config_paths.default_config.exists():
             config_paths.default_config.unlink()
 
         if config_paths.user_config and config_paths.user_config.exists():
@@ -245,35 +214,5 @@ class AnkiSession:
 
     # Anki config object handling ####
 
-    def set_anki_object_data(
-        self, storage_object: AnkiStorageObject, data: dict
-    ) -> Union[Dict[str, Any], "ConfigManager"]:
-        """Update the data of a specified Anki storage object
-
-        This may be used to simulate specific Anki and/or add-on states
-        during testing."""
-
-        anki_object = self.get_anki_object(storage_object=storage_object)
-
-        if storage_object == AnkiStorageObject.synced_storage:
-            # mw.col.conf dict API is deprecated in favor of ConfigManager API
-            collection = self.collection
-            for key, value in data.items():
-                collection.set_config(key, value)
-        else:
-            anki_object.update(data)  # type: ignore
-
-        return anki_object
-
-    def get_anki_object(
-        self, storage_object: AnkiStorageObject
-    ) -> Union[Dict[str, Any], "ConfigManager"]:
-        """Get Anki object for specified AnkiStorageObject type"""
-        attribute_path = storage_object.value
-        try:
-            return get_nested_attribute(obj=self._mw, attr=attribute_path)
-        except Exception as e:
-            raise AnkiSessionError(
-                f"Anki storage object {storage_object.name} could not be accessed:"
-                f" {str(e)}"
-            )
+    def update_anki_state(self, anki_state_update: AnkiStateUpdate):
+        update_anki_state(main_window=self._mw, anki_state_update=anki_state_update)
