@@ -1,14 +1,5 @@
 name: tests
 
-env:
-  # LATEST variables specify the set-up for the latest tested Anki version
-  # TODO: have these automatically be updated once a new Anki tag is pushed
-  # and it passes pytest_anki's test suite
-  LATEST_ANKI: 2.1.47
-  LATEST_PYTHON: 3.8.1
-  LATEST_PYQT: 5.15.1
-  LATEST_PYQTWEBENGINE: 5.15.1
-
 on:
   pull_request:
     paths-ignore:
@@ -24,10 +15,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - anki: ${{ env.LATEST_ANKI }}
-            python: ${{ env.LATEST_PYTHON }}
-            pyqt: ${{ env.LATEST_PYQT }}
-            pyqtwebengine: ${{ env.LATEST_PYQTWEBENGINE }}
+          - anki: 2.1.47
+            python: 3.8.1
+            pyqt: 5.15.1
+            pyqtwebengine: 5.15.1
           - anki: 2.1.44
             python: 3.8.1
             pyqt: 5.14.2
@@ -85,10 +76,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - anki: ${{ env.LATEST_ANKI }}
-            python: ${{ env.LATEST_PYTHON }}
-            pyqt: ${{ env.LATEST_PYQT }}
-            pyqtwebengine: ${{ env.LATEST_PYQTWEBENGINE }}
+          - anki: 2.1.47
+            python: 3.8.1
+            pyqt: 5.15.1
+            pyqtwebengine: 5.15.1
     steps:
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
