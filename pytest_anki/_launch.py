@@ -46,7 +46,7 @@ from ._types import PathLike
 
 @contextmanager
 def temporary_user(
-    anki_base_dir: str, name: str, lang: str, keep: bool
+    anki_base_dir: str, name: str, lang: str
 ) -> Iterator[str]:
 
     from aqt.profiles import ProfileManager
@@ -56,7 +56,7 @@ def temporary_user(
     pm.setupMeta()
     pm.setLang(lang)
 
-    if not keep and name in pm.profiles():
+    if name in pm.profiles():
         warn(f"Temporary user named {name} already exists")
     else:
         pm.create(name)
@@ -65,7 +65,7 @@ def temporary_user(
 
     yield name
 
-    if not keep and pm.db:
+    if pm.db:
         # reimplement pm.remove() to avoid trouble with trash
         p = pm.profileFolder()
         if os.path.exists(p):
@@ -75,13 +75,12 @@ def temporary_user(
 
 
 @contextmanager
-def base_directory(base_path: str, base_name: str, keep: bool) -> Iterator[str]:
+def base_directory(base_path: str, base_name: str) -> Iterator[str]:
     if not os.path.isdir(base_path):
         os.mkdir(base_path)
     anki_base_dir = tempfile.mkdtemp(prefix=f"{base_name}_", dir=base_path)
     yield anki_base_dir
-    if not keep:
-        shutil.rmtree(anki_base_dir)
+    shutil.rmtree(anki_base_dir)
 
 
 @contextmanager
@@ -89,7 +88,6 @@ def anki_running(
     base_path: str = tempfile.gettempdir(),
     base_name: str = "anki_base",
     profile_name: str = "__Temporary Test User__",
-    keep_profile: bool = False,
     load_profile: bool = False,
     force_early_profile_load: bool = False,
     lang: str = "en_US",
@@ -107,9 +105,6 @@ def anki_running(
         base_name {str} -- Base folder name (default: {"anki_base"})
 
         profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
-
-        keep_profile {bool} -- Whether to preserve profile at context exit
-            (default: {False})
 
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
@@ -163,7 +158,7 @@ def anki_running(
     import aqt
     from aqt import _run, gui_hooks
 
-    with base_directory(base_path, base_name, keep_profile) as anki_base_dir:
+    with base_directory(base_path=base_path, base_name=base_name) as anki_base_dir:
 
         # Callback to run between main UI initialization and finishing steps of UI
         # initialization (add-on loading time)
@@ -200,7 +195,7 @@ def anki_running(
 
         with patch_anki(post_ui_setup_callback=post_ui_setup_callback):
             with temporary_user(
-                anki_base_dir, profile_name, lang, keep_profile
+                anki_base_dir=anki_base_dir, name=profile_name, lang=lang
             ) as user_name:
 
                 # We don't pass in -p <profile> in order to avoid profile loading.

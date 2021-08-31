@@ -59,9 +59,6 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
 
         profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
 
-        keep_profile {bool} -- Whether to preserve profile at context exit
-            (default: {False})
-
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
 
