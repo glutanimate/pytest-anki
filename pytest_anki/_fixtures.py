@@ -60,7 +60,7 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
         profile_name {str} -- User profile name (default: {"User 1"})
 
         lang {str} -- Language to use for the user profile (default: {"en_US"})
-        
+
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
 

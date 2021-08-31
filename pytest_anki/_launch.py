@@ -35,7 +35,6 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 from typing import Any, Dict, Iterator, List, Optional, Tuple
-from warnings import warn
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
 from ._errors import AnkiSessionError
@@ -203,7 +202,7 @@ def anki_running(
 
                 if not load_profile:
                     yield anki_session
-                
+
                 else:
                     with anki_session.profile_loaded():
                         yield anki_session

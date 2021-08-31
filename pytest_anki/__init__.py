@@ -34,10 +34,10 @@ A simple pytest plugin for testing Anki add-ons
 """
 
 from ._anki import AnkiStateUpdate  # noqa: F401
+from ._errors import AnkiSessionError  # noqa: F401
 from ._fixtures import anki_session  # noqa: F401
 from ._launch import anki_running  # noqa: F401
 from ._session import AnkiSession  # noqa: F401
-from ._errors import AnkiSessionError  # noqa: F401
 
 __version__ = "1.0.0-dev.1"
 __author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
