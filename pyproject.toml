@@ -20,7 +20,7 @@ classifiers = [
 include = ["pytest_anki/py.typed"]
 
 [tool.poetry.plugins.pytest11]
-anki = "pytest_anki"
+anki = "pytest_anki.plugin"
 
 [tool.poetry.dependencies]
 python = "^3.8"
