@@ -3,23 +3,29 @@ SHELL = /bin/bash
 PACKAGE = pytest_anki
 TEST_FLAGS ?= -n4
 
+# Set up project
 install:
 	poetry install
 
+# Run tests
 test:
 	python -m pytest $(TEST_FLAGS) tests/
 
+# Run type checkers
 check:
 	python -m mypy $(PACKAGE)
 
+# Run code linters
 lint:
 	python -m flake8 $(PACKAGE)
 	python -m black --check $(PACKAGE)
 
+# Run code formatters
 format:
 	python -m isort $(PACKAGE)
 	python -m black $(PACKAGE)
 
+# Build project
 build:
 	poetry build
 
