@@ -33,7 +33,7 @@ Tests for all pytest fixtures provided by the plug-in
 """
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 import pytest
 
@@ -41,6 +41,11 @@ from pytest_anki import AnkiSession, AnkiSessionError
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
+
+    try:
+        from anki.collection import Collection
+    except ImportError:
+        from anki.collection import _Collection as Collection
 
 
 # General tests ####
@@ -109,10 +114,35 @@ def test_collection_loading_unloading(anki_session: AnkiSession, qtbot: "QtBot")
 _deck_path = Path(__file__).parent / "samples" / "decks" / "sample_deck.apkg"
 
 
-@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
-def test_deck_imported(anki_session: AnkiSession):
-    collection = anki_session.collection
-    with anki_session.deck_installed(path=_deck_path) as deck_id:
-        deck = collection.decks.get(did=deck_id)
-        assert deck is not None
-        assert deck["id"] == deck_id
+def _get_deck_ids(collection: "Collection") -> List[int]:
+    try:
+        return [int(deck.id) for deck in collection.decks.all_names_and_ids()]
+    except AttributeError:
+        return [
+            int(deck_id)
+            for deck_id in collection.decks.allIds()  # type: ignore[attr-defined]
+        ]
+
+
+def _deck_exists(collection: "Collection", deck_id: int) -> bool:
+    deck = collection.decks.get(did=deck_id)  # type: ignore[arg-type]
+    return deck is not None and deck["id"] == deck_id
+
+
+def test_deck_management(anki_session: AnkiSession):
+    with anki_session.profile_loaded():
+        collection = anki_session.collection
+        assert len(_get_deck_ids(collection)) == 1
+
+        with anki_session.deck_installed(path=_deck_path) as deck_id:
+            assert len(_get_deck_ids(anki_session.collection)) == 2
+            assert _deck_exists(collection=collection, deck_id=deck_id)
+
+        assert len(_get_deck_ids(anki_session.collection)) == 1
+
+        deck_id = anki_session.install_deck(path=_deck_path)
+        assert len(_get_deck_ids(anki_session.collection)) == 2
+        assert _deck_exists(collection=collection, deck_id=deck_id)
+
+        anki_session.remove_deck(deck_id=deck_id)
+        assert len(_get_deck_ids(anki_session.collection)) == 1
