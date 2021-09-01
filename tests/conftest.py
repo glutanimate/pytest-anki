@@ -29,5 +29,6 @@
 # Any modifications to this file must keep this entire header intact.
 
 
-class AnkiSessionError(Exception):
-    pass
+def pytest_collection_modifyitems(items):
+    for item in items:
+        item.add_marker("forked")

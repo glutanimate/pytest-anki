@@ -57,19 +57,12 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
 
         base_name {str} -- Base folder name (default: {"anki_base"})
 
-        profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
+        profile_name {str} -- User profile name (default: {"User 1"})
 
-        keep_profile {bool} -- Whether to preserve profile at context exit
-            (default: {False})
+        lang {str} -- Language to use for the user profile (default: {"en_US"})
 
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
-
-        force_early_profile_load {bool} -- Whether to load Anki profile at app
-            initialization time (without collection). Replicates the behavior when
-            passing profile as a CLI argument (default: {False})
-
-        lang {str} -- Language to use for the user profile (default: {"en_US"})
 
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
@@ -89,7 +82,7 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
         preset_anki_state {Optional[pytest_anki.AnkiStateUpdate]}:
             Allows pre-configuring Anki object state, as described by a PresetAnkiState
             dataclass. This includes the three main configuration storages used by
-            add-ons, mw.col.conf (colconf_strage), mw.pm.profile (profile_storage),
+            add-ons, mw.col.conf (colconf_storage), mw.pm.profile (profile_storage),
             and mw.pm.meta (meta_storage).
 
             The provided data is applied on top of the existing data in each case

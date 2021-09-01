@@ -145,7 +145,7 @@ class AnkiSession:
             # passing in an int for now.
             self.collection.decks.remove([deck_id])  # type: ignore[list-item]
         except AttributeError:  # legacy
-            self.collection.decks.rem(deck_id)
+            self.collection.decks.rem(deck_id, cardsToo=True)
 
     @contextmanager
     def deck_installed(self, path: PathLike) -> Iterator[int]:
@@ -175,11 +175,16 @@ class AnkiSession:
     def create_addon_config(
         self,
         package_name: str,
-        default_config: Dict[str, Any],
-        user_config: Optional[Dict[str, Any]],
+        default_config: Optional[Dict[str, Any]] = None,
+        user_config: Optional[Dict[str, Any]] = None,
     ) -> ConfigPaths:
         """Create and populate the config.json and meta.json configuration
         files for an add-on, as specified by its package name"""
+        if default_config is None and user_config is None:
+            raise ValueError(
+                "Need to provide at least one of default_config, user_config"
+            )
+
         return create_addon_config(
             anki_base_dir=self._base,
             package_name=package_name,
@@ -191,12 +196,17 @@ class AnkiSession:
     def addon_config_created(
         self,
         package_name: str,
-        default_config: Dict[str, Any],
-        user_config: Dict[str, Any],
+        default_config: Optional[Dict[str, Any]] = None,
+        user_config: Optional[Dict[str, Any]] = None,
     ) -> Iterator[ConfigPaths]:
         """Context manager that takes care of creating the configuration files
         for an add-on, as specified by its package name, and then deleting them
         upon context exit."""
+        if default_config is None and user_config is None:
+            raise ValueError(
+                "Need to provide at least one of default_config, user_config"
+            )
+
         config_paths = self.create_addon_config(
             package_name=package_name,
             default_config=default_config,
@@ -214,4 +224,11 @@ class AnkiSession:
     # Anki config object handling ####
 
     def update_anki_state(self, anki_state_update: AnkiStateUpdate):
+        """Set the state of certain Anki storage objects that are frequently used by add-ons.
+        This includes mw.col.conf (colconf_storage), mw.pm.profile (profile_storage),
+        and mw.pm.meta (meta_storage).
+
+        The combined state of all objects is supplied as a pytest_anki.AnkiStateUpdate
+        data class.
+        """
         update_anki_state(main_window=self._mw, anki_state_update=anki_state_update)

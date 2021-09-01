@@ -35,19 +35,16 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 from typing import Any, Dict, Iterator, List, Optional, Tuple
-from warnings import warn
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
-from ._errors import AnkiLaunchException
+from ._errors import AnkiSessionError
 from ._patch import patch_anki, post_ui_setup_callback_factory
 from ._session import AnkiSession
 from ._types import PathLike
 
 
 @contextmanager
-def temporary_user(
-    anki_base_dir: str, name: str, lang: str, keep: bool
-) -> Iterator[str]:
+def temporary_user(anki_base_dir: str, name: str, lang: str) -> Iterator[str]:
 
     from aqt.profiles import ProfileManager
 
@@ -55,17 +52,13 @@ def temporary_user(
 
     pm.setupMeta()
     pm.setLang(lang)
-
-    if not keep and name in pm.profiles():
-        warn(f"Temporary user named {name} already exists")
-    else:
-        pm.create(name)
+    pm.create(name)
 
     pm.name = name
 
     yield name
 
-    if not keep and pm.db:
+    if pm.db:
         # reimplement pm.remove() to avoid trouble with trash
         p = pm.profileFolder()
         if os.path.exists(p):
@@ -75,24 +68,21 @@ def temporary_user(
 
 
 @contextmanager
-def base_directory(base_path: str, base_name: str, keep: bool) -> Iterator[str]:
+def base_directory(base_path: str, base_name: str) -> Iterator[str]:
     if not os.path.isdir(base_path):
         os.mkdir(base_path)
     anki_base_dir = tempfile.mkdtemp(prefix=f"{base_name}_", dir=base_path)
     yield anki_base_dir
-    if not keep:
-        shutil.rmtree(anki_base_dir)
+    shutil.rmtree(anki_base_dir)
 
 
 @contextmanager
 def anki_running(
     base_path: str = tempfile.gettempdir(),
     base_name: str = "anki_base",
-    profile_name: str = "__Temporary Test User__",
-    keep_profile: bool = False,
-    load_profile: bool = False,
-    force_early_profile_load: bool = False,
+    profile_name: str = "User 1",
     lang: str = "en_US",
+    load_profile: bool = False,
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
@@ -106,19 +96,30 @@ def anki_running(
 
         base_name {str} -- Base folder name (default: {"anki_base"})
 
-        profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
+        profile_name {str} -- User profile name (default: {"User 1"})
 
-        keep_profile {bool} -- Whether to preserve profile at context exit
-            (default: {False})
+        lang {str} -- Language to use for the user profile (default: {"en_US"})
 
         load_profile {bool} -- Whether to preload Anki user profile (with collection)
             (default: {False})
 
-        force_early_profile_load {bool} -- Whether to load Anki profile at app
-            initialization time (without collection). Replicates the behavior when
-            passing profile as a CLI argument (default: {False})
+        preset_anki_state {Optional[pytest_anki.AnkiStateUpdate]}:
+            Allows pre-configuring Anki object state, as described by a PresetAnkiState
+            dataclass. This includes the three main configuration storages used by
+            add-ons, mw.col.conf (colconf_storage), mw.pm.profile (profile_storage),
+            and mw.pm.meta (meta_storage).
 
-        lang {str} -- Language to use for the user profile (default: {"en_US"})
+            The provided data is applied on top of the existing data in each case
+            (i.e. in the same way as dict.update(new_data) would).
+
+            State specified in this manner is guaranteed to be pre-configured ahead of
+            add-on load time (in the case of meta_storage), or ahead of
+            gui_hooks.profile_did_open fire time (in the case of colconf_storage and
+            profile_storage).
+
+            Please note that, in the case of colconf_storage and profile_storage, the
+            caller is responsible for either passing 'load_profile=True', or manually
+            loading the profile at a later stage.
 
         packed_addons {Optional[List[PathLike]]}: List of paths to .ankiaddon-packaged
             add-ons that should be installed ahead of starting Anki
@@ -135,24 +136,6 @@ def anki_running(
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
 
-        preset_anki_state {Optional[pytest_anki.AnkiStateUpdate]}:
-            Allows pre-configuring Anki object state, as described by a PresetAnkiState
-            dataclass. This includes the three main configuration storages used by
-            add-ons, mw.col.conf (colconf_strage), mw.pm.profile (profile_storage),
-            and mw.pm.meta (meta_storage).
-
-            The provided data is applied on top of the existing data in each case
-            (i.e. in the same way as dict.update(new_data) would).
-
-            State specified in this manner is guaranteed to be pre-configured ahead of
-            add-on load time (in the case of meta_storage), or ahead of
-            gui_hooks.profile_did_open fire time (in the case of colconf_storage and
-            profile_storage).
-
-            Please note that, in the case of colconf_storage and profile_storage, the
-            caller is responsible for either passing 'load_profile=True', or manually
-            loading the profile at a later stage.
-
     Returns:
         Iterator[AnkiSession] -- [description]
 
@@ -163,7 +146,7 @@ def anki_running(
     import aqt
     from aqt import _run, gui_hooks
 
-    with base_directory(base_path, base_name, keep_profile) as anki_base_dir:
+    with base_directory(base_path=base_path, base_name=base_name) as anki_base_dir:
 
         # Callback to run between main UI initialization and finishing steps of UI
         # initialization (add-on loading time)
@@ -200,7 +183,7 @@ def anki_running(
 
         with patch_anki(post_ui_setup_callback=post_ui_setup_callback):
             with temporary_user(
-                anki_base_dir, profile_name, lang, keep_profile
+                anki_base_dir=anki_base_dir, name=profile_name, lang=lang
             ) as user_name:
 
                 # We don't pass in -p <profile> in order to avoid profile loading.
@@ -211,10 +194,7 @@ def anki_running(
                 mw = aqt.mw
 
                 if mw is None or app is None:
-                    raise AnkiLaunchException("Main window not initialized correctly")
-
-                if force_early_profile_load:
-                    mw.pm.openProfile(profile_name)
+                    raise AnkiSessionError("Main window not initialized correctly")
 
                 anki_session = AnkiSession(
                     app=app, mw=mw, user=user_name, base=anki_base_dir
@@ -222,6 +202,7 @@ def anki_running(
 
                 if not load_profile:
                     yield anki_session
+
                 else:
                     with anki_session.profile_loaded():
                         yield anki_session
