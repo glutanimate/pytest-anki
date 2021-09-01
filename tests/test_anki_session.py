@@ -124,9 +124,9 @@ def _get_deck_ids(collection: "Collection") -> List[int]:
         ]
 
 
-def _deck_exists(collection: "Collection", deck_id: int) -> bool:
+def _assert_deck_exists(collection: "Collection", deck_id: int):
     deck = collection.decks.get(did=deck_id)  # type: ignore[arg-type]
-    return deck is not None and deck["id"] == deck_id
+    assert deck is not None and deck["id"] == deck_id
 
 
 def test_deck_management(anki_session: AnkiSession):
@@ -136,13 +136,13 @@ def test_deck_management(anki_session: AnkiSession):
 
         with anki_session.deck_installed(path=_deck_path) as deck_id:
             assert len(_get_deck_ids(anki_session.collection)) == 2
-            assert _deck_exists(collection=collection, deck_id=deck_id)
+            _assert_deck_exists(collection=collection, deck_id=deck_id)
 
         assert len(_get_deck_ids(anki_session.collection)) == 1
 
         deck_id = anki_session.install_deck(path=_deck_path)
         assert len(_get_deck_ids(anki_session.collection)) == 2
-        assert _deck_exists(collection=collection, deck_id=deck_id)
+        _assert_deck_exists(collection=collection, deck_id=deck_id)
 
         anki_session.remove_deck(deck_id=deck_id)
         assert len(_get_deck_ids(anki_session.collection)) == 1
