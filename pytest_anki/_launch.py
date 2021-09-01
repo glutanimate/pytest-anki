@@ -35,12 +35,21 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 from typing import Any, Dict, Iterator, List, Optional, Tuple
+from unittest import mock
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
 from ._errors import AnkiSessionError
 from ._patch import patch_anki, post_ui_setup_callback_factory
 from ._session import AnkiSession
 from ._types import PathLike
+
+# @contextmanager
+# def environment_set(environment: Dict[str, str]):
+#     os.environ.update(environment)
+
+#     yield os.environ
+
+#     os.environ.update(old_environ)
 
 
 @contextmanager
@@ -87,6 +96,7 @@ def anki_running(
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
+    web_debugging_port: Optional[int] = None,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
@@ -135,6 +145,10 @@ def anki_running(
             for the specified add-on to. Useful for simulating specific config set-ups.
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
+
+        web_debugging_port {Optional[int]}:
+            If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
+            you to remotely debug Qt web engine views.
 
     Returns:
         Iterator[AnkiSession] -- [description]
@@ -186,26 +200,34 @@ def anki_running(
                 anki_base_dir=anki_base_dir, name=profile_name, lang=lang
             ) as user_name:
 
-                # We don't pass in -p <profile> in order to avoid profile loading.
-                # This helps replicate the profile availability at add-on init time
-                # for most users. Anki will automatically open the profile at
-                # mw.setupProfile time in single-profile setups
-                app = _run(argv=["anki", "-b", anki_base_dir], exec=False)
-                mw = aqt.mw
+                environment = {}
 
-                if mw is None or app is None:
-                    raise AnkiSessionError("Main window not initialized correctly")
+                if web_debugging_port:
+                    environment["QTWEBENGINE_REMOTE_DEBUGGING"] = str(
+                        web_debugging_port
+                    )
 
-                anki_session = AnkiSession(
-                    app=app, mw=mw, user=user_name, base=anki_base_dir
-                )
+                with mock.patch.dict(os.environ, environment):
+                    # We don't pass in -p <profile> in order to avoid profile loading.
+                    # This helps replicate the profile availability at add-on init time
+                    # for most users. Anki will automatically open the profile at
+                    # mw.setupProfile time in single-profile setups
+                    app = _run(argv=["anki", "-b", anki_base_dir], exec=False)
+                    mw = aqt.mw
 
-                if not load_profile:
-                    yield anki_session
+                    if mw is None or app is None:
+                        raise AnkiSessionError("Main window not initialized correctly")
 
-                else:
-                    with anki_session.profile_loaded():
+                    anki_session = AnkiSession(
+                        app=app, mw=mw, user=user_name, base=anki_base_dir
+                    )
+
+                    if not load_profile:
                         yield anki_session
+
+                    else:
+                        with anki_session.profile_loaded():
+                            yield anki_session
 
     # NOTE: clean up does not seem to work properly in all cases,
     # so use pytest-forked for now

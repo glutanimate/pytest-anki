@@ -97,6 +97,10 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
 
+        web_debugging_port {Optional[int]}:
+            If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
+            you to remotely debug Qt web engine views.
+
     """
 
     indirect_parameters: Optional[Dict[str, Any]] = getattr(request, "param", None)
