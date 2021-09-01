@@ -32,10 +32,15 @@
 Tests for all pytest fixtures provided by the plug-in
 """
 
+import copy
+import dataclasses
+import json
 from pathlib import Path
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import pytest
+from aqt import AnkiApp
+from aqt.main import AnkiQt
 
 from pytest_anki import AnkiSession, AnkiSessionError
 
@@ -52,9 +57,6 @@ if TYPE_CHECKING:
 
 
 def test_anki_session_launches(anki_session: AnkiSession):
-    from aqt import AnkiApp
-    from aqt.main import AnkiQt
-
     assert isinstance(anki_session.app, AnkiApp)
     assert isinstance(anki_session.mw, AnkiQt)
     assert isinstance(anki_session.user, str)
@@ -146,3 +148,80 @@ def test_deck_management(anki_session: AnkiSession):
 
         anki_session.remove_deck(deck_id=deck_id)
         assert len(_get_deck_ids(anki_session.collection)) == 1
+
+
+@dataclasses.dataclass
+class AddonConfig:
+    package_name: str
+    default_config: Optional[Dict[str, Any]] = None
+    user_config: Optional[Dict[str, Any]] = None
+
+
+_addon_configs = [
+    AddonConfig(
+        package_name="sample_addon",
+        default_config={"foo": True},
+        user_config={"foo": False},
+    ),
+    AddonConfig(package_name="32452234234", default_config={"foo": True}),
+    AddonConfig(
+        package_name="11211211221",
+        user_config={"foo": True},
+    ),
+]
+
+
+def _assert_config_written(anki_base_dir: str, addon_config: AddonConfig):
+    addon_path = Path(anki_base_dir) / "addons21" / addon_config.package_name
+    user_config_path = addon_path / "meta.json"
+    default_config_path = addon_path / "config.json"
+
+    if addon_config.user_config:
+        assert user_config_path.exists()
+        with user_config_path.open() as user_config_file:
+            user_config = json.load(user_config_file)
+            assert user_config["config"] == addon_config.user_config
+
+    else:
+        assert not user_config_path.exists()
+
+    if addon_config.default_config:
+        assert default_config_path.exists()
+        with default_config_path.open() as default_config_file:
+            default_config = json.load(default_config_file)
+            assert default_config == addon_config.default_config
+
+    else:
+        assert not default_config_path.exists()
+
+
+def test_addon_config_management(anki_session: AnkiSession):
+    with pytest.raises(ValueError):
+        anki_session.create_addon_config(package_name="sample_addon")
+
+    for addon_config in _addon_configs:
+        anki_session.create_addon_config(**dataclasses.asdict(addon_config))
+
+        _assert_config_written(
+            anki_base_dir=anki_session.base, addon_config=addon_config
+        )
+
+    for addon_config in _addon_configs:
+        addon_config = copy.deepcopy(addon_config)
+        addon_config.package_name = addon_config.package_name + "2"
+
+        all_config_paths = []
+
+        with anki_session.addon_config_created(
+            **dataclasses.asdict(addon_config)
+        ) as config_paths:
+            all_config_paths.append(config_paths)
+            _assert_config_written(
+                anki_base_dir=anki_session.base, addon_config=addon_config
+            )
+
+        for config_paths in all_config_paths:
+            if config_paths.default_config:
+                assert not config_paths.default_config.exists()
+            if config_paths.user_config:
+                assert not config_paths.user_config.exists()
