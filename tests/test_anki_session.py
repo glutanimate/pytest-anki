@@ -35,8 +35,10 @@ Tests for all pytest fixtures provided by the plug-in
 import copy
 import dataclasses
 import json
+import sys
+from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional
 
 import pytest
 from aqt import AnkiApp
@@ -51,6 +53,15 @@ if TYPE_CHECKING:
         from anki.collection import Collection
     except ImportError:
         from anki.collection import _Collection as Collection
+
+# Helpers
+
+
+@contextmanager
+def extend_sys_path(import_path: str) -> Iterator[None]:
+    sys.path.append(import_path)
+    yield
+    sys.path.remove(import_path)
 
 
 # General tests ####
@@ -193,6 +204,19 @@ def _assert_config_written(anki_base_dir: str, addon_config: AddonConfig):
 
     else:
         assert not default_config_path.exists()
+
+
+_sample_addons_path = Path(__file__).parent / "samples" / "add-ons" / "simple"
+_package_name = "sample_addon_three"
+
+
+def test_load_addon(anki_session: AnkiSession):
+    assert _package_name not in sys.path
+
+    with extend_sys_path(import_path=str(_sample_addons_path)):
+        addon = anki_session.load_addon(package_name=_package_name)
+        assert sys.modules[_package_name] == addon
+        assert getattr(anki_session.mw, _package_name)
 
 
 def test_addon_config_management(anki_session: AnkiSession):
