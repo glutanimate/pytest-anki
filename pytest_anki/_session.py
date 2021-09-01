@@ -175,8 +175,8 @@ class AnkiSession:
     def create_addon_config(
         self,
         package_name: str,
-        default_config: Optional[Dict[str, Any]],
-        user_config: Optional[Dict[str, Any]],
+        default_config: Optional[Dict[str, Any]] = None,
+        user_config: Optional[Dict[str, Any]] = None,
     ) -> ConfigPaths:
         """Create and populate the config.json and meta.json configuration
         files for an add-on, as specified by its package name"""
@@ -196,8 +196,8 @@ class AnkiSession:
     def addon_config_created(
         self,
         package_name: str,
-        default_config: Optional[Dict[str, Any]],
-        user_config: Optional[Dict[str, Any]],
+        default_config: Optional[Dict[str, Any]] = None,
+        user_config: Optional[Dict[str, Any]] = None,
     ) -> Iterator[ConfigPaths]:
         """Context manager that takes care of creating the configuration files
         for an add-on, as specified by its package name, and then deleting them
