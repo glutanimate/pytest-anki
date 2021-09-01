@@ -32,9 +32,8 @@
 Tests for all pytest fixtures provided by the plug-in
 """
 
-from typing import TYPE_CHECKING
-
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
