@@ -1,6 +1,8 @@
 SHELL = /bin/bash
 
-PACKAGE = pytest_anki
+PACKAGE_FOLDER = pytest_anki
+TESTS_FOLDER = tests
+MONITORED_FOLDERS = $(PACKAGE_FOLDER) $(TESTS_FOLDER)
 TEST_FLAGS ?= -n4
 
 # Set up project
@@ -13,17 +15,17 @@ test:
 
 # Run type checkers
 check:
-	python -m mypy $(PACKAGE)
+	python -m mypy $(MONITORED_FOLDERS)
 
 # Run code linters
 lint:
-	python -m flake8 $(PACKAGE)
-	python -m black --check $(PACKAGE)
+	python -m flake8 $(MONITORED_FOLDERS)
+	python -m black --check $(MONITORED_FOLDERS)
 
 # Run code formatters
 format:
-	python -m isort $(PACKAGE)
-	python -m black $(PACKAGE)
+	python -m isort $(MONITORED_FOLDERS)
+	python -m black $(MONITORED_FOLDERS)
 
 # Build project
 build:
