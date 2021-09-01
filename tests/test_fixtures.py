@@ -1,7 +1,7 @@
 # pytest-anki
 #
 # Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
-# Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
+#                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -64,14 +64,14 @@ _lang = "de_DE"
     indirect=True,
 )
 def test_can_set_anki_session_properties(anki_session: AnkiSession):
-    import anki
+    from anki import lang
 
     assert anki_session.base.startswith(_base_path)
     assert Path(anki_session.base).name.startswith(_base_name)
 
     with anki_session.profile_loaded():
         assert anki_session.mw.pm.name == _profile_name
-        assert anki.lang.currentLang == _lang.split("_")[0]
+        assert lang.currentLang == _lang.split("_")[0]
 
 
 # Preloading Anki state

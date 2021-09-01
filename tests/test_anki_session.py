@@ -1,7 +1,7 @@
 # pytest-anki
 #
 # Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
-# Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
+#                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -65,7 +65,7 @@ def test_collection_loading_unloading(anki_session: AnkiSession, qtbot: "QtBot")
         from anki.collection import Collection
     except ImportError:  # <=2.1.26
         from anki.collection import _Collection as Collection  # type: ignore[no-redef]
-    
+
     from aqt import gui_hooks
 
     is_profile_loaded = False
