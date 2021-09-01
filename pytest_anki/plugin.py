@@ -82,7 +82,7 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
         preset_anki_state {Optional[pytest_anki.AnkiStateUpdate]}:
             Allows pre-configuring Anki object state, as described by a PresetAnkiState
             dataclass. This includes the three main configuration storages used by
-            add-ons, mw.col.conf (colconf_strage), mw.pm.profile (profile_storage),
+            add-ons, mw.col.conf (colconf_storage), mw.pm.profile (profile_storage),
             and mw.pm.meta (meta_storage).
 
             The provided data is applied on top of the existing data in each case
