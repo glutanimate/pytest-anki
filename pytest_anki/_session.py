@@ -145,7 +145,7 @@ class AnkiSession:
             # passing in an int for now.
             self.collection.decks.remove([deck_id])  # type: ignore[list-item]
         except AttributeError:  # legacy
-            self.collection.decks.rem(deck_id)
+            self.collection.decks.rem(deck_id, cardsToo=True)
 
     @contextmanager
     def deck_installed(self, path: PathLike) -> Iterator[int]:
