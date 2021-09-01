@@ -42,7 +42,7 @@ import pytest
 from aqt import AnkiApp
 from aqt.main import AnkiQt
 
-from pytest_anki import AnkiSession, AnkiSessionError
+from pytest_anki import AnkiSession, AnkiSessionError, AnkiStateUpdate
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
@@ -225,3 +225,46 @@ def test_addon_config_management(anki_session: AnkiSession):
                 assert not config_paths.default_config.exists()
             if config_paths.user_config:
                 assert not config_paths.user_config.exists()
+
+
+_anki_state_updates = [
+    AnkiStateUpdate(meta_storage={"my_key": True}),
+    AnkiStateUpdate(profile_storage={"my_key": True}),
+    AnkiStateUpdate(colconf_storage={"my_key": True}),
+    AnkiStateUpdate(
+        meta_storage={"my_key": False},
+        profile_storage={"my_key": False},
+        colconf_storage={"my_key": False},
+    ),
+]
+
+
+def _assert_anki_state_updated(
+    main_window: "AnkiQt", anki_state_update: AnkiStateUpdate
+):
+    if anki_state_update.meta_storage:
+        for key in anki_state_update.meta_storage.keys():
+            assert main_window.pm.meta[key] == anki_state_update.meta_storage[key]
+
+    assert main_window.pm.profile is not None
+    assert main_window.col is not None
+
+    if anki_state_update.profile_storage:
+        for key in anki_state_update.profile_storage.keys():
+            assert main_window.pm.profile[key] == anki_state_update.profile_storage[key]
+
+    if anki_state_update.colconf_storage:
+        for key in anki_state_update.colconf_storage.keys():
+            assert (
+                main_window.col.get_config(key)
+                == anki_state_update.colconf_storage[key]
+            )
+
+
+def test_anki_state_updates(anki_session: AnkiSession):
+    with anki_session.profile_loaded():
+        for anki_state_update in _anki_state_updates:
+            anki_session.update_anki_state(anki_state_update=anki_state_update)
+            _assert_anki_state_updated(
+                main_window=anki_session.mw, anki_state_update=anki_state_update
+            )
