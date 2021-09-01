@@ -7,10 +7,13 @@ license = "AGPL-3.0-or-later"
 repository = "https://github.com/glutanimate/pytest-anki"
 homepage = "https://github.com/glutanimate/pytest-anki"
 readme = "README.md"
-keywords = ["anki", "development", "testing", "pytest"]
+keywords = ["anki", "development", "testing", "test", "pytest"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: User Interfaces",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
