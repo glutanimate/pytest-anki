@@ -36,12 +36,15 @@ Tests for the AnkiSession API
 import sys
 import tempfile
 from pathlib import Path
+from typing import Final
 
 import pytest
 
 from pytest_anki import AnkiSession, AnkiStateUpdate
 
 # Indirect parametrization ####
+
+ANKI_SESSION: Final = "anki_session"
 
 # Session parameters
 
@@ -52,7 +55,7 @@ _lang = "de_DE"
 
 
 @pytest.mark.parametrize(
-    "anki_session",
+    ANKI_SESSION,
     [
         dict(
             base_path=_base_path,
@@ -77,7 +80,7 @@ def test_can_set_anki_session_properties(anki_session: AnkiSession):
 # Preloading Anki state
 
 
-@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
+@pytest.mark.parametrize(ANKI_SESSION, [dict(load_profile=True)], indirect=True)
 def test_can_preload_profile(anki_session: AnkiSession):
     from anki.collection import _Collection
 
@@ -106,7 +109,7 @@ for path in _simple_addons_path.iterdir():
 
 
 @pytest.mark.parametrize(
-    "anki_session",
+    ANKI_SESSION,
     [dict(packed_addons=_packed_addons, unpacked_addons=_unpacked_addons)],
     indirect=True,
 )
@@ -136,7 +139,7 @@ for addon_copy in range(2):
 
 
 @pytest.mark.parametrize(
-    "anki_session",
+    ANKI_SESSION,
     [dict(unpacked_addons=_unpacked_addons, addon_configs=_addon_configs)],
     indirect=True,
 )
@@ -156,7 +159,7 @@ _my_anki_state = AnkiStateUpdate(
 
 
 @pytest.mark.parametrize(
-    "anki_session",
+    ANKI_SESSION,
     [
         dict(
             unpacked_addons=[(_state_checker_addon_package, _state_checker_addon_path)],
