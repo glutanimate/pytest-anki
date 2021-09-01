@@ -61,7 +61,11 @@ def test_anki_session_launches(anki_session: AnkiSession):
 
 
 def test_collection_loading_unloading(anki_session: AnkiSession, qtbot: "QtBot"):
-    from anki.collection import Collection
+    try:
+        from anki.collection import Collection
+    except ImportError:  # <=2.1.26
+        from anki.collection import _Collection as Collection  # type: ignore[no-redef]
+    
     from aqt import gui_hooks
 
     is_profile_loaded = False
