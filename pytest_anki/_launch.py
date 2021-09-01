@@ -83,10 +83,10 @@ def anki_running(
     profile_name: str = "User 1",
     lang: str = "en_US",
     load_profile: bool = False,
+    preset_anki_state: Optional[AnkiStateUpdate] = None,
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
-    preset_anki_state: Optional[AnkiStateUpdate] = None,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
