@@ -206,7 +206,7 @@ class AnkiSession:
             raise ValueError(
                 "Need to provide at least one of default_config, user_config"
             )
-        
+
         config_paths = self.create_addon_config(
             package_name=package_name,
             default_config=default_config,
@@ -224,4 +224,11 @@ class AnkiSession:
     # Anki config object handling ####
 
     def update_anki_state(self, anki_state_update: AnkiStateUpdate):
+        """Set the state of certain Anki storage objects that are frequently used by add-ons.
+        This includes mw.col.conf (colconf_storage), mw.pm.profile (profile_storage),
+        and mw.pm.meta (meta_storage).
+
+        The combined state of all objects is supplied as a pytest_anki.AnkiStateUpdate
+        data class.
+        """
         update_anki_state(main_window=self._mw, anki_state_update=anki_state_update)
