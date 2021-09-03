@@ -31,18 +31,18 @@
 import re
 from contextlib import contextmanager
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
-from PyQt5.QtCore import QThreadPool
-from PyQt5.QtWebEngineWidgets import QWebEngineProfile
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Union
 
 from anki.importing.apkg import AnkiPackageImporter
+from PyQt5.QtCore import QThreadPool
+from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 from selenium import webdriver
 
 from ._addons import ConfigPaths, create_addon_config
-from ._anki import AnkiStateUpdate, get_collection, update_anki_state
+from ._anki import AnkiStateUpdate, AnkiWebViews, get_collection, update_anki_state
 from ._errors import AnkiSessionError
-from ._types import PathLike
 from ._qt import SignallingWorker
+from ._types import PathLike
 
 if TYPE_CHECKING:
     from anki.collection import Collection
@@ -317,7 +317,7 @@ class AnkiSession:
     def run_with_chrome_driver(
         self,
         test_function: Callable[[webdriver.Chrome], Optional[bool]],
-        target_web_view: Optional[str] = None,
+        target_web_view: Optional[Union[AnkiWebViews, str]] = None,
     ):
         """[summary]
 
@@ -325,6 +325,13 @@ class AnkiSession:
             test_function (Callable[[webdriver.Chrome], Optional[bool]]): [description]
             target_web_view: Web view as identified by its title. Defaults to None.
         """
+        web_view_title: Optional[str]
+        
+        if isinstance(target_web_view, AnkiWebViews):
+            web_view_title = target_web_view.value
+        else:
+            web_view_title = target_web_view
+
         def test_wrapper() -> Optional[bool]:
             options = webdriver.ChromeOptions()
             options.add_experimental_option(
@@ -332,9 +339,9 @@ class AnkiSession:
             )
             driver = webdriver.Chrome(options=options)
 
-            if target_web_view:
+            if web_view_title:
                 self._switch_chrome_driver_to_web_view(
-                    driver=driver, web_view_title=target_web_view
+                    driver=driver, web_view_title=web_view_title
                 )
 
             return test_function(driver)

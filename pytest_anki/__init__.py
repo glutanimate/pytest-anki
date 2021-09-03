@@ -34,6 +34,7 @@ A simple pytest plugin for testing Anki add-ons
 """
 
 from ._anki import AnkiStateUpdate  # noqa: F401
+from ._anki import AnkiWebViews  # noqa: F401
 from ._errors import AnkiSessionError  # noqa: F401
 from ._session import AnkiSession  # noqa: F401
 
