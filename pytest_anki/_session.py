@@ -39,7 +39,7 @@ from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 from selenium import webdriver
 
 from ._addons import ConfigPaths, create_addon_config
-from ._anki import AnkiStateUpdate, AnkiWebViews, get_collection, update_anki_state
+from ._anki import AnkiStateUpdate, AnkiWebViewType, get_collection, update_anki_state
 from ._errors import AnkiSessionError
 from ._qt import SignallingWorker
 from ._types import PathLike
@@ -317,7 +317,7 @@ class AnkiSession:
     def run_with_chrome_driver(
         self,
         test_function: Callable[[webdriver.Chrome], Optional[bool]],
-        target_web_view: Optional[Union[AnkiWebViews, str]] = None,
+        target_web_view: Optional[Union[AnkiWebViewType, str]] = None,
     ):
         """[summary]
 
@@ -326,8 +326,8 @@ class AnkiSession:
             target_web_view: Web view as identified by its title. Defaults to None.
         """
         web_view_title: Optional[str]
-        
-        if isinstance(target_web_view, AnkiWebViews):
+
+        if isinstance(target_web_view, AnkiWebViewType):
             web_view_title = target_web_view.value
         else:
             web_view_title = target_web_view

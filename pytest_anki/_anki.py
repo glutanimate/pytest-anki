@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from aqt.main import AnkiQt
 
 
-class AnkiWebViews(Enum):
+class AnkiWebViewType(Enum):
     main_webview = "main webview"
     top_toolbar = "top toolbar"
     bottom_toolbar = "bottom toolbar"
