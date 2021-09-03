@@ -99,7 +99,7 @@ def anki_running(
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
-    enable_web_debugging: bool = False,
+    enable_web_debugging: bool = True,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
