@@ -325,6 +325,9 @@ class AnkiSession:
             test_function (Callable[[webdriver.Chrome], Optional[bool]]): [description]
             target_web_view: Web view as identified by its title. Defaults to None.
         """
+        if self._web_debugging_port is None:
+            raise AnkiSessionError("Web debugging interface is not active")
+
         web_view_title: Optional[str]
 
         if isinstance(target_web_view, AnkiWebViewType):
