@@ -29,7 +29,7 @@
 # Any modifications to this file must keep this entire header intact.
 
 
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 
 from PyQt5.QtCore import QMessageLogContext, QObject, QRunnable, QtMsgType, pyqtSignal
 
