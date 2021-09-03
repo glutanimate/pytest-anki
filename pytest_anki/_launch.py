@@ -49,13 +49,6 @@ from ._types import PathLike
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
 
-# @contextmanager
-# def environment_set(environment: Dict[str, str]):
-#     os.environ.update(environment)
-
-#     yield os.environ
-
-#     os.environ.update(old_environ)
 
 QTWEBENGINE_REMOTE_DEBUGGING = "QTWEBENGINE_REMOTE_DEBUGGING"
 
