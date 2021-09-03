@@ -49,7 +49,7 @@ if TYPE_CHECKING:
     from aqt import AnkiApp
     from aqt.main import AnkiQt
     from pytestqt.qtbot import QtBot
-    from selenium.webdriver import Chrome
+    from selenium import webdriver
 
 
 class AnkiSession:
@@ -272,7 +272,7 @@ class AnkiSession:
 
     # Web debugging ####
 
-    def run_in_background(self, task: Callable, *task_args: Any, **task_kwargs: Any):
+    def run_in_thread(self, task: Callable, *task_args: Any, **task_kwargs: Any):
         thread_pool = QThreadPool.globalInstance()
         worker = SignallingWorker(
             task=task, task_args=task_args, task_kwargs=task_kwargs
@@ -303,7 +303,9 @@ class AnkiSession:
         self.mw.app.setApplicationName(old_application_name)
         self.mw.app.setApplicationVersion(old_application_version)
 
-    def run_webdriver_test(self, test_function: Callable[["Chrome"], Optional[bool]]):
+    def run_with_chrome_driver(
+        self, test_function: Callable[["webdriver.Chrome"], Optional[bool]]
+    ):
         def test_wrapper() -> Optional[bool]:
             options = ChromeOptions()
             options.add_experimental_option(
@@ -313,4 +315,4 @@ class AnkiSession:
             return test_function(driver)
 
         with self._allow_selenium_to_detect_anki():
-            return self.run_in_background(test_wrapper)
+            return self.run_in_thread(test_wrapper)
