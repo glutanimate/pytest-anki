@@ -78,6 +78,6 @@ def get_nested_attribute(obj: Any, attr: str, *args) -> Any:
 def find_free_port():
     # https://stackoverflow.com/a/45690594
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-        s.bind(('', 0))
+        s.bind(("", 0))
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         return s.getsockname()[1]

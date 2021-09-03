@@ -28,12 +28,12 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
-from selenium import webdriver
+from unittest.mock import Mock
+
 import requests
+from selenium import webdriver
 
 from pytest_anki import AnkiSession, AnkiWebViewType
-
-from unittest.mock import Mock
 
 
 def test_run_in_thread(anki_session: AnkiSession):
@@ -70,6 +70,7 @@ def test_web_driver_can_select_web_view(anki_session: AnkiSession):
         anki_session.run_with_chrome_driver(
             assert_web_driver_connected_to_main_web_view, AnkiWebViewType.main_webview
         )
+
 
 def test_web_driver_can_interact_with_anki(anki_session: AnkiSession):
     def switch_to_deck_view(driver: webdriver.Chrome):
