@@ -31,7 +31,17 @@
 import re
 from contextlib import contextmanager
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from anki.importing.apkg import AnkiPackageImporter
 from PyQt5.QtCore import QThreadPool
@@ -271,7 +281,12 @@ class AnkiSession:
 
     # Web debugging ####
 
-    def run_in_thread(self, task: Callable, *task_args: Any, **task_kwargs: Any):
+    def run_in_thread(
+        self,
+        task: Callable,
+        task_args: Optional[Tuple[Any, ...]] = None,
+        task_kwargs: Optional[Dict[str, Any]] = None,
+    ):
         thread_pool = QThreadPool.globalInstance()
         worker = SignallingWorker(
             task=task, task_args=task_args, task_kwargs=task_kwargs
