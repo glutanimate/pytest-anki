@@ -590,7 +590,7 @@ pytest = ">=3.10"
 name = "pytest-qt"
 version = "4.0.2"
 description = "pytest support for PyQt and PySide applications"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -800,7 +800,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "58442f2900445000768eed9fa8a5f240ef5ddf87ea4dec6b842205b98332fce4"
+content-hash = "e1a46d3a7b2743f76ee39e9c3f491996213aa717ab0f24ac373df34ede245c3c"
 
 [metadata.files]
 anki = [

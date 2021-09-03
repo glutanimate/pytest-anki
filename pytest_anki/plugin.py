@@ -34,13 +34,14 @@ import pytest
 
 if TYPE_CHECKING:
     from pytest import FixtureRequest
+    from pytestqt.qtbot import QtBot
 
 from ._launch import anki_running
 from ._session import AnkiSession
 
 
 @pytest.fixture
-def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
+def anki_session(request: "FixtureRequest", qtbot: "QtBot") -> Iterator[AnkiSession]:
     """Fixture that instantiates Anki, yielding an AnkiSession object
 
     All keyword arguments below may be passed to the fixture by using indirect
@@ -105,7 +106,7 @@ def anki_session(request: "FixtureRequest") -> Iterator[AnkiSession]:
 
     indirect_parameters: Optional[Dict[str, Any]] = getattr(request, "param", None)
 
-    with anki_running() if not indirect_parameters else anki_running(
-        **indirect_parameters
+    with anki_running(qtbot=qtbot) if not indirect_parameters else anki_running(
+        qtbot=qtbot, **indirect_parameters
     ) as session:
         yield session
