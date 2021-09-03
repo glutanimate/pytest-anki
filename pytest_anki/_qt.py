@@ -47,18 +47,19 @@ class QtMessageMatcher(QObject):
             self.match_found.emit()
 
 
-class SignallingWorker(QObject, QRunnable):
-
+class Signals(QObject):
     finished = pyqtSignal()
 
+
+class SignallingWorker(QRunnable):
     def __init__(
         self,
         task: Callable,
         task_args: Optional[Tuple[Any, ...]] = None,
         task_kwargs: Optional[Dict[str, Any]] = None,
-        parent: Optional[QObject] = None,
     ):
-        super().__init__(parent=parent)
+        super().__init__()
+        self.signals = Signals()
         self._task = task
         self._task_args = task_args or tuple()
         self._task_kwargs = task_kwargs or {}
@@ -71,7 +72,7 @@ class SignallingWorker(QObject, QRunnable):
         except Exception as error:
             self._error = error
         finally:
-            self.finished.emit()
+            self.signals.finished.emit()
 
     @property
     def result(self) -> Optional[Any]:

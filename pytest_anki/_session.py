@@ -275,10 +275,10 @@ class AnkiSession:
     def run_in_background(self, task: Callable, *task_args: Any, **task_kwargs: Any):
         thread_pool = QThreadPool.globalInstance()
         worker = SignallingWorker(
-            task=task, parent=self.mw, task_args=task_args, task_kwargs=task_kwargs
+            task=task, task_args=task_args, task_kwargs=task_kwargs
         )
 
-        with self._qtbot.wait_signal(worker.finished):
+        with self._qtbot.wait_signal(worker.signals.finished):
             thread_pool.start(worker)
 
         if exception := worker.error:
