@@ -36,7 +36,7 @@ from PyQt5.QtCore import QThreadPool
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 
 from anki.importing.apkg import AnkiPackageImporter
-from selenium.webdriver import Chrome, ChromeOptions
+from selenium import webdriver
 
 from ._addons import ConfigPaths, create_addon_config
 from ._anki import AnkiStateUpdate, get_collection, update_anki_state
@@ -49,7 +49,6 @@ if TYPE_CHECKING:
     from aqt import AnkiApp
     from aqt.main import AnkiQt
     from pytestqt.qtbot import QtBot
-    from selenium import webdriver
 
 
 class AnkiSession:
@@ -303,15 +302,41 @@ class AnkiSession:
         self.mw.app.setApplicationName(old_application_name)
         self.mw.app.setApplicationVersion(old_application_version)
 
-    def run_with_chrome_driver(
-        self, test_function: Callable[["webdriver.Chrome"], Optional[bool]]
+    def _switch_chrome_driver_to_web_view(
+        self, driver: webdriver.Chrome, web_view_title: str
     ):
+        for window_handle in driver.window_handles:
+            driver.switch_to.window(window_handle)
+            if driver.title == web_view_title:
+                break
+        else:
+            raise AnkiSessionError(
+                f"Could not find web view with provided title '{web_view_title}'"
+            )
+
+    def run_with_chrome_driver(
+        self,
+        test_function: Callable[[webdriver.Chrome], Optional[bool]],
+        target_web_view: Optional[str] = None,
+    ):
+        """[summary]
+
+        Args:
+            test_function (Callable[[webdriver.Chrome], Optional[bool]]): [description]
+            target_web_view: Web view as identified by its title. Defaults to None.
+        """
         def test_wrapper() -> Optional[bool]:
-            options = ChromeOptions()
+            options = webdriver.ChromeOptions()
             options.add_experimental_option(
                 "debuggerAddress", f"127.0.0.1:{self._web_debugging_port}"
             )
-            driver = Chrome(options=options)
+            driver = webdriver.Chrome(options=options)
+
+            if target_web_view:
+                self._switch_chrome_driver_to_web_view(
+                    driver=driver, web_view_title=target_web_view
+                )
+
             return test_function(driver)
 
         with self._allow_selenium_to_detect_anki():
