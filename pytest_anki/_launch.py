@@ -45,6 +45,7 @@ from ._patch import patch_anki, post_ui_setup_callback_factory
 from ._qt import QtMessageMatcher
 from ._session import AnkiSession
 from ._types import PathLike
+from ._util import find_free_port
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
@@ -98,7 +99,7 @@ def anki_running(
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
-    web_debugging_port: Optional[int] = None,
+    enable_web_debugging: bool = False,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
@@ -204,8 +205,14 @@ def anki_running(
 
                 environment = {}
 
-                if web_debugging_port:
+                if enable_web_debugging:
+                    web_debugging_port = find_free_port()
+                    print(type(web_debugging_port))
+                    if web_debugging_port is None:
+                        raise OSError("Could not find a free port for remote debugging")
                     environment[QTWEBENGINE_REMOTE_DEBUGGING] = str(web_debugging_port)
+                else:
+                    web_debugging_port = None
 
                 with mock.patch.dict(os.environ, environment):
 
