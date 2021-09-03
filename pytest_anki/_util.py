@@ -33,7 +33,7 @@ import socket
 from contextlib import closing
 from functools import reduce
 from pathlib import Path
-from typing import Any, List, Union
+from typing import Any, Union
 
 
 def create_json(path: Union[str, Path], data: dict) -> str:
