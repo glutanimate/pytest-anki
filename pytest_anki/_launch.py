@@ -253,7 +253,12 @@ def anki_running(
                         raise AnkiSessionError("Main window not initialized correctly")
 
                     anki_session = AnkiSession(
-                        app=app, mw=mw, user=user_name, base=anki_base_dir
+                        app=app,
+                        mw=mw,
+                        user=user_name,
+                        base=anki_base_dir,
+                        qtbot=qtbot,
+                        web_debugging_port=web_debugging_port,
                     )
 
                     if not load_profile:

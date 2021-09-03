@@ -29,7 +29,9 @@
 # Any modifications to this file must keep this entire header intact.
 
 
-from PyQt5.QtCore import QMessageLogContext, QObject, QtMsgType, pyqtSignal
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+from PyQt5.QtCore import QMessageLogContext, QObject, QRunnable, QtMsgType, pyqtSignal
 
 
 class QtMessageMatcher(QObject):
@@ -43,3 +45,38 @@ class QtMessageMatcher(QObject):
     def __call__(self, type: QtMsgType, context: QMessageLogContext, msg: str):
         if self._matched_phrase in msg:
             self.match_found.emit()
+
+
+class SignallingWorker(QObject, QRunnable):
+
+    finished = pyqtSignal()
+
+    def __init__(
+        self,
+        task: Callable,
+        task_args: Optional[Tuple[Any, ...]] = None,
+        task_kwargs: Optional[Dict[str, Any]] = None,
+        parent: Optional[QObject] = None,
+    ):
+        super().__init__(parent=parent)
+        self._task = task
+        self._task_args = task_args or tuple()
+        self._task_kwargs = task_kwargs or {}
+        self._result: Optional[Any] = None
+        self._error: Optional[Exception] = None
+
+    def run(self):
+        try:
+            self._result = self._task(*self._task_args, **self._task_kwargs)
+        except Exception as error:
+            self._error = error
+        finally:
+            self.finished.emit()
+
+    @property
+    def result(self) -> Optional[Any]:
+        return self._result
+
+    @property
+    def error(self) -> Optional[Exception]:
+        return self._error

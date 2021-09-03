@@ -28,25 +28,40 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import re
 from contextlib import contextmanager
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional
+from PyQt5.QtCore import QThreadPool
+from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 
 from anki.importing.apkg import AnkiPackageImporter
+from selenium.webdriver import Chrome, ChromeOptions
 
 from ._addons import ConfigPaths, create_addon_config
 from ._anki import AnkiStateUpdate, get_collection, update_anki_state
 from ._errors import AnkiSessionError
 from ._types import PathLike
+from ._qt import SignallingWorker
 
 if TYPE_CHECKING:
     from anki.collection import Collection
     from aqt import AnkiApp
     from aqt.main import AnkiQt
+    from pytestqt.qtbot import QtBot
+    from selenium.webdriver import Chrome
 
 
 class AnkiSession:
-    def __init__(self, app: "AnkiApp", mw: "AnkiQt", user: str, base: str):
+    def __init__(
+        self,
+        app: "AnkiApp",
+        mw: "AnkiQt",
+        user: str,
+        base: str,
+        qtbot: "QtBot",
+        web_debugging_port: Optional[int] = None,
+    ):
         """Anki test session object, returned by anki_session fixture.
 
         Contains a number of helpful properties and methods to characterize and
@@ -63,6 +78,8 @@ class AnkiSession:
         self._mw = mw
         self._user = user
         self._base = base
+        self._qtbot = qtbot
+        self._web_debugging_port = web_debugging_port
 
     # Key session properties ####
 
@@ -85,6 +102,26 @@ class AnkiSession:
     def base(self) -> str:
         """Path to Anki base directory"""
         return self._base
+
+    # Interaction with Qt
+
+    @property
+    def qtbot(self) -> "QtBot":
+        """pytest-qt QtBot fixture"""
+        return self._qtbot
+
+    @property
+    def web_debugging_port(self) -> Optional[int]:
+        """Port used for remote web debugging (if set)"""
+        return self._web_debugging_port
+
+    @property
+    def chromium_version(self) -> str:
+        user_agent = QWebEngineProfile.defaultProfile().httpUserAgent()
+        match = re.match(r".*Chrome/(.+)\s+.*", user_agent)
+        if match is None:
+            raise AnkiSessionError("Could not determine Chromium version")
+        return match.groups()[0]
 
     # Collection and profiles ####
 
@@ -232,3 +269,48 @@ class AnkiSession:
         data class.
         """
         update_anki_state(main_window=self._mw, anki_state_update=anki_state_update)
+
+    # Web debugging ####
+
+    def run_in_background(self, task: Callable, *task_args: Any, **task_kwargs: Any):
+        thread_pool = QThreadPool.globalInstance()
+        worker = SignallingWorker(
+            task=task, parent=self.mw, task_args=task_args, task_kwargs=task_kwargs
+        )
+
+        with self._qtbot.wait_signal(worker.finished):
+            thread_pool.start(worker)
+
+        if exception := worker.error:
+            raise exception
+
+        return worker.result
+
+    @contextmanager
+    def _allow_selenium_to_detect_anki(self) -> Iterator[None]:
+        """
+        Context manager that reversibly patches Anki's application name and
+        version, so that it passes Selenium's logic for identifying
+        supported browsers
+
+        cf. https://forum.qt.io/topic/96202
+        """
+        old_application_name = self.mw.app.applicationName()
+        old_application_version = self.mw.app.applicationVersion()
+        self.mw.app.setApplicationName("Chrome")
+        self.mw.app.setApplicationVersion(self.chromium_version)
+        yield
+        self.mw.app.setApplicationName(old_application_name)
+        self.mw.app.setApplicationVersion(old_application_version)
+
+    def run_webdriver_test(self, test_function: Callable[["Chrome"], Optional[bool]]):
+        def test_wrapper() -> Optional[bool]:
+            options = ChromeOptions()
+            options.add_experimental_option(
+                "debuggerAddress", f"127.0.0.1:{self._web_debugging_port}"
+            )
+            driver = Chrome(options=options)
+            return test_function(driver)
+
+        with self._allow_selenium_to_detect_anki():
+            return self.run_in_background(test_wrapper)
