@@ -1,0 +1,57 @@
+name: "Run checks"
+description: "Run checks"
+
+inputs:
+  # If left unspecified, inputs will fall back to defaults defined in setup_ actions
+  # which are informed by the latest tested Anki release
+  python:
+    description: "Python interpreter version"
+    required: false
+  anki:
+    description: "Anki version. Set this to 'prerelease' to install either the latest release or prerelease."
+    required: false
+  pyqt:
+    description: "PyQt widget toolkit version"
+    required: false
+  pyqtwebengine:
+    description: "PyQt WebEngine version"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout pytest-anki
+      uses: actions/checkout@v2
+
+    - name: "Set up environment"
+      uses: ./.github/actions/setup_system
+      with:
+        python: ${{ inputs.python }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.1.8
+        virtualenvs-create: false
+
+    - name: Set up pytest-anki
+      shell: bash
+      run: |
+        make install
+
+    - name: "Set up Anki"
+      uses: ./.github/actions/setup_anki
+      with:
+        anki: ${{ inputs.anki }}
+        pyqt: ${{ inputs.pyqt }}
+        pyqtwebengine: ${{ inputs.pyqtwebengine }}
+
+    - name: Run type checker
+      shell: bash
+      run: |
+        make check
+
+    - name: Run linter
+      shell: bash
+      run: |
+        make lint
