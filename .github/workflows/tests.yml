@@ -11,6 +11,7 @@ on:
 
 jobs:
   read-current-anki-matrix:
+    # Reads current Anki set-up from anki-current.json
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
