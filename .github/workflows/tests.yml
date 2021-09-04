@@ -1,4 +1,4 @@
-name: tests
+name: General tests
 
 on:
   pull_request:
@@ -10,25 +10,26 @@ on:
       - main
 
 jobs:
-  check-and-test-current-anki:
+  read-current-anki-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - id: set-matrix
+      run: |
+        json=$(cat ./anki-current.json)
+        echo "::set-output name=matrix::${JSON//'%'/'%25'}"
+
+  check-current-anki:
     runs-on: ubuntu-18.04
 
     strategy:
-      matrix:
-        include:
-          # Configuration based on latest tested macOS static build for Anki
-          # Updates to the dependencies specified here usually only occur every
-          # few Anki releases.
-          - anki: 2.1.47
-            python: 3.8.6
-            pyqt: 5.14.2
-            pyqtwebengine: 5.14.0
-            chrome: 77.0.3865.129
+      matrix: ${{fromJson(needs.read-current-anki-matrix.outputs.matrix)}}
 
     steps:
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
-      
+
       - name: Set up test environment
         uses: ./.github/actions/setup
         with:
@@ -37,7 +38,7 @@ jobs:
           anki: ${{ matrix.anki }}
           pyqt: ${{ matrix.pyqt }}
           pyqtwebengine: ${{ matrix.pyqtwebengine }}
-      
+
       - name: Run type checker for Anki ${{ matrix.anki }}
         shell: bash
         run: |
@@ -47,7 +48,26 @@ jobs:
         shell: bash
         run: |
           make lint
-      
+
+  test-current-anki:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix: ${{fromJson(needs.read-current-anki-matrix.outputs.matrix)}}
+
+    steps:
+      - name: Checkout pytest-anki
+        uses: actions/checkout@v2
+
+      - name: Set up test environment
+        uses: ./.github/actions/setup
+        with:
+          python: ${{ matrix.python }}
+          chrome: ${{ matrix.chrome }}
+          anki: ${{ matrix.anki }}
+          pyqt: ${{ matrix.pyqt }}
+          pyqtwebengine: ${{ matrix.pyqtwebengine }}
+
       - name: Run tests for Anki ${{ matrix.anki }}
         shell: bash
         run: |
