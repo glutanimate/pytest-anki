@@ -41,7 +41,11 @@ from PyQt5.QtCore import qInstallMessageHandler
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
 from ._errors import AnkiSessionError
-from ._patch import patch_anki, post_ui_setup_callback_factory
+from ._patch import (
+    patch_anki,
+    post_ui_setup_callback_factory,
+    set_qt_message_handler_installer,
+)
 from ._qt import QtMessageMatcher
 from ._session import AnkiSession
 from ._types import PathLike
@@ -238,7 +242,7 @@ def anki_running(
 
                             qInstallMessageHandler(message_handler_wrapper)
 
-                        aqt.qInstallMessageHandler = install_message_handler
+                        set_qt_message_handler_installer(install_message_handler)
 
                         maybe_wait_for_web_debugging = qtbot.wait_signal(
                             qt_message_matcher.match_found
@@ -276,7 +280,7 @@ def anki_running(
                             yield anki_session
 
                     # Undo monkey-patch if applied
-                    aqt.qInstallMessageHandler = qInstallMessageHandler
+                    set_qt_message_handler_installer(qInstallMessageHandler)
 
     # NOTE: clean up does not seem to work properly in all cases,
     # so use pytest-forked for now

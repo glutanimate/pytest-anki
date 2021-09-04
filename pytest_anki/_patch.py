@@ -188,3 +188,7 @@ def patch_anki(
         old_maybe_check_for_addon_updates
     )
     errors.ErrorHandler = old_errorHandler  # type: ignore[misc]
+
+
+def set_qt_message_handler_installer(message_handler_installer: Callable):
+    aqt.qInstallMessageHandler = message_handler_installer  # type: ignore[assignment]
