@@ -20,7 +20,7 @@ jobs:
     - id: set-matrix
       run: |
         json=$(cat ./anki-current.json)
-        echo "::set-output name=matrix::{\"include\": [${json//'%'/'%25'}]}"
+        echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
 
   check-current-anki:
     needs: read-current-anki-matrix
