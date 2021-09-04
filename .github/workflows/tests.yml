@@ -15,26 +15,34 @@ jobs:
     strategy:
       matrix:
         include:
+          # Version matrix follows static macOS builds as closely as possible.
+          # Some Qt package versions are not available on PyPI, so we need to make
+          # compromises here and there.
           - anki: 2.1.47
-            python: 3.8.1
-            pyqt: 5.15.1
-            pyqtwebengine: 5.15.1
-          - anki: 2.1.44
-            python: 3.8.1
+            python: 3.8.6
             pyqt: 5.14.2
             pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
+          - anki: 2.1.44
+            python: 3.8.6
+            pyqt: 5.14.2
+            pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
           - anki: 2.1.35
             python: 3.8.0
             pyqt: 5.14.2
             pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
           - anki: 2.1.28
             python: 3.8.0
             pyqt: 5.15.0
             pyqtwebengine: 5.15.0
+            chrome: 80.0.3987.163
           - anki: 2.1.26
             python: 3.8.0
             pyqt: 5.13.1
             pyqtwebengine: 5.13.1
+            chrome: 73.0.3683.105
 
     steps:
       # Qt5 requires a number of X11-related dependencies to be installed system-wide.
@@ -43,6 +51,16 @@ jobs:
       - name: Install xvfb / qt dependencies
         run: |
           sudo apt-get install libqt5gui5
+
+      - name: Setup chromedriver
+        run: |
+          chrome_version=${{ matrix.chrome }}
+          truncated_version=${chrome_version%.*}
+          driver_version=$(curl --location --fail --retry 10 "http://chromedriver.storage.googleapis.com/LATEST_RELEASE_${truncated_version}")
+          wget -c -nc --retry-connrefused --tries=0 "https://chromedriver.storage.googleapis.com/${driver_version}/chromedriver_linux64.zip"
+          unzip -o -q "chromedriver_linux64.zip"
+          sudo mv chromedriver /usr/local/bin/chromedriver
+          rm "chromedriver_linux64.zip"
 
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
@@ -77,9 +95,9 @@ jobs:
       matrix:
         include:
           - anki: 2.1.47
-            python: 3.8.1
-            pyqt: 5.15.1
-            pyqtwebengine: 5.15.1
+            python: 3.8.6
+            pyqt: 5.14.2
+            pyqtwebengine: 5.14.0
     steps:
       - name: Checkout pytest-anki
         uses: actions/checkout@v2

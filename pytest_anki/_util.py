@@ -29,6 +29,8 @@
 # Any modifications to this file must keep this entire header intact.
 
 import json
+import socket
+from contextlib import closing
 from functools import reduce
 from pathlib import Path
 from typing import Any, Union
@@ -71,3 +73,11 @@ def get_nested_attribute(obj: Any, attr: str, *args) -> Any:
         return getattr(obj, attr, *args)
 
     return reduce(_getattr, [obj] + attr.split("."))
+
+
+def find_free_port():
+    # https://stackoverflow.com/a/45690594
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(("", 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]

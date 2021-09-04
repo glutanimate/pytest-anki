@@ -25,6 +25,7 @@ lint:
 # Run code formatters
 format:
 	python -m isort $(MONITORED_FOLDERS)
+	python -m autoflake --recursive --in-place --remove-all-unused-imports $(MONITORED_FOLDERS)
 	python -m black $(MONITORED_FOLDERS)
 
 # Build project

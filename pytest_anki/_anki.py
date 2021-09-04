@@ -41,6 +41,19 @@ if TYPE_CHECKING:
     from aqt.main import AnkiQt
 
 
+class AnkiWebViewType(Enum):
+    main_webview = "main webview"
+    top_toolbar = "top toolbar"
+    bottom_toolbar = "bottom toolbar"
+    legacy_deck_stats = "deck stats"
+    previewer = "previewer"
+    browser_card_info = "browser card info"
+    card_layout = "card layout"
+    change_notetype = "changeNotetype"
+    find_duplicates = "find duplicates"
+    empty_cards = "empty cards"
+
+
 @dataclass
 class AnkiStateUpdate:
 

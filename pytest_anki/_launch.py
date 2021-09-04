@@ -33,14 +33,29 @@
 import os
 import shutil
 import tempfile
-from contextlib import contextmanager
-from typing import Any, Dict, Iterator, List, Optional, Tuple
+from contextlib import contextmanager, nullcontext
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
+from unittest import mock
+
+from PyQt5.QtCore import qInstallMessageHandler
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
 from ._errors import AnkiSessionError
-from ._patch import patch_anki, post_ui_setup_callback_factory
+from ._patch import (
+    patch_anki,
+    post_ui_setup_callback_factory,
+    set_qt_message_handler_installer,
+)
+from ._qt import QtMessageMatcher
 from ._session import AnkiSession
 from ._types import PathLike
+from ._util import find_free_port
+
+if TYPE_CHECKING:
+    from pytestqt.qtbot import QtBot
+
+
+QTWEBENGINE_REMOTE_DEBUGGING = "QTWEBENGINE_REMOTE_DEBUGGING"
 
 
 @contextmanager
@@ -78,15 +93,17 @@ def base_directory(base_path: str, base_name: str) -> Iterator[str]:
 
 @contextmanager
 def anki_running(
+    qtbot: "QtBot",
     base_path: str = tempfile.gettempdir(),
     base_name: str = "anki_base",
     profile_name: str = "User 1",
     lang: str = "en_US",
     load_profile: bool = False,
+    preset_anki_state: Optional[AnkiStateUpdate] = None,
     packed_addons: Optional[List[PathLike]] = None,
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
-    preset_anki_state: Optional[AnkiStateUpdate] = None,
+    enable_web_debugging: bool = True,
 ) -> Iterator[AnkiSession]:
     """Context manager that safely launches an Anki session, cleaning up after itself
 
@@ -136,6 +153,10 @@ def anki_running(
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
 
+        web_debugging_port {Optional[int]}:
+            If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
+            you to remotely debug Qt web engine views.
+
     Returns:
         Iterator[AnkiSession] -- [description]
 
@@ -144,7 +165,7 @@ def anki_running(
     """
 
     import aqt
-    from aqt import _run, gui_hooks
+    from aqt import gui_hooks
 
     with base_directory(base_path=base_path, base_name=base_name) as anki_base_dir:
 
@@ -186,26 +207,80 @@ def anki_running(
                 anki_base_dir=anki_base_dir, name=profile_name, lang=lang
             ) as user_name:
 
-                # We don't pass in -p <profile> in order to avoid profile loading.
-                # This helps replicate the profile availability at add-on init time
-                # for most users. Anki will automatically open the profile at
-                # mw.setupProfile time in single-profile setups
-                app = _run(argv=["anki", "-b", anki_base_dir], exec=False)
-                mw = aqt.mw
+                environment = {}
 
-                if mw is None or app is None:
-                    raise AnkiSessionError("Main window not initialized correctly")
-
-                anki_session = AnkiSession(
-                    app=app, mw=mw, user=user_name, base=anki_base_dir
-                )
-
-                if not load_profile:
-                    yield anki_session
-
+                if enable_web_debugging:
+                    web_debugging_port = find_free_port()
+                    print(type(web_debugging_port))
+                    if web_debugging_port is None:
+                        raise OSError("Could not find a free port for remote debugging")
+                    environment[QTWEBENGINE_REMOTE_DEBUGGING] = str(web_debugging_port)
                 else:
-                    with anki_session.profile_loaded():
+                    web_debugging_port = None
+
+                with mock.patch.dict(os.environ, environment):
+
+                    if os.environ.get(QTWEBENGINE_REMOTE_DEBUGGING):
+
+                        # We want to wait until remote debugging started to yield the
+                        # Anki session, so we monitor Qt's log for the corresponding msg
+                        qt_message_matcher = QtMessageMatcher(
+                            "Remote debugging server started successfully"
+                        )
+
+                        # On macOS, Anki does not install a custom message
+                        # handler, so we can install our own directly:
+                        qInstallMessageHandler(qt_message_matcher)
+
+                        # On Windows and Linux, we need to monkey-patch the
+                        # message handler installer to make sure that ours is
+                        # not switched out when aqt runs
+                        def install_message_handler(message_handler):
+                            def message_handler_wrapper(*args, **kwargs):
+                                qt_message_matcher(*args, **kwargs)
+                                return message_handler(*args, **kwargs)
+
+                            qInstallMessageHandler(message_handler_wrapper)
+
+                        set_qt_message_handler_installer(install_message_handler)
+
+                        maybe_wait_for_web_debugging = qtbot.wait_signal(
+                            qt_message_matcher.match_found
+                        )
+                    else:
+                        maybe_wait_for_web_debugging = nullcontext()
+
+                    with maybe_wait_for_web_debugging:
+                        # We don't pass in -p <profile> in order to avoid
+                        # profileloading. This helps replicate the profile
+                        # availability at add-on init time for most users. Anki
+                        # will automatically open the profile at mw.setupProfile
+                        # time in single-profile setups
+                        app = aqt._run(argv=["anki", "-b", anki_base_dir], exec=False)
+
+                    mw = aqt.mw
+
+                    if mw is None or app is None:
+                        raise AnkiSessionError("Main window not initialized correctly")
+
+                    anki_session = AnkiSession(
+                        app=app,
+                        mw=mw,
+                        user=user_name,
+                        base=anki_base_dir,
+                        qtbot=qtbot,
+                        web_debugging_port=web_debugging_port,
+                    )
+
+                    if not load_profile:
                         yield anki_session
+
+                    else:
+                        with anki_session.profile_loaded():
+                            yield anki_session
+
+                    # Undo monkey-patch if applied
+                    set_qt_message_handler_installer(qInstallMessageHandler)
 
     # NOTE: clean up does not seem to work properly in all cases,
     # so use pytest-forked for now
