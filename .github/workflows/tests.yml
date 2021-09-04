@@ -37,7 +37,7 @@ jobs:
     steps:
       - name: debug matrix
         run: |
-          echo ${{ fromJSON(needs.read-current-anki-matrix.outputs.matrix) }}
+          echo ${{ needs.read-current-anki-matrix.outputs.matrix }}
 
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
