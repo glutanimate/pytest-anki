@@ -81,5 +81,8 @@ def test_web_driver_can_interact_with_anki(anki_session: AnkiSession):
         anki_session.run_with_chrome_driver(
             switch_to_deck_view, AnkiWebViewType.main_webview
         )
-        anki_session.qtbot.wait(100)
-        assert anki_session.mw.state == "overview"
+
+        def mw_state_switched():
+            assert anki_session.mw.state == "overview"
+
+        anki_session.qtbot.wait_until(mw_state_switched)
