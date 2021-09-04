@@ -10,7 +10,17 @@ on:
       - main
 
 jobs:
-  pytest:
+  pytest-current:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout pytest-anki
+        uses: actions/checkout@v2
+      - name: Run tests
+        uses: ./.github/actions/run_tests
+        # uses default values which are specified in setup_ actions for the latest
+        # tested Anki release
+  
+  pytest-legacy:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
@@ -18,11 +28,6 @@ jobs:
           # Version matrix follows static macOS builds as closely as possible.
           # Some Qt package versions are not available on PyPI, so we need to make
           # compromises here and there.
-          - anki: 2.1.47
-            python: 3.8.6
-            pyqt: 5.14.2
-            pyqtwebengine: 5.14.0
-            chrome: 77.0.3865.129
           - anki: 2.1.44
             python: 3.8.6
             pyqt: 5.14.2
