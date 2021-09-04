@@ -21,6 +21,9 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Checkout pytest-anki
+      uses: actions/checkout@v2
+
     - name: "Set up environment"
       uses: ./.github/actions/setup_env
       with:
@@ -29,9 +32,6 @@ runs:
         pyqt_version: ${{ matrix.pyqt }}
         pyqtwebengine_version: ${{ matrix.pyqtwebengine }}
         chrome_version: ${{ matrix.chrome }}
-
-    - name: Checkout pytest-anki
-      uses: actions/checkout@v2
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
