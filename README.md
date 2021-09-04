@@ -1,6 +1,6 @@
 ## pytest-anki
 
-pytest-anki is a [pytest](https://docs.pytest.org/en/) plugin that allows developers to write tests for their [Anki add-ons](https://addon-docs.ankiweb.net/).
+pytest-anki is a [pytest](https://docs.pytest.org/) plugin that allows developers to write tests for their [Anki add-ons](https://addon-docs.ankiweb.net/).
 
 At its core lies the `anki_session` fixture that provides add-on authors with the ability to create and control headless Anki sessions to test their add-ons in:
 
