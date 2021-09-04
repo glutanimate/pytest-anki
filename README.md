@@ -1,33 +1,42 @@
 ## pytest-anki
 
+pytest-anki is a [pytest](https://docs.pytest.org/en/) plugin that allows developers to write tests for their [Anki add-ons](https://addon-docs.ankiweb.net/).
+
+At its core lies the `anki_session` fixture that provides add-on authors with the ability to create and control headless Anki sessions to test their add-ons in:
+
+```python
+from pytest_anki import AnkiSession
+
+def test_addon_registers_deck(anki_session: AnkiSession):
+    my_addon = anki_session.load_addon("my_addon")
+    with anki_session.load_profile()
+        with anki_session.deck_installed(deck_path) as deck_id:
+            assert deck_id in my_addon.deck_ids
+
+```
+
+`anki_session` comes with a comprehensive API that allows developers to programmatically manipulate Anki, set up and reproduce specific configurations, simulate user interactions, and much more.
+
+The goal is to provide add-on authors with a one-stop-shop for their functional testing needs, while also enabling them to QA their add-ons against a battery of different Anki versions, catching incompatibilities as they arise.
+
 [![General tests](https://github.com/glutanimate/pytest-anki/actions/workflows/general.yml/badge.svg)](https://github.com/glutanimate/pytest-anki/actions/workflows/general.yml)
-
-> a simple pytest plugin for testing Anki add-ons
-
-This project is a rewrite of [krassowski/anki_testing](https://github.com/krassowski/anki_testing) as a pytest plugin, with a number of added convenience features and adjustments for more recent Anki releases.
-
 
 ### Disclaimer
 
 #### Project State
 
-This is still very much a work-in-progress. Neither the API, nor the implementation are set in stone.
+**Important**: The plugin is currently undergoing a major rewrite and expansion of its feature-set, so the documentation below is very sparse at the moment. I am working on bringing the docs up to speed, but until then, please feel free to check out the inline documentation and also take a look at the plug-in's tests for a number of hopefully helpful examples.
 
 #### Platform Support
 
-`pytest-anki` has only been tested on Linux so far.
+`pytest-anki` has only been confirmed to work on Linux so far.
+
 
 ### Installation
 
-1. [Set up an Anki development environment](https://github.com/dae/anki/blob/master/README.development) and add your local Anki source folder to your `PYTHONPATH` (so that both the `anki` and `aqt` packages can be resolved by Python, see [run_tests.sh](tools/run_tests.sh) for an example).
-
-    **The minimum supported Anki version currently is 2.1.17**
-
-2. Install `pytest-anki` into your testing environment:
-
-    ```bash
-    pip install --upgrade git+https://github.com/glutanimate/pytest-anki.git
-    ```
+```bash
+pip install --upgrade git+https://github.com/glutanimate/pytest-anki.git
+```
 
 ### Usage
 
@@ -36,11 +45,14 @@ This is still very much a work-in-progress. Neither the API, nor the implementat
 In your tests add:
    
 ```python
-def test_my_addon(anki_session):
+from pytest_anki import AnkiSession  # for type checking and completions
+
+@pytest.mark.forked
+def test_my_addon(anki_session: AnkiSession):
     # add some tests in here
 ```
 
-The `anki_session` fixture yields an `AnkiSession` object that gives you access to the following attributes:
+The `anki_session` fixture yields an `AnkiSession` object that gives you access to the following attributes, among others:
 
 ```
 app {AnkiApp} -- Anki QApplication instance
@@ -49,104 +61,78 @@ user {str} -- User profile name (e.g. "User 1")
 base {str} -- Path to Anki base directory
 ```
 
-This allows you to perform actions like loading or unloading Anki profiles, e.g.:
-
-```python
-def test_my_addon(anki_session):
-    anki_session.mw.loadProfile()
-    assert anki_session.mw.col is not None
-```
-
-Finally, assuming that your tests are located in a `tests` folder at the root of your project, you can then run your tests with:
-
-```bash
-python3 -m pytest tests
-```
-
-(also see the [sample script under tools](./tools/run_tests.sh))
-
-#### Configuring the Anki Session
-
-You can customize the Anki session context with a series of arguments that can be passed to the `anki_session` fixture using indirect parametrization, e.g.
-
-```python
-@pytest.mark.parametrize("anki_session", [dict(profile_name="foo")], indirect=True)
-def test_my_addon(anki_session):
-    assert anki_session.user == "foo"
-```
-
-A full list of supported arguments follows below:
-
-```
-Keyword Arguments:
-    base_path {str} -- Path to write Anki base folder to
-                        (default: {tempfile.gettempdir()})
-    base_name {str} -- Base folder name (default: {"anki_base"})
-    profile_name {str} -- User profile name (default: {"__Temporary Test User__"})
-    keep_profile {bool} -- Whether to preserve profile at context exit
-                            (default: {False})
-    load_profile {bool} -- Whether to return an Anki session with the user profile
-                            and collection fully preloaded (default: {False})
-    lang {str} -- Language to use for the user profile (default: {"en_US"})
-```
-
-#### Other Features
-
-`pytest-anki` also provides a convenient context manager called `profile_loaded` that simplifies testing your add-ons at different profile load states:
-
-```python
-from pytest_anki import AnkiSession  # used here for type annotations
-from pytest_anki import profile_loaded
-
-def test_my_addon(anki_session: AnkiSession):
-    assert anki_session.mw.col is None  # profile / collection not yet loaded
-
-    with profile_loaded(anki_session.mw):
-        assert anki_session.mw.col is not None  # loaded
-    
-    assert anki_session.mw.col is None  # safely unloaded again
-```
-
-Additional helper functions and context managers are also available. Please refer to the source code for the latest feature-set.
-
-#### Other Notes
-
-Running your test in an Anki environment is expensive and introduces an additional layer of confounding factors, so I would recommend avoiding the `anki_session` fixture as much as possible, `mock`ing away Anki runtime dependencies where you can. The `anki_session` fixture is in many ways more suited towards end-to-end testing rather more fundamental tests in the test pyramid.
-
-If you do use `anki_session`, I would highly recommend running your tests in separate subprocesses using `pytest-forked`. Because of the way Anki works (e.g. in terms of monkey-patching, etc.) exiting out of the `anki_session` fixture is never quite clean, and so you run the risk of state persisting across to your next tests. This could lead to unexpected behavior, or worse still, your tests crashing. Forking a new subprocess for each test bypasses these limitations.
-
-Running a test in a separate subprocess is as easy as decorating it with `pytest.mark.forked`:
+Additionally, the fixture provides a number of helpful methods and context managers, e.g. for initializing an Anki profile:
 
 ```python
 @pytest.mark.forked
-def test_my_addon(anki_session):
-    # add some tests in here
+def test_my_addon(anki_session: AnkiSession):
+    with anki_session.profile_loaded():
+        assert anki_session.collection
 ```
+
+
+#### Configuring the Anki Session
+
+You can customize the Anki session context by passing arguments to the `anki_session` fixture using pytest's indirect parametrization, e.g.
+
+```python
+import pytest
+
+@pytest.mark.forked
+@pytest.mark.parametrize("anki_session", [dict(load_profile=True)], indirect=True)
+def test_my_addon(anki_session: AnkiSession):
+    # profile / collection already pre-loaded!
+    assert anki_session.collection
+```
+
+
+### When to use pytest-anki
+
+Running your test in an Anki environment is expensive and introduces an additional layer of confounding factors. If you can `mock` your Anki runtime dependencies away, then that should always be your first tool of choice.
+
+Where `anki_session` comes in handy is further towards the upper levels of the test pyramid, i.e. functional tests, end-to-end tests, and UI tests. Additionally the plugin can provide you with a convenient way to automate testing for incompatibilities with Anki and other add-ons.
+
+### The importance of forking your tests
+
+You might have noticed that most of the examples above use a `@pytest.mark.forked` decorator. This is because, while the plugin does attempt to tear down Anki sessions as cleanly as possible on exit, this process is never quite perfect, especially for add-ons that monkey-patch Anki.
+
+With unforked test runs, factors like that can lead to unexpected behavior, or worse still, your tests crashing. Forking a new subprocess for each test bypasses these limitations, and therefore my advice would be to mark any `anki_session` tests as forked by default.
+
+To do this in batch for an entire test module, you can use the following pytest hook:
+
+```python
+def pytest_collection_modifyitems(items):
+    for item in items:
+        item.add_marker("forked")
+```
+
+Future versions of `pytest-anki` will possibly do this by default.
 
 ### Automated Testing
 
-`pytest-anki` is designed to work well with continuous integration systems such as GitHub actions. For an example see `pytest-anki`'s own [GitHub workflows](./.github/workflows/tests.yml).
+`pytest-anki` is designed to work well with continuous integration systems such as GitHub actions. For an example see `pytest-anki`'s own [GitHub workflows](./.github/workflows/).
 
 
 ### Troubleshooting
 
 #### pytest hanging when using xvfb
 
-Especially if you run your tests headlessly with `xvfb`, you might run into cases where pytest will sometimes appear to hang. Oftentimes this is due to blocking non-dismissable prompts that Anki your add-on code might invoke in some scenarios. If you suspect that might be the case, my advice would be to temporarily bypass `xvfb` locally via `pytest --no-xvfb` to debug the issue.
+Especially if you run your tests headlessly with `xvfb`, you might run into cases where pytest will sometimes appear to hang. Oftentimes this is due to blocking non-dismissable prompts that your add-on code might invoke in some scenarios. If you suspect that might be the case, my advice would be to temporarily bypass `xvfb` locally via `pytest --no-xvfb` to show the UI and manually debug the issue.
 
 ### License and Credits
 
 *pytest-anki* is
 
-*Copyright © 2017-2021 [Ankitects Pty Ltd and contributors](https://github.com/ankitects/)*
+*Copyright © 2019-2021 [Aristotelis P.](https://glutanimate.com/contact/) (Glutanimate) and [contributors](./CONTRIBUTORS)*
 
 *Copyright © 2017-2019 [Michal Krassowski](https://github.com/krassowski/anki_testing)*
 
-*Copyright © 2019-2021 [Aristotelis P.](https://glutanimate.com/contact/) (Glutanimate) and [contributors](./CONTRIBUTORS)*
+*Copyright © 2017-2021 [Ankitects Pty Ltd and contributors](https://github.com/ankitects/)*
 
-All credits for the original idea for this project go to Michal. _pytest-anki_ would not exist without his work.
 
-I would also like to extend a special thanks to [AMBOSS](https://github.com/amboss-mededu/) for supporting the development of this project.
+All credits for the original idea for a testing tool like this go to Michal. _pytest-anki_ would not exist without his [anki_testing](https://github.com/krassowski/anki_testing) project.
+
+I would also like to extend a heartfelt thanks to [AMBOSS](https://github.com/amboss-mededu/) for their major part in supporting the development of this plugin! Most of the recent feature additions were implemented as part of my work on the [AMBOSS add-on](https://www.amboss.com/us/anki-amboss).
 
 _pytest-anki_ is free and open-source software. Its source-code is released under the GNU AGPLv3 license, extended by a number of additional terms. For more information please see the [license file](https://github.com/glutanimate/pytest-anki/blob/master/LICENSE) that accompanies this program.
 
