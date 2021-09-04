@@ -1,0 +1,37 @@
+name: "Set up system"
+description: "Set up system"
+
+inputs:
+  python:
+    description: "Python interpreter version"
+    required: true
+  chrome:
+    description: "Chrome version"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # Qt5 requires a number of X11-related dependencies to be installed system-wide.
+    # Rather than installing each individually, we install libqt5 on the machine which
+    # in turn takes care of installing all deps also needed for the PyPI version of Qt5
+    - name: Install xvfb / qt dependencies
+      shell: bash
+      run: |
+        sudo apt-get install libqt5gui5
+
+    - name: Set up chromedriver
+      shell: bash
+      run: |
+        chrome_version=${{ inputs.chrome }}
+        truncated_version=${chrome_version%.*}
+        driver_version=$(curl --location --fail --retry 10 "http://chromedriver.storage.googleapis.com/LATEST_RELEASE_${truncated_version}")
+        wget -c -nc --retry-connrefused --tries=0 "https://chromedriver.storage.googleapis.com/${driver_version}/chromedriver_linux64.zip"
+        unzip -o -q "chromedriver_linux64.zip"
+        sudo mv chromedriver /usr/local/bin/chromedriver
+        rm "chromedriver_linux64.zip"
+
+    - name: Set up Python ${{ inputs.python }}
+      uses: actions/setup-python@v2.2.1
+      with:
+        python-version: ${{ inputs.python }}

@@ -1,0 +1,132 @@
+name: General tests
+
+on:
+  pull_request:
+    paths-ignore:
+      - "README.md"
+      - "docs/**"
+  push:
+    branches:
+      - main
+
+jobs:
+  read-current-anki-matrix:
+    # Reads current Anki set-up from anki-current.json
+    runs-on: ubuntu-latest
+    
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    
+    steps:
+    - name: Checkout pytest-anki
+      uses: actions/checkout@v2
+    - id: set-matrix
+      run: |
+        content=$(cat ./anki-current.json)
+        content="${content//'%'/'%25'}"
+        content="${content//$'\n'/'%0A'}"
+        content="${content//$'\r'/'%0D'}"
+        content="{ \"include\": [ ${content} ] }"
+        echo "::set-output name=matrix::$content"
+
+  check-current-anki:
+    needs: read-current-anki-matrix
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix: ${{ fromJSON(needs.read-current-anki-matrix.outputs.matrix) }}
+
+    steps:
+      - name: Checkout pytest-anki
+        uses: actions/checkout@v2
+
+      - name: Set up test environment
+        uses: ./.github/actions/setup
+        with:
+          python: ${{ matrix.python }}
+          chrome: ${{ matrix.chrome }}
+          anki: ${{ matrix.anki }}
+          pyqt: ${{ matrix.pyqt }}
+          pyqtwebengine: ${{ matrix.pyqtwebengine }}
+
+      - name: Run type checker for Anki ${{ matrix.anki }}
+        shell: bash
+        run: |
+          make check
+
+      - name: Run linter for Anki ${{ matrix.anki }}
+        shell: bash
+        run: |
+          make lint
+
+  test-current-anki:
+    needs: read-current-anki-matrix
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix: ${{ fromJSON(needs.read-current-anki-matrix.outputs.matrix) }}
+
+    steps:
+      - name: Checkout pytest-anki
+        uses: actions/checkout@v2
+
+      - name: Set up test environment
+        uses: ./.github/actions/setup
+        with:
+          python: ${{ matrix.python }}
+          chrome: ${{ matrix.chrome }}
+          anki: ${{ matrix.anki }}
+          pyqt: ${{ matrix.pyqt }}
+          pyqtwebengine: ${{ matrix.pyqtwebengine }}
+
+      - name: Run tests for Anki ${{ matrix.anki }}
+        shell: bash
+        run: |
+          make test
+
+  test-old-anki:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          # Version matrix follows static macOS builds as closely as possible.
+          # Some Qt package versions are not available on PyPI, so we need to make
+          # compromises here and there.
+          - anki: 2.1.44
+            python: 3.8.6
+            pyqt: 5.14.2
+            pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
+          - anki: 2.1.35
+            python: 3.8.0
+            pyqt: 5.14.2
+            pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
+          - anki: 2.1.28
+            python: 3.8.0
+            pyqt: 5.15.0
+            pyqtwebengine: 5.15.0
+            chrome: 80.0.3987.163
+          - anki: 2.1.26
+            python: 3.8.0
+            pyqt: 5.13.1
+            pyqtwebengine: 5.13.1
+            chrome: 73.0.3683.105
+
+    steps:
+      - name: Checkout pytest-anki
+        uses: actions/checkout@v2
+
+      - name: Set up test environment
+        uses: ./.github/actions/setup
+        with:
+          python: ${{ matrix.python }}
+          chrome: ${{ matrix.chrome }}
+          anki: ${{ matrix.anki }}
+          pyqt: ${{ matrix.pyqt }}
+          pyqtwebengine: ${{ matrix.pyqtwebengine }}
+
+      - name: Run tests for Anki ${{ matrix.anki }}
+        shell: bash
+        run: |
+          make test

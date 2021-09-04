@@ -1,0 +1,41 @@
+name: "Set up test environment"
+description: "Set up test environment"
+
+inputs:
+  python:
+    description: "Python interpreter version"
+    required: true
+  anki:
+    description: "Anki version. Set this to 'prerelease' to install either the latest release or prerelease."
+    required: true
+  pyqt:
+    description: "PyQt widget toolkit version"
+    required: true
+  pyqtwebengine:
+    description: "PyQt WebEngine version"
+    required: true
+  chrome:
+    description: "Chrome version"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout pytest-anki
+      uses: actions/checkout@v2
+
+    - name: Set up environment
+      uses: ./.github/actions/setup_system
+      with:
+        python: ${{ inputs.python }}
+        chrome: ${{ inputs.chrome }}
+
+    - name: Set up project
+      uses: ./.github/actions/setup_project
+
+    - name: Set up Anki
+      uses: ./.github/actions/setup_anki
+      with:
+        anki: ${{ inputs.anki }}
+        pyqt: ${{ inputs.pyqt }}
+        pyqtwebengine: ${{ inputs.pyqtwebengine }}

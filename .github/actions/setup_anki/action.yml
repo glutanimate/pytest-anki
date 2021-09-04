@@ -1,0 +1,28 @@
+name: "Set up Anki"
+description: "Set up Anki"
+
+inputs:
+  anki:
+    description: "Anki version. Set this to 'prerelease' to install either the latest release or prerelease."
+    required: true
+  pyqt:
+    description: "PyQt widget toolkit version"
+    required: true
+  pyqtwebengine:
+    description: "PyQt WebEngine version"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Anki ${{ inputs.anki }}
+      shell: bash
+      run: |
+        pip install --upgrade setuptools pip
+        pip install --upgrade PyQt5==${{ inputs.pyqt }} PyQtWebEngine==${{ inputs.pyqtwebengine }}
+
+        if [[ "${{ inputs.anki }}" == "prerelease" ]]; then
+          pip install --upgrade --pre anki aqt
+        else:
+          pip install --upgrade anki==${{ inputs.anki }} aqt==${{ inputs.anki }}
+        fi
