@@ -15,12 +15,15 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
+    - name: Checkout pytest-anki
+      uses: actions/checkout@v2
     - id: set-matrix
       run: |
         json=$(cat ./anki-current.json)
-        echo "::set-output name=matrix::${JSON//'%'/'%25'}"
+        echo "::set-output name=matrix::{\"include\": [${json//'%'/'%25'}]}"
 
   check-current-anki:
+    needs: read-current-anki-matrix
     runs-on: ubuntu-18.04
 
     strategy:
@@ -50,6 +53,7 @@ jobs:
           make lint
 
   test-current-anki:
+    needs: read-current-anki-matrix
     runs-on: ubuntu-18.04
 
     strategy:
