@@ -31,18 +31,9 @@ jobs:
     runs-on: ubuntu-18.04
 
     strategy:
-      matrix:
-        include:
-          - anki: 2.1.44
-            python: 3.8.6
-            pyqt: 5.14.2
-            pyqtwebengine: 5.14.0
+      matrix: ${{ fromJSON(needs.read-current-anki-matrix.outputs.matrix) }}
 
     steps:
-      - name: debug matrix
-        run: |
-          echo ${{ needs.read-current-anki-matrix.outputs.matrix }}
-
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
 
