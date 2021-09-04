@@ -45,7 +45,10 @@ jobs:
             chrome: 73.0.3683.105
 
     steps:
-      - uses: ./.github/actions/run_tests
+      - name: Checkout pytest-anki
+        uses: actions/checkout@v2
+      - name: Run tests
+        uses: ./.github/actions/run_tests
         with:
           anki_version: ${{ matrix.anki }}
           python_version: ${{ matrix.python }}
