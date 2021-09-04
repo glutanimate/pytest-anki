@@ -2,34 +2,23 @@ name: "Run tests"
 description: "Run tests"
 
 inputs:
-  # The defaults are based on the latest tested Anki release. Updates to them usually
-  # only occur every few Anki releases, typically with months between them.
-  # As a result, this should be a reasonable enough strategy to allow us to test
-  # new Anki pre-releases without knowing the exact dependency set-up.
+  # If left unspecified, inputs will fall back to defaults defined in setup_ actions
+  # which are informed by the latest tested Anki release
   python:
     description: "Python interpreter version"
     required: false
-    default: 3.8.6
   anki:
-    description: "Anki version. If set to 'latest', this will install latest (pre)-release."
+    description: "Anki version. Set this to 'prerelease' to install either the latest release or prerelease."
     required: false
-    default: "latest"
   pyqt:
     description: "PyQt widget toolkit version"
     required: false
-    default: 5.14.2
   pyqtwebengine:
     description: "PyQt WebEngine version"
     required: false
-    default: 5.14.0
   chrome:
     description: "Chrome version"
     required: false
-    default: 77.0.3865.129
-    # ^ determining the Chrome version used in an Anki release is difficult
-    # to automate without an external service, so use the default for the current
-    # PyQt version. Anki typically uses the same Qt major version across a full
-    # release line, so this should be good enough for now.
 
 runs:
   using: "composite"

@@ -2,13 +2,22 @@ name: "Set up system"
 description: "Set up system"
 
 inputs:
+  # The defaults are based on the latest tested Anki release. Updates to them usually
+  # only occur every few Anki releases, typically with months between them.
+  # As a result, this should be a reasonable enough strategy to allow us to test
+  # new Anki pre-releases without knowing the exact dependency set-up.
   python:
     description: "Python interpreter version"
-    required: true
+    required: false
+    default: 3.8.6
   chrome:
     description: "Chrome version"
     required: false
-    default: ""
+    default: 77.0.3865.129
+    # ^ determining the Chrome version used in an Anki release is difficult
+    # to automate without an external service, so use the default for the current
+    # PyQt version. Anki typically uses the same Qt major version across a full
+    # release line, so this should be good enough for now.
 
 runs:
   using: "composite"

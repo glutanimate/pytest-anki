@@ -2,15 +2,22 @@ name: "Set up Anki"
 description: "Set up Anki"
 
 inputs:
+  # The defaults are based on the latest tested Anki release. Updates to them usually
+  # only occur every few Anki releases, typically with months between them.
+  # As a result, this should be a reasonable enough strategy to allow us to test
+  # new Anki pre-releases without knowing the exact dependency set-up.
   anki:
-    description: "Anki version. If set to 'latest', this will install latest (pre)-release."
-    required: true
+    description: "Anki version. Set this to 'prerelease' to install either the latest release or prerelease."
+    required: false
+    default: 2.1.47
   pyqt:
     description: "PyQt widget toolkit version"
-    required: true
+    required: false
+    default: 5.14.2
   pyqtwebengine:
     description: "PyQt WebEngine version"
-    required: true
+    required: false
+    default: 5.14.0
 
 runs:
   using: "composite"
@@ -21,7 +28,7 @@ runs:
         pip install --upgrade setuptools pip
         pip install --upgrade PyQt5==${{ inputs.pyqt }} PyQtWebEngine==${{ inputs.pyqtwebengine }}
 
-        if [[ "${{ inputs.anki }}" == "latest" ]]; then
+        if [[ "${{ inputs.anki }}" == "prerelease" ]]; then
           pip install --upgrade --pre anki aqt
         else:
           pip install --upgrade anki==${{ inputs.anki }} aqt==${{ inputs.anki }}
