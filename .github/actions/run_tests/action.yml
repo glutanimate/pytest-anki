@@ -7,18 +7,23 @@ inputs:
   python:
     description: "Python interpreter version"
     required: false
+    default: 3.8.6
   anki:
     description: "Anki version. Set this to 'prerelease' to install either the latest release or prerelease."
     required: false
+    default: 2.1.47
   pyqt:
     description: "PyQt widget toolkit version"
     required: false
+    default: 5.14.2
   pyqtwebengine:
     description: "PyQt WebEngine version"
     required: false
+    default: 5.14.0
   chrome:
     description: "Chrome version"
     required: false
+    default: 77.0.3865.129
 
 runs:
   using: "composite"
