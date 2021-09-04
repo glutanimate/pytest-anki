@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-18.04
 
     strategy:
-      matrix: ${{fromJson(needs.read-current-anki-matrix.outputs.matrix)}}
+      matrix: ${{fromJSON(needs.read-current-anki-matrix.outputs.matrix)}}
 
     steps:
       - name: Checkout pytest-anki
