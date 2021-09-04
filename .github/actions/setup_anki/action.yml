@@ -2,22 +2,15 @@ name: "Set up Anki"
 description: "Set up Anki"
 
 inputs:
-  # The defaults are based on the latest tested Anki release. Updates to them usually
-  # only occur every few Anki releases, typically with months between them.
-  # As a result, this should be a reasonable enough strategy to allow us to test
-  # new Anki pre-releases without knowing the exact dependency set-up.
   anki:
     description: "Anki version. Set this to 'prerelease' to install either the latest release or prerelease."
-    required: false
-    default: 2.1.47
+    required: true
   pyqt:
     description: "PyQt widget toolkit version"
-    required: false
-    default: 5.14.2
+    required: true
   pyqtwebengine:
     description: "PyQt WebEngine version"
-    required: false
-    default: 5.14.0
+    required: true
 
 runs:
   using: "composite"

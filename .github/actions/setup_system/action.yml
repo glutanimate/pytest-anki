@@ -2,22 +2,12 @@ name: "Set up system"
 description: "Set up system"
 
 inputs:
-  # The defaults are based on the latest tested Anki release. Updates to them usually
-  # only occur every few Anki releases, typically with months between them.
-  # As a result, this should be a reasonable enough strategy to allow us to test
-  # new Anki pre-releases without knowing the exact dependency set-up.
   python:
     description: "Python interpreter version"
-    required: false
-    default: 3.8.6
+    required: true
   chrome:
     description: "Chrome version"
-    required: false
-    default: 77.0.3865.129
-    # ^ determining the Chrome version used in an Anki release is difficult
-    # to automate without an external service, so use the default for the current
-    # PyQt version. Anki typically uses the same Qt major version across a full
-    # release line, so this should be good enough for now.
+    required: true
 
 runs:
   using: "composite"
@@ -33,20 +23,15 @@ runs:
     - name: Set up chromedriver
       shell: bash
       run: |
-        if [[ -n "${{ inputs.chrome }}" ]]; then
-          chrome_version=${{ inputs.chrome }}
-          truncated_version=${chrome_version%.*}
-          driver_version=$(curl --location --fail --retry 10 "http://chromedriver.storage.googleapis.com/LATEST_RELEASE_${truncated_version}")
-          wget -c -nc --retry-connrefused --tries=0 "https://chromedriver.storage.googleapis.com/${driver_version}/chromedriver_linux64.zip"
-          unzip -o -q "chromedriver_linux64.zip"
-          sudo mv chromedriver /usr/local/bin/chromedriver
-          rm "chromedriver_linux64.zip"
-        else
-          echo "Skipping chrome driver installation"
-        fi
+        chrome_version=${{ inputs.chrome }}
+        truncated_version=${chrome_version%.*}
+        driver_version=$(curl --location --fail --retry 10 "http://chromedriver.storage.googleapis.com/LATEST_RELEASE_${truncated_version}")
+        wget -c -nc --retry-connrefused --tries=0 "https://chromedriver.storage.googleapis.com/${driver_version}/chromedriver_linux64.zip"
+        unzip -o -q "chromedriver_linux64.zip"
+        sudo mv chromedriver /usr/local/bin/chromedriver
+        rm "chromedriver_linux64.zip"
 
     - name: Set up Python ${{ inputs.python }}
       uses: actions/setup-python@v2.2.1
       with:
         python-version: ${{ inputs.python }}
-

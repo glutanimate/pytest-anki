@@ -10,17 +10,50 @@ on:
       - main
 
 jobs:
-  pytest-current:
+  check-and-test-current-anki:
     runs-on: ubuntu-18.04
+
+    strategy:
+      matrix:
+        include:
+          # Configuration based on latest tested macOS static build for Anki
+          # Updates to the dependencies specified here usually only occur every
+          # few Anki releases.
+          - anki: 2.1.47
+            python: 3.8.6
+            pyqt: 5.14.2
+            pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
+
     steps:
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
-      - name: Run tests
-        uses: ./.github/actions/run_tests
-        # uses default values which are specified in setup_ actions for the latest
-        # tested Anki release
+      
+      - name: Set up test environment
+        uses: ./.github/actions/setup
+        with:
+          python: ${{ matrix.python }}
+          chrome: ${{ matrix.chrome }}
+          anki: ${{ matrix.anki }}
+          pyqt: ${{ matrix.pyqt }}
+          pyqtwebengine: ${{ matrix.pyqtwebengine }}
+      
+      - name: Run type checker for Anki ${{ matrix.anki }}
+        shell: bash
+        run: |
+          make check
 
-  pytest-legacy:
+      - name: Run linter for Anki ${{ matrix.anki }}
+        shell: bash
+        run: |
+          make lint
+      
+      - name: Run tests for Anki ${{ matrix.anki }}
+        shell: bash
+        run: |
+          make test
+
+  test-old-anki:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
@@ -52,23 +85,17 @@ jobs:
     steps:
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
-      - name: Run tests
-        uses: ./.github/actions/run_tests
+
+      - name: Set up test environment
+        uses: ./.github/actions/setup
         with:
-          anki: ${{ matrix.anki }}
           python: ${{ matrix.python }}
+          chrome: ${{ matrix.chrome }}
+          anki: ${{ matrix.anki }}
           pyqt: ${{ matrix.pyqt }}
           pyqtwebengine: ${{ matrix.pyqtwebengine }}
-          chrome: ${{ matrix.chrome }}
 
-  lint-and-check:
-    runs-on: ubuntu-18.04
-
-    steps:
-      - name: Checkout pytest-anki
-        uses: actions/checkout@v2
-
-      - name: Run checks
-        uses: ./.github/actions/run_checks
-        # uses default values which are specified in setup_ actions for the latest
-        # tested Anki release
+      - name: Run tests for Anki ${{ matrix.anki }}
+        shell: bash
+        run: |
+          make test
