@@ -1,0 +1,57 @@
+name: "Set up environment"
+description: "Set up environment"
+
+inputs:
+  anki_version:
+    description: "Anki version"
+    required: true
+  python_version:
+    description: "Python interpreter version"
+    required: true
+  pyqt_version:
+    description: "PyQt widget toolkit version"
+    required: true
+  pyqtwebengine_version:
+    description: "PyQt WebEngine version"
+    required: true
+  chrome_version:
+    description: "Chrome version"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    # Qt5 requires a number of X11-related dependencies to be installed system-wide.
+    # Rather than installing each individually, we install libqt5 on the machine which
+    # in turn takes care of installing all deps also needed for the PyPI version of Qt5
+    - name: Install xvfb / qt dependencies
+      shell: bash
+      run: |
+        sudo apt-get install libqt5gui5
+
+    - name: Set up chromedriver
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.chrome_version }}" ]]; then
+          chrome_version=${{ inputs.chrome_version }}
+          truncated_version=${chrome_version%.*}
+          driver_version=$(curl --location --fail --retry 10 "http://chromedriver.storage.googleapis.com/LATEST_RELEASE_${truncated_version}")
+          wget -c -nc --retry-connrefused --tries=0 "https://chromedriver.storage.googleapis.com/${driver_version}/chromedriver_linux64.zip"
+          unzip -o -q "chromedriver_linux64.zip"
+          sudo mv chromedriver /usr/local/bin/chromedriver
+          rm "chromedriver_linux64.zip"
+        else
+          echo "Skipping chrome driver installation"
+        fi
+
+    - name: Set up Python ${{ inputs.python_version }}
+      uses: actions/setup-python@v2.2.1
+      with:
+        python-version: ${{ inputs.python_version }}
+
+    - name: Set up Anki ${{ inputs.anki_version }}
+      shell: bash
+      run: |
+        pip install --upgrade setuptools pip
+        pip install --upgrade PyQt5==${{ inputs.pyqt_version }} PyQtWebEngine==${{ inputs.pyqtwebengine_version }} anki==${{ inputs.anki_version }} aqt==${{ inputs.anki_version }}
