@@ -44,6 +44,13 @@ runs:
       run: |
         make install
 
+    - name: "Set up Anki"
+      uses: ./.github/actions/setup_anki
+      with:
+        anki: ${{ inputs.anki }}
+        pyqt: ${{ inputs.pyqt }}
+        pyqtwebengine: ${{ inputs.pyqtwebengine }}
+
     - name: Run tests for Anki ${{ matrix.anki }}
       shell: bash
       run: |

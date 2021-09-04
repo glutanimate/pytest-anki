@@ -1,0 +1,22 @@
+name: "Set up Anki"
+description: "Set up Anki"
+
+inputs:
+  anki:
+    description: "Anki version"
+    required: true
+  pyqt:
+    description: "PyQt widget toolkit version"
+    required: true
+  pyqtwebengine:
+    description: "PyQt WebEngine version"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Anki ${{ inputs.anki }}
+      shell: bash
+      run: |
+        pip install --upgrade setuptools pip
+        pip install --upgrade PyQt5==${{ inputs.pyqt }} PyQtWebEngine==${{ inputs.pyqtwebengine }} anki==${{ inputs.anki }} aqt==${{ inputs.anki }}

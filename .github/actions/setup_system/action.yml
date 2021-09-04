@@ -1,18 +1,9 @@
-name: "Set up environment"
-description: "Set up environment"
+name: "Set up system"
+description: "Set up system"
 
 inputs:
-  anki:
-    description: "Anki version"
-    required: true
   python:
     description: "Python interpreter version"
-    required: true
-  pyqt:
-    description: "PyQt widget toolkit version"
-    required: true
-  pyqtwebengine:
-    description: "PyQt WebEngine version"
     required: true
   chrome:
     description: "Chrome version"
@@ -50,8 +41,3 @@ runs:
       with:
         python-version: ${{ inputs.python }}
 
-    - name: Set up Anki ${{ inputs.anki }}
-      shell: bash
-      run: |
-        pip install --upgrade setuptools pip
-        pip install --upgrade PyQt5==${{ inputs.pyqt }} PyQtWebEngine==${{ inputs.pyqtwebengine }} anki==${{ inputs.anki }} aqt==${{ inputs.anki }}
