@@ -55,7 +55,7 @@ jobs:
       - name: Setup chromedriver
         run:
           wget -c -nc --retry-connrefused --tries=0 https://chromedriver.storage.googleapis.com/${{ matrix.chrome }}/chromedriver_linux64.zip
-          unzip -o -q chromedriver_${ARCH}.zip
+          unzip -o -q chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/chromedriver
           rm chromedriver_linux64.zip
 
