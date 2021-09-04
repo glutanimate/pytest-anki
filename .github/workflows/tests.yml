@@ -52,10 +52,12 @@ jobs:
         run: |
           sudo apt-get install libqt5gui5
 
-      - name: setup-chromedriver
-        uses: nanasess/setup-chromedriver@v1.0.1
-        with:
-          chromedriver-version: ${{ matrix.chrome }}
+      - name: Setup chromedriver
+        run:
+          wget -c -nc --retry-connrefused --tries=0 https://chromedriver.storage.googleapis.com/${{ matrix.chrome }}/chromedriver_linux64.zip
+          unzip -o -q chromedriver_${ARCH}.zip
+          sudo mv chromedriver /usr/local/bin/chromedriver
+          rm chromedriver_linux64.zip
 
       - name: Checkout pytest-anki
         uses: actions/checkout@v2
