@@ -3,7 +3,7 @@ description: "Set up Anki"
 
 inputs:
   anki:
-    description: "Anki version"
+    description: "Anki version. If set to 'latest', this will install latest (pre)-release."
     required: true
   pyqt:
     description: "PyQt widget toolkit version"
@@ -19,4 +19,10 @@ runs:
       shell: bash
       run: |
         pip install --upgrade setuptools pip
-        pip install --upgrade PyQt5==${{ inputs.pyqt }} PyQtWebEngine==${{ inputs.pyqtwebengine }} anki==${{ inputs.anki }} aqt==${{ inputs.anki }}
+        pip install --upgrade PyQt5==${{ inputs.pyqt }} PyQtWebEngine==${{ inputs.pyqtwebengine }}
+
+        if [[ "${{ inputs.anki }}" == "latest" ]]; then
+          pip install --upgrade --pre anki aqt
+        else:
+          pip install --upgrade anki==${{ inputs.anki }} aqt==${{ inputs.anki }}
+        fi
