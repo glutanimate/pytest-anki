@@ -1,0 +1,54 @@
+name: Dependabot tests
+
+on:
+  pull_request
+
+
+jobs:
+  read-current-anki-matrix:
+    # Reads current Anki set-up from anki-current.json
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    
+    steps:
+    - name: Checkout pytest-anki
+      uses: actions/checkout@v2
+    - id: set-matrix
+      run: |
+        content=$(cat ./anki-current.json)
+        content="${content//'%'/'%25'}"
+        content="${content//$'\n'/'%0A'}"
+        content="${content//$'\r'/'%0D'}"
+        content="{ \"include\": [ ${content} ] }"
+        echo "::set-output name=matrix::$content"
+
+  test-newly-published-anki:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    needs: read-current-anki-matrix
+
+    strategy:
+      matrix: ${{ fromJSON(needs.read-current-anki-matrix.outputs.matrix) }}
+
+    steps:
+      - name: Checkout pytest-anki
+        uses: actions/checkout@v2
+
+      - name: Set up environment
+        uses: ./.github/actions/setup_system
+        with:
+          # We assume that these will remain constant across most Anki updates.
+          # However, sometimes this will break.
+          python: ${{ matrix.python }}
+          chrome: ${{ matrix.chrome }}
+
+      - name: Set up project
+        uses: ./.github/actions/setup_project
+      
+      - name: Run tests for Anki
+        shell: bash
+        run: |
+          make test
