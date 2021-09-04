@@ -44,6 +44,8 @@ isort = "^5.9.3"
 flake8 = "^3.9.2"
 requests = "^2.26.0"
 types-requests = "^2.25.6"
+PyQt5-stubs = "^5.15.2"
+autoflake = "^1.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
