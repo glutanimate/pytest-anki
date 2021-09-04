@@ -15,26 +15,34 @@ jobs:
     strategy:
       matrix:
         include:
+          # Version matrix follows static macOS builds as closely as possible.
+          # Some Qt package versions are not available on PyPI, so we need to make
+          # compromises here and there.
           - anki: 2.1.47
-            python: 3.8.1
-            pyqt: 5.15.1
-            pyqtwebengine: 5.15.1
-          - anki: 2.1.44
-            python: 3.8.1
+            python: 3.8.6
             pyqt: 5.14.2
             pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
+          - anki: 2.1.44
+            python: 3.8.6
+            pyqt: 5.14.2
+            pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
           - anki: 2.1.35
             python: 3.8.0
             pyqt: 5.14.2
             pyqtwebengine: 5.14.0
+            chrome: 77.0.3865.129
           - anki: 2.1.28
             python: 3.8.0
             pyqt: 5.15.0
             pyqtwebengine: 5.15.0
+            chrome: 80.0.3987.163
           - anki: 2.1.26
             python: 3.8.0
             pyqt: 5.13.1
             pyqtwebengine: 5.13.1
+            chrome: 73.0.3683.105
 
     steps:
       # Qt5 requires a number of X11-related dependencies to be installed system-wide.
