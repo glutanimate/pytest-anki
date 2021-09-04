@@ -45,49 +45,13 @@ jobs:
             chrome: 73.0.3683.105
 
     steps:
-      # Qt5 requires a number of X11-related dependencies to be installed system-wide.
-      # Rather than installing each individually, we install libqt5 on the machine which
-      # in turn takes care of installing all deps also needed for the PyPI version of Qt5
-      - name: Install xvfb / qt dependencies
-        run: |
-          sudo apt-get install libqt5gui5
-
-      - name: Setup chromedriver
-        run: |
-          chrome_version=${{ matrix.chrome }}
-          truncated_version=${chrome_version%.*}
-          driver_version=$(curl --location --fail --retry 10 "http://chromedriver.storage.googleapis.com/LATEST_RELEASE_${truncated_version}")
-          wget -c -nc --retry-connrefused --tries=0 "https://chromedriver.storage.googleapis.com/${driver_version}/chromedriver_linux64.zip"
-          unzip -o -q "chromedriver_linux64.zip"
-          sudo mv chromedriver /usr/local/bin/chromedriver
-          rm "chromedriver_linux64.zip"
-
-      - name: Checkout pytest-anki
-        uses: actions/checkout@v2
-
-      - name: Setup Python ${{ matrix.python }}
-        uses: actions/setup-python@v2.2.1
+      - uses: ./.github/actions/run_tests
         with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.1.8
-          virtualenvs-create: false
-
-      - name: Set up pytest-anki
-        run: |
-          make install
-
-      - name: Set up Anki ${{ matrix.anki }}
-        run: |
-          pip install --upgrade setuptools pip
-          pip install --upgrade PyQt5==${{ matrix.pyqt }} PyQtWebEngine==${{ matrix.pyqtwebengine }} anki==${{ matrix.anki }} aqt==${{ matrix.anki }}
-
-      - name: Run tests for Anki ${{ matrix.anki }}
-        run: |
-          make test
+          anki_version: ${{ matrix.anki }}
+          python_version: ${{ matrix.python }}
+          pyqt_version: ${{ matrix.pyqt }}
+          pyqtwebengine_version: ${{ matrix.pyqtwebengine }}
+          chrome_version: ${{ matrix.chrome }}
 
   lint-and-check:
     runs-on: ubuntu-18.04
