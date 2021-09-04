@@ -2,19 +2,19 @@ name: "Set up environment"
 description: "Set up environment"
 
 inputs:
-  anki_version:
+  anki:
     description: "Anki version"
     required: true
-  python_version:
+  python:
     description: "Python interpreter version"
     required: true
-  pyqt_version:
+  pyqt:
     description: "PyQt widget toolkit version"
     required: true
-  pyqtwebengine_version:
+  pyqtwebengine:
     description: "PyQt WebEngine version"
     required: true
-  chrome_version:
+  chrome:
     description: "Chrome version"
     required: false
     default: ""
@@ -33,8 +33,8 @@ runs:
     - name: Set up chromedriver
       shell: bash
       run: |
-        if [[ -n "${{ inputs.chrome_version }}" ]]; then
-          chrome_version=${{ inputs.chrome_version }}
+        if [[ -n "${{ inputs.chrome }}" ]]; then
+          chrome_version=${{ inputs.chrome }}
           truncated_version=${chrome_version%.*}
           driver_version=$(curl --location --fail --retry 10 "http://chromedriver.storage.googleapis.com/LATEST_RELEASE_${truncated_version}")
           wget -c -nc --retry-connrefused --tries=0 "https://chromedriver.storage.googleapis.com/${driver_version}/chromedriver_linux64.zip"
@@ -45,13 +45,13 @@ runs:
           echo "Skipping chrome driver installation"
         fi
 
-    - name: Set up Python ${{ inputs.python_version }}
+    - name: Set up Python ${{ inputs.python }}
       uses: actions/setup-python@v2.2.1
       with:
-        python-version: ${{ inputs.python_version }}
+        python-version: ${{ inputs.python }}
 
-    - name: Set up Anki ${{ inputs.anki_version }}
+    - name: Set up Anki ${{ inputs.anki }}
       shell: bash
       run: |
         pip install --upgrade setuptools pip
-        pip install --upgrade PyQt5==${{ inputs.pyqt_version }} PyQtWebEngine==${{ inputs.pyqtwebengine_version }} anki==${{ inputs.anki_version }} aqt==${{ inputs.anki_version }}
+        pip install --upgrade PyQt5==${{ inputs.pyqt }} PyQtWebEngine==${{ inputs.pyqtwebengine }} anki==${{ inputs.anki }} aqt==${{ inputs.anki }}

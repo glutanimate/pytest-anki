@@ -50,11 +50,11 @@ jobs:
       - name: Run tests
         uses: ./.github/actions/run_tests
         with:
-          anki_version: ${{ matrix.anki }}
-          python_version: ${{ matrix.python }}
-          pyqt_version: ${{ matrix.pyqt }}
-          pyqtwebengine_version: ${{ matrix.pyqtwebengine }}
-          chrome_version: ${{ matrix.chrome }}
+          anki: ${{ matrix.anki }}
+          python: ${{ matrix.python }}
+          pyqt: ${{ matrix.pyqt }}
+          pyqtwebengine: ${{ matrix.pyqtwebengine }}
+          chrome: ${{ matrix.chrome }}
 
   lint-and-check:
     runs-on: ubuntu-18.04

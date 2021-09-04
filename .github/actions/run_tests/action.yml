@@ -2,19 +2,19 @@ name: "Run tests"
 description: "Run tests"
 
 inputs:
-  anki_version:
+  anki:
     description: "Anki version"
     required: true
-  python_version:
+  python:
     description: "Python interpreter version"
     required: true
-  pyqt_version:
+  pyqt:
     description: "PyQt widget toolkit version"
     required: true
-  pyqtwebengine_version:
+  pyqtwebengine:
     description: "PyQt WebEngine version"
     required: true
-  chrome_version:
+  chrome:
     description: "Chrome version"
     required: true
 
@@ -27,11 +27,11 @@ runs:
     - name: "Set up environment"
       uses: ./.github/actions/setup_env
       with:
-        anki_version: ${{ matrix.anki }}
-        python_version: ${{ matrix.python }}
-        pyqt_version: ${{ matrix.pyqt }}
-        pyqtwebengine_version: ${{ matrix.pyqtwebengine }}
-        chrome_version: ${{ matrix.chrome }}
+        anki: ${{ inputs.anki }}
+        python: ${{ inputs.python }}
+        pyqt: ${{ inputs.pyqt }}
+        pyqtwebengine: ${{ inputs.pyqtwebengine }}
+        chrome: ${{ inputs.chrome }}
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
