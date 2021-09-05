@@ -44,7 +44,7 @@ from typing import (
 )
 
 from anki.importing.apkg import AnkiPackageImporter
-from PyQt5.QtCore import QThreadPool
+from PyQt5.QtCore import QThreadPool, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 from selenium import webdriver
 
@@ -279,9 +279,9 @@ class AnkiSession:
         """
         update_anki_state(main_window=self._mw, anki_state_update=anki_state_update)
 
-    # Web debugging ####
+    # Synchronicity / event loop handling ####
 
-    def run_in_thread(
+    def run_in_thread_and_wait(
         self,
         task: Callable,
         task_args: Optional[Tuple[Any, ...]] = None,
@@ -299,6 +299,11 @@ class AnkiSession:
             raise exception
 
         return worker.result
+
+    def set_timeout(self, task: Callable, milliseconds: int, *args, **kwargs):
+        QTimer.singleShot(milliseconds, lambda: task(*args, **kwargs))
+
+    # Web debugging ####
 
     @contextmanager
     def _allow_selenium_to_detect_anki(self) -> Iterator[None]:
@@ -365,4 +370,4 @@ class AnkiSession:
             return test_function(driver)
 
         with self._allow_selenium_to_detect_anki():
-            return self.run_in_thread(test_wrapper)
+            return self.run_in_thread_and_wait(test_wrapper)
