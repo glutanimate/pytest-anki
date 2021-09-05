@@ -3,14 +3,16 @@ name: tests
 on:
   pull_request:
     paths-ignore:
-      - "README.md"
+      - "**.md"
       - "docs/**"
+      - ".github/dependabot.yml"
   push:
     branches:
       - main
     paths-ignore:
-      - "README.md"
+      - "**.md"
       - "docs/**"
+      - ".github/dependabot.yml"
 
 jobs:
   read-current-anki-matrix:
