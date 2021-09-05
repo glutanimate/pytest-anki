@@ -211,7 +211,6 @@ def anki_running(
 
                 if enable_web_debugging:
                     web_debugging_port = find_free_port()
-                    print(type(web_debugging_port))
                     if web_debugging_port is None:
                         raise OSError("Could not find a free port for remote debugging")
                     environment[QTWEBENGINE_REMOTE_DEBUGGING] = str(web_debugging_port)
