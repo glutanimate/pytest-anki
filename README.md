@@ -173,7 +173,7 @@ make format
 *Copyright © 2017-2021 [Ankitects Pty Ltd and contributors](https://github.com/ankitects/)*
 
 
-All credits for the original idea for creating a library to test Anki add-ons with go to Michal. _pytest-anki_ would not exist without his [anki_testing](https://github.com/krassowski/anki_testing) project.
+All credits for the original idea for creating a context manager to test Anki add-ons with go to Michal. _pytest-anki_ would not exist without his [anki_testing](https://github.com/krassowski/anki_testing) project.
 
 I would also like to extend a heartfelt thanks to [AMBOSS](https://github.com/amboss-mededu/) for their major part in supporting the development of this plugin! Most of the recent feature additions leading up to v1.0.0 of the plugin were implemented as part of my work on the [AMBOSS add-on](https://www.amboss.com/us/anki-amboss).
 
