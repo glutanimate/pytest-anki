@@ -19,7 +19,7 @@ def test_addon_registers_deck(anki_session: AnkiSession):
 
 The goal is to provide add-on authors with a one-stop-shop for their functional testing needs, while also enabling them to QA their add-ons against a battery of different Anki versions, catching incompatibilities as they arise.
 
-[![General tests](https://github.com/glutanimate/pytest-anki/actions/workflows/general.yml/badge.svg)](https://github.com/glutanimate/pytest-anki/actions/workflows/general.yml)
+![PyPI](https://img.shields.io/pypi/v/pytest-anki) <a title="License: GNU AGPLv3" href="https://github.com/glutanimate/anki-addon-builder/blob/master/LICENSE"><img  src="https://img.shields.io/badge/license-GNU AGPLv3-f37f40.svg"></a>  <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>  [![tests](https://github.com/glutanimate/pytest-anki/actions/workflows/general.yml/badge.svg)](https://github.com/glutanimate/pytest-anki/actions/workflows/general.yml) 
 
 ## Disclaimer
 
