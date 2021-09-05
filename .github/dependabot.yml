@@ -6,5 +6,4 @@ updates:
       interval: "daily"
     allow:
       - dependency-name: "aqt"
-      - dependency-name: "anki"
   
