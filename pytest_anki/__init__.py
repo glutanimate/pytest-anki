@@ -37,7 +37,7 @@ from ._anki import AnkiStateUpdate, AnkiWebViewType  # noqa: F401
 from ._errors import AnkiSessionError  # noqa: F401
 from ._session import AnkiSession  # noqa: F401
 
-__version__ = "1.0.0-dev.1"
+__version__ = "1.0.0-beta.1"
 __author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
 __title__ = "pytest-anki"
 __homepage__ = "https://github.com/glutanimate/pytest-anki"
