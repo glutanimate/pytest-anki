@@ -40,7 +40,9 @@ def test_run_in_thread(anki_session: AnkiSession):
     mock_task = Mock()
     args = tuple((1, 2, 3))
     kwargs = {"foo": 1, "bar": 2, "zing": 3}
-    anki_session.run_in_thread_and_wait(task=mock_task, task_args=args, task_kwargs=kwargs)
+    anki_session.run_in_thread_and_wait(
+        task=mock_task, task_args=args, task_kwargs=kwargs
+    )
     mock_task.assert_called_once_with(*args, **kwargs)
 
 
