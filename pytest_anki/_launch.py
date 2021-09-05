@@ -75,9 +75,9 @@ def temporary_user(anki_base_dir: str, name: str, lang: str) -> Iterator[str]:
 
     if pm.db:
         # reimplement pm.remove() to avoid trouble with trash
-        p = pm.profileFolder()
-        if os.path.exists(p):
-            shutil.rmtree(p)
+        profile_folder = pm.profileFolder()
+        if os.path.exists(profile_folder):
+            shutil.rmtree(profile_folder, ignore_errors=True)
         pm.db.execute("delete from profiles where name = ?", name)
         pm.db.commit()
 
@@ -88,7 +88,7 @@ def base_directory(base_path: str, base_name: str) -> Iterator[str]:
         os.mkdir(base_path)
     anki_base_dir = tempfile.mkdtemp(prefix=f"{base_name}_", dir=base_path)
     yield anki_base_dir
-    shutil.rmtree(anki_base_dir)
+    shutil.rmtree(anki_base_dir, ignore_errors=True)
 
 
 @contextmanager
