@@ -300,8 +300,8 @@ class AnkiSession:
 
         return worker.result
 
-    def set_timeout(self, task: Callable, milliseconds: int, *args, **kwargs):
-        QTimer.singleShot(milliseconds, lambda: task(*args, **kwargs))
+    def set_timeout(self, task: Callable, delay: int, *args, **kwargs):
+        QTimer.singleShot(delay, lambda: task(*args, **kwargs))
 
     # Web debugging ####
 
