@@ -89,6 +89,7 @@ class AnkiSession:
         self._base = base
         self._qtbot = qtbot
         self._web_debugging_port = web_debugging_port
+        self._chrome_driver: Optional[webdriver.Chrome] = None
 
     # Key session properties ####
 
@@ -118,6 +119,8 @@ class AnkiSession:
     def qtbot(self) -> "QtBot":
         """pytest-qt QtBot fixture"""
         return self._qtbot
+
+    # Web view debugging
 
     @property
     def web_debugging_port(self) -> Optional[int]:
@@ -356,18 +359,25 @@ class AnkiSession:
             web_view_title = target_web_view
 
         def test_wrapper() -> Optional[bool]:
-            options = webdriver.ChromeOptions()
-            options.add_experimental_option(
-                "debuggerAddress", f"127.0.0.1:{self._web_debugging_port}"
-            )
-            driver = webdriver.Chrome(options=options)
+            if not self._chrome_driver:
+                options = webdriver.ChromeOptions()
+                options.add_experimental_option(
+                    "debuggerAddress", f"127.0.0.1:{self._web_debugging_port}"
+                )
+                self._chrome_driver = webdriver.Chrome(options=options)
 
             if web_view_title:
                 self._switch_chrome_driver_to_web_view(
-                    driver=driver, web_view_title=web_view_title
+                    driver=self._chrome_driver, web_view_title=web_view_title
                 )
 
-            return test_function(driver)
+            return test_function(self._chrome_driver)
 
         with self._allow_selenium_to_detect_anki():
             return self.run_in_thread_and_wait(test_wrapper)
+
+    def reset_chrome_driver(self):
+        if not self._chrome_driver:
+            return
+        self._chrome_driver.quit()
+        self._chrome_driver = None
