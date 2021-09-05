@@ -1,4 +1,4 @@
-## pytest-anki
+# pytest-anki
 
 pytest-anki is a [pytest](https://docs.pytest.org/) plugin that allows developers to write tests for their [Anki add-ons](https://addon-docs.ankiweb.net/).
 
@@ -21,26 +21,39 @@ The goal is to provide add-on authors with a one-stop-shop for their functional 
 
 [![General tests](https://github.com/glutanimate/pytest-anki/actions/workflows/general.yml/badge.svg)](https://github.com/glutanimate/pytest-anki/actions/workflows/general.yml)
 
-### Disclaimer
+## Disclaimer
 
-#### Project State
+### Project State
 
 **Important**: The plugin is currently undergoing a major rewrite and expansion of its feature-set, so the documentation below is very sparse at the moment. I am working on bringing the docs up to speed, but until then, please feel free to check out the inline documentation and also take a look at the plug-in's tests for a number of hopefully helpful examples.
 
-#### Platform Support
+### Platform Support
 
 `pytest-anki` has only been confirmed to work on Linux so far.
 
 
-### Installation
+## Installation
+
+### Requirements
+
+`pytest-anki` requires Python 3.8+.
+
+### Installing the latest packaged build
 
 ```bash
-pip install --upgrade git+https://github.com/glutanimate/pytest-anki.git
+$ pip install poetry-anki
 ```
 
-### Usage
+or
 
-#### Basic Use
+```bash
+$ poetry add --dev pytest-anki
+```
+
+
+## Usage
+
+### Basic Use
 
 In your tests add:
    
@@ -71,7 +84,7 @@ def test_my_addon(anki_session: AnkiSession):
 ```
 
 
-#### Configuring the Anki Session
+### Configuring the Anki Session
 
 You can customize the Anki session context by passing arguments to the `anki_session` fixture using pytest's indirect parametrization, e.g.
 
@@ -85,6 +98,7 @@ def test_my_addon(anki_session: AnkiSession):
     assert anki_session.collection
 ```
 
+## Additional Notes
 
 ### When to use pytest-anki
 
@@ -119,7 +133,36 @@ Future versions of `pytest-anki` will possibly do this by default.
 
 Especially if you run your tests headlessly with `xvfb`, you might run into cases where pytest will sometimes appear to hang. Oftentimes this is due to blocking non-dismissable prompts that your add-on code might invoke in some scenarios. If you suspect that might be the case, my advice would be to temporarily bypass `xvfb` locally via `pytest --no-xvfb` to show the UI and manually debug the issue.
 
-### License and Credits
+## Contributing
+
+Contributions are welcome! To set up `pytest-anki` for development, please first make sure you have Python 3.8+ and [poetry](https://python-poetry.org/docs/) installed, then run the following steps:
+
+```
+$ git clone https://github.com/glutanimate/pytest-anki.git
+
+$ cd pytest-anki
+
+# Either set up a new Python virtual environment at this stage
+# (e.g. using pyenv), or let poetry create the venv for you
+
+$ make install
+```
+
+Before submitting any changes, please make sure that `pytest-anki`'s checks and tests pass:
+
+```bash
+make check
+make lint
+make test
+```
+
+This project uses `black`, `isort` and `autoflake` to enforce a consistent code style. To auto-format your code you can use:
+
+```bash
+make format
+```
+
+## License and Credits
 
 *pytest-anki* is
 
