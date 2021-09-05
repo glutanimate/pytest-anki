@@ -8,6 +8,9 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "README.md"
+      - "docs/**"
 
 jobs:
   read-current-anki-matrix:
