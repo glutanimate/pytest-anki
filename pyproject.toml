@@ -9,7 +9,7 @@ homepage = "https://github.com/glutanimate/pytest-anki"
 readme = "README.md"
 keywords = ["anki", "development", "testing", "test", "pytest"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Topic :: Software Development :: Testing",
     "Topic :: Software Development :: Quality Assurance",
     "Topic :: Software Development :: Testing",
