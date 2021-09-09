@@ -41,7 +41,7 @@ The goal is to provide add-on authors with a one-stop-shop for their functional 
 ### Installing the latest packaged build
 
 ```bash
-$ pip install poetry-anki
+$ pip install pytest-anki
 ```
 
 or
