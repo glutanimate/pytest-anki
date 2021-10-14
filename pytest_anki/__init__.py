@@ -33,6 +33,8 @@
 A simple pytest plugin for testing Anki add-ons
 """
 
+__all__ = ["AnkiStateUpdate", "AnkiWebViewType", "AnkiSessionError", "AnkiSession"]
+
 from ._anki import AnkiStateUpdate, AnkiWebViewType  # noqa: F401
 from ._errors import AnkiSessionError  # noqa: F401
 from ._session import AnkiSession  # noqa: F401
