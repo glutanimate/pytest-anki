@@ -43,7 +43,7 @@ from typing import (
     Union,
 )
 
-from anki.importing.apkg import AnkiPackageImporter
+import anki
 from PyQt5.QtCore import QThreadPool, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 from selenium import webdriver
@@ -176,7 +176,7 @@ class AnkiSession:
         """Install deck from specified .apkg file, returning deck ID"""
         old_ids = set(self._get_deck_ids())
 
-        importer = AnkiPackageImporter(col=self.collection, file=str(path))
+        importer = anki.importing.apkg.AnkiPackageImporter(col=self.collection, file=str(path))
         importer.run()
 
         new_ids = set(self._get_deck_ids())
