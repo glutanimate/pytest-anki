@@ -37,7 +37,7 @@ from contextlib import contextmanager, nullcontext
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
 from unittest import mock
 
-from PyQt5.QtCore import qInstallMessageHandler
+from PyQt6.QtCore import qInstallMessageHandler
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
 from ._errors import AnkiSessionError

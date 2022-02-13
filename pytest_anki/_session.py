@@ -44,8 +44,8 @@ from typing import (
 )
 
 import anki
-from PyQt5.QtCore import QThreadPool, QTimer
-from PyQt5.QtWebEngineWidgets import QWebEngineProfile
+from PyQt6.QtCore import QThreadPool, QTimer
+import PyQt6.QtWebEngineWidgets
 from selenium import webdriver
 
 from ._addons import ConfigPaths, create_addon_config
@@ -129,7 +129,7 @@ class AnkiSession:
 
     @property
     def chromium_version(self) -> str:
-        user_agent = QWebEngineProfile.defaultProfile().httpUserAgent()
+        user_agent = PyQt6.QtWebEngineWidgets.QWebEngineProfile.defaultProfile().httpUserAgent()
         match = re.match(r".*Chrome/(.+)\s+.*", user_agent)
         if match is None:
             raise AnkiSessionError("Could not determine Chromium version")
