@@ -10,6 +10,7 @@
 # listed at the end of the license file that accompanied this program.
 #
 # This program is distributed in the hope that it will be useful,
+
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
@@ -43,7 +44,6 @@ from typing import (
     Union,
 )
 
-import anki
 from PyQt6.QtCore import QThreadPool, QTimer
 import PyQt6.QtWebEngineWidgets
 from selenium import webdriver
@@ -174,9 +174,10 @@ class AnkiSession:
 
     def install_deck(self, path: PathLike) -> int:
         """Install deck from specified .apkg file, returning deck ID"""
+        from anki.importing.apkg import AnkiPackageImporter
         old_ids = set(self._get_deck_ids())
 
-        importer = anki.importing.apkg.AnkiPackageImporter(col=self.collection, file=str(path))
+        importer = AnkiPackageImporter(col=self.collection, file=str(path))
         importer.run()
 
         new_ids = set(self._get_deck_ids())
