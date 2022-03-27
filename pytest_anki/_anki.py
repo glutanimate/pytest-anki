@@ -32,6 +32,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
+from packaging.version import Version
+
 from ._errors import AnkiSessionError
 from ._util import get_nested_attribute
 
@@ -178,3 +180,11 @@ def get_anki_object(
             f"Anki storage object {storage_object.name} could not be accessed:"
             f" {str(e)}"
         )
+
+
+def get_anki_version() -> Version:
+    try:
+        from anki.buildinfo import version
+    except (ImportError, ModuleNotFoundError):
+        from anki import version  # type: ignore[attr-defined, no-redef]
+    return Version(version)
