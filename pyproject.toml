@@ -31,9 +31,9 @@ pytest = ">=3.5.0"
 pytest-forked = "^1.3.0"
 pytest-xdist = "^2.3.0"
 pytest-xvfb = "^2.0.0"
-anki = ">=2.1.28,<=2.1.47"
-aqt = ">=2.1.28,<=2.1.47"
 pytest-qt = "^4.0.2"
+aqt = ">=2.1.28"
+anki = ">=2.1.28"
 selenium = "^3.141.0"
 
 [tool.poetry.dev-dependencies]
