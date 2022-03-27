@@ -177,8 +177,7 @@ def get_anki_object(
         return get_nested_attribute(obj=main_window, attr=attribute_path)
     except Exception as e:
         raise AnkiSessionError(
-            f"Anki storage object {storage_object.name} could not be accessed:"
-            f" {str(e)}"
+            f"Anki storage object {storage_object.name} could not be accessed: {str(e)}"
         )
 
 
