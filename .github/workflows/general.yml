@@ -97,11 +97,6 @@ jobs:
           # Version matrix follows static macOS builds as closely as possible.
           # Some Qt package versions are not available on PyPI, so we need to make
           # compromises here and there.
-          - anki: 2.1.49
-            python: 3.8.6
-            pyqt: 5.14.2
-            pyqtwebengine: 5.14.2
-            chrome: 77.0.3865.129
           - anki: 2.1.44
             python: 3.8.6
             pyqt: 5.14.2
