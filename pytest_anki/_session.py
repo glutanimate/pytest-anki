@@ -44,7 +44,7 @@ from typing import (
     Union,
 )
 
-from PyQt6.QtCore import QThreadPool, QTimer
+from aqt.qt import QThreadPool, QTimer
 import PyQt6.QtWebEngineWidgets
 from selenium import webdriver
 
