@@ -51,6 +51,8 @@ from ._session import AnkiSession
 from ._types import PathLike
 from ._util import find_free_port
 
+from anki.errors import BackendIOError
+
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
 
@@ -286,7 +288,10 @@ def anki_running(
 
     # clean up what was spoiled
     if aqt.mw:
-        aqt.mw.cleanupAndExit()
+        try:
+            aqt.mw.cleanupAndExit()
+        except BackendIOError:
+            pass
 
     # remove hooks added by pytest-anki
 
