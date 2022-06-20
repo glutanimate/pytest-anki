@@ -21,6 +21,27 @@ stringcase = "*"
 syncserver = ["flask", "waitress"]
 
 [[package]]
+name = "anki"
+version = "2.1.53"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+beautifulsoup4 = "*"
+decorator = "*"
+distro = {version = "*", markers = "sys_platform != \"darwin\" and sys_platform != \"win32\""}
+markdown = "*"
+orjson = "*"
+protobuf = ">=3.17"
+psutil = {version = "*", markers = "sys_platform == \"win32\""}
+requests = {version = "*", extras = ["socks"]}
+
+[package.extras]
+syncserver = ["flask", "waitress"]
+
+[[package]]
 name = "aqt"
 version = "2.1.49"
 description = ""
@@ -45,6 +66,31 @@ winrt = [
     {version = "1.0.20239.1", markers = "sys_platform == \"win32\" and platform_release == \"10\" and python_version == \"3.8\""},
     {version = "*", markers = "sys_platform == \"win32\" and platform_release == \"10\" and python_version >= \"3.9\""},
 ]
+
+[[package]]
+name = "aqt"
+version = "2.1.53"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+anki = "2.1.53"
+beautifulsoup4 = "*"
+flask = "*"
+flask_cors = "*"
+jsonschema = "*"
+psutil = {version = "*", markers = "sys_platform == \"win32\""}
+pywin32 = {version = "*", markers = "sys_platform == \"win32\""}
+requests = "*"
+send2trash = "*"
+waitress = "*"
+winrt = {version = "*", markers = "sys_platform == \"win32\""}
+
+[package.extras]
+qt5 = ["pyqt5 (>=5.14)", "pyqtwebengine"]
+qt6 = ["pyqt6 (>=6.2)", "pyqt6-webengine (>=6.2)"]
 
 [[package]]
 name = "astroid"
@@ -884,16 +930,22 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "e81c89bdd833d5cfc05ebcbeda95ef57dfc25e956daa9d288da7817352a62e81"
+content-hash = "5484b37426837849abd367d79e920c239556ceb6d22699faaccdece891b1a4f2"
 
 [metadata.files]
 anki = [
     {file = "anki-2.1.49-cp38-abi3-macosx_10_7_x86_64.whl", hash = "sha256:9f4384db0432468f94e69e65244a0a28a6718cd6d187a02463bf0dd64803bdb9"},
     {file = "anki-2.1.49-cp38-abi3-manylinux2014_x86_64.whl", hash = "sha256:746c9807d5f2f87503eb993b28b660fd8e0bc70b969796855dbd48bdaa995af4"},
     {file = "anki-2.1.49-cp38-abi3-win_amd64.whl", hash = "sha256:fda47880fbc4bf232090ea171fb337c4301d7f001bb2647fccb83785886cc6f8"},
+    {file = "anki-2.1.53-cp39-abi3-macosx_10_13_x86_64.whl", hash = "sha256:f40faf84959e9dbf3c02ce111ed4f0260950b2ccae79a4271ce059992066984b"},
+    {file = "anki-2.1.53-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:7521249661a22cb170a3cf04010241da123c6863d32b9e97fa6bf97250259f72"},
+    {file = "anki-2.1.53-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:54f1b28b0c7f83bab0a009255741e9ec02ccfaf19c6a99e5ed50c5a91eb3caf4"},
+    {file = "anki-2.1.53-cp39-abi3-manylinux_2_31_aarch64.whl", hash = "sha256:af134482da698f98c1cc8c4f2cccd176f66bf500663c562d1ff3d1f569900fa1"},
+    {file = "anki-2.1.53-cp39-abi3-win_amd64.whl", hash = "sha256:a9b91c0d9496decbc21875d1e81f080dad635a6821fd490b9ac5c66e0f762dc3"},
 ]
 aqt = [
     {file = "aqt-2.1.49-py3-none-any.whl", hash = "sha256:e9aee6a19ab4f4cf7142f4ccf776a34245013d2800d873177854b0ec5dfb2411"},
+    {file = "aqt-2.1.53-py3-none-any.whl", hash = "sha256:d12c1b29a6c6c024a99472e8501718c8ab3046eddc98e4e02b8b0eb0afea5c53"},
 ]
 astroid = [
     {file = "astroid-2.7.3-py3-none-any.whl", hash = "sha256:dc1e8b28427d6bbef6b8842b18765ab58f558c42bb80540bd7648c98412af25e"},
