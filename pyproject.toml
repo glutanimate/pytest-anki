@@ -35,8 +35,8 @@ pytest-qt = "^4.0.2"
 selenium = "^3.141.0"
 packaging = "^21.3"
 aqt = [
-    {version = ">=2.1.28, <=2.1.49", python = "^3.8"},
-    {version = ">=2.1.50", python = "^3.9"}
+    {version = ">=2.1.28, <=2.1.49", python = ">=3.8, <3.9"},
+    {version = ">=2.1.50", python = ">=3.9"}
 ]
 
 [tool.poetry.dev-dependencies]
