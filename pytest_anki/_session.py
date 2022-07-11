@@ -37,6 +37,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     Iterator,
     List,
     Optional,
@@ -44,8 +45,7 @@ from typing import (
     Union,
 )
 
-from aqt.qt import QThreadPool, QTimer
-from aqt.qt import QWebEngineProfile
+from aqt.qt import QThreadPool, QTimer, QWebEngineProfile
 from selenium import webdriver
 
 from ._addons import ConfigPaths, create_addon_config
@@ -182,8 +182,11 @@ class AnkiSession:
 
         new_ids = set(self._get_deck_ids())
 
+        def highest_level_did(dids: Iterable[int]) -> int:
+            return min(dids, key=lambda did: self.collection.decks.name(did).count("::"))
+
         # deck IDs are strings on <=2.1.26
-        deck_id = int(next(iter(new_ids - old_ids)))
+        deck_id = int(highest_level_did(new_ids - old_ids))
 
         return deck_id
 
