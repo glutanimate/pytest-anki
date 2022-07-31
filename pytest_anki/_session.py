@@ -289,13 +289,14 @@ class AnkiSession:
         task: Callable,
         task_args: Optional[Tuple[Any, ...]] = None,
         task_kwargs: Optional[Dict[str, Any]] = None,
+        timeout: int = 5000,
     ):
         thread_pool = QThreadPool.globalInstance()
         worker = SignallingWorker(
             task=task, task_args=task_args, task_kwargs=task_kwargs
         )
 
-        with self._qtbot.wait_signal(worker.signals.finished):
+        with self._qtbot.wait_signal(worker.signals.finished, timeout=timeout):
             thread_pool.start(worker)
 
         if exception := worker.error:
@@ -341,12 +342,14 @@ class AnkiSession:
         self,
         test_function: Callable[[webdriver.Chrome], Optional[bool]],
         target_web_view: Optional[Union[AnkiWebViewType, str]] = None,
+        timeout: int = 5000,
     ):
         """[summary]
 
         Args:
             test_function (Callable[[webdriver.Chrome], Optional[bool]]): [description]
             target_web_view: Web view as identified by its title. Defaults to None.
+            timeout: Time to wait for task to complete until qtbot raises a TimeoutError
         """
         if self._web_debugging_port is None:
             raise AnkiSessionError("Web debugging interface is not active")
@@ -374,7 +377,7 @@ class AnkiSession:
             return test_function(self._chrome_driver)
 
         with self._allow_selenium_to_detect_anki():
-            return self.run_in_thread_and_wait(test_wrapper)
+            return self.run_in_thread_and_wait(test_wrapper, timeout=timeout)
 
     def reset_chrome_driver(self):
         if not self._chrome_driver:
