@@ -28,9 +28,12 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import time
 from unittest.mock import Mock
 
+import pytest
 import requests
+from pytestqt.qtbot import TimeoutError
 from selenium import webdriver
 
 from pytest_anki import AnkiSession, AnkiWebViewType
@@ -44,6 +47,31 @@ def test_run_in_thread(anki_session: AnkiSession):
         task=mock_task, task_args=args, task_kwargs=kwargs
     )
     mock_task.assert_called_once_with(*args, **kwargs)
+
+
+def test_can_supply_timeout(anki_session: AnkiSession):
+    timeout_duration = 4
+    task_duration = 3
+
+    def mock_task():
+        time.sleep(task_duration)
+
+    start_time = time.time()
+    try:
+        anki_session.run_in_thread_and_wait(
+            task=mock_task, timeout=timeout_duration * 1000
+        )
+    except TimeoutError:
+        pytest.fail("Call unexpectedly timed out")
+
+    wait_time = time.time() - start_time
+
+    assert timeout_duration > wait_time >= task_duration
+
+    with pytest.raises(TimeoutError):
+        anki_session.run_in_thread_and_wait(
+            task=mock_task, timeout=(task_duration - 1) * 1000
+        )
 
 
 def test_web_debugging_available_on_launch(anki_session: AnkiSession):
