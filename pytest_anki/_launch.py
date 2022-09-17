@@ -157,7 +157,7 @@ def anki_running(
         web_debugging_port {Optional[int]}:
             If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
             you to remotely debug Qt web engine views.
-        
+
         skip_loading_addons {bool}:
             If set to True, will skip loading packed and unpacked add-ons, giving the
             caller full control over the add-on import time.
@@ -183,7 +183,7 @@ def anki_running(
             unpacked_addons=unpacked_addons,
             addon_configs=addon_configs,
             preset_anki_state=preset_anki_state,
-            skip_loading_addons=skip_loading_addons
+            skip_loading_addons=skip_loading_addons,
         )
 
         # Apply preset Anki profile and collection.conf storage on profile load
