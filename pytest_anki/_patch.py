@@ -65,6 +65,7 @@ def post_ui_setup_callback_factory(
     unpacked_addons: Optional[List[Tuple[str, PathLike]]] = None,
     addon_configs: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
     preset_anki_state: Optional[AnkiStateUpdate] = None,
+    skip_loading_addons: bool = False
 ):
     def post_ui_setup_callback(main_window: AnkiQt):
         """Initialize add-on manager, install add-ons, load add-ons"""
@@ -97,7 +98,8 @@ def post_ui_setup_callback_factory(
                 main_window=main_window, anki_state_update=preset_anki_state
             )
 
-        main_window.addonManager.loadAddons()
+        if not skip_loading_addons:
+            main_window.addonManager.loadAddons()
 
     return post_ui_setup_callback
 
