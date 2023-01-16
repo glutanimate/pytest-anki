@@ -120,6 +120,9 @@ def anki_session(request: "FixtureRequest", qtbot: "QtBot") -> Iterator[AnkiSess
             If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
             you to remotely debug Qt web engine views.
 
+        skip_loading_addons {bool}:
+            If set to True, will skip loading packed and unpacked add-ons, giving the
+            caller full control over the add-on import time.
     """
 
     indirect_parameters: Optional[Dict[str, Any]] = getattr(request, "param", None)
