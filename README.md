@@ -135,7 +135,7 @@ Especially if you run your tests headlessly with `xvfb`, you might run into case
 
 ## Contributing
 
-Contributions are welcome! To set up `pytest-anki` for development, please first make sure you have Python 3.8+ and [poetry](https://python-poetry.org/docs/) installed, then run the following steps:
+Contributions are welcome! To set up `pytest-anki` for development, please first make sure you have Python 3.8+ and [poetry](https://python-poetry.org/docs/) installed (1.3.x or later), then run the following steps:
 
 ```
 $ git clone https://github.com/glutanimate/pytest-anki.git
