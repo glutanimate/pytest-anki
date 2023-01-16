@@ -45,8 +45,23 @@ isort = "^5.9.3"
 flake8 = "^3.9.2"
 requests = "^2.26.0"
 types-requests = "^2.25.6"
-PyQt5-stubs = "^5.15.2"
 autoflake = "^1.4"
+
+[tool.poetry.group.qt5]
+optional = true
+
+[tool.poetry.group.qt5.dependencies]
+PyQt5 = "^5.14.1"
+PyQtWebEngine = "^5.14.0"
+PyQt5-stubs = "^5.15.6"
+
+[tool.poetry.group.qt6]
+optional = true
+
+[tool.poetry.group.qt6.dependencies]
+PyQt6 = "^6.2"
+PyQt6-WebEngine = "^6.2"
+# Add https://github.com/python-qt-tools/PyQt6-stubs ?
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -69,6 +84,6 @@ experimental-string-processing = true
 [tool.isort]
 multi_line_output = 3
 include_trailing_comma = true
-line_length=88
-ensure_newline_before_comments=true
+line_length = 88
+ensure_newline_before_comments = true
 skip_glob = "tests/samples/**"
