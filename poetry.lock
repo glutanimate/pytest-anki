@@ -1,6 +1,6 @@
 [[package]]
 name = "anki"
-version = "2.1.54"
+version = ">=2.1.54"
 description = ""
 category = "main"
 optional = false
@@ -21,14 +21,14 @@ syncserver = ["flask", "waitress"]
 
 [[package]]
 name = "aqt"
-version = "2.1.54"
+version = ">=2.1.54"
 description = ""
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-anki = "2.1.54"
+anki = ">=2.1.54"
 beautifulsoup4 = "*"
 flask = "*"
 flask_cors = "*"
