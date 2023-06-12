@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytest-anki"
-version = "1.0.0-beta.7"
+version = "1.0.0-beta.3"
 description = "A pytest plugin for testing Anki add-ons"
 authors = ["Aristotelis P. (Glutanimate)", "Michal Krassowski"]
 license = "AGPL-3.0-or-later"
@@ -20,7 +20,7 @@ classifiers = [
     "Framework :: Pytest",
     "Intended Audience :: Developers",
 ]
-include = ["pytest_anki/py.typed", "pytest_anki/anki-current.json"]
+include = ["pytest_anki/py.typed"]
 
 [tool.poetry.plugins.pytest11]
 anki = "pytest_anki.plugin"
@@ -35,9 +35,6 @@ anki = ">=2.1.54"
 aqt = ">=2.1.54"
 pytest-qt = "^4.0.2"
 selenium = "^3.141.0"
-packaging = "^21.3"
-aqt = ">=2.1.28"
-anki = ">=2.1.28"
 
 [tool.poetry.dev-dependencies]
 black = "^21.7b0"
@@ -66,7 +63,6 @@ exclude = "tests/samples/"
 
 [tool.black]
 exclude = "tests/samples/"
-experimental-string-processing = true
 
 [tool.isort]
 multi_line_output = 3
