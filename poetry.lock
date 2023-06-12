@@ -1,6 +1,27 @@
 [[package]]
 name = "anki"
-version = "2.1.54"
+version = ">=2.1.54"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+beautifulsoup4 = "*"
+decorator = "*"
+distro = {version = "*", markers = "sys_platform != \"darwin\" and sys_platform != \"win32\""}
+markdown = "*"
+orjson = "*"
+protobuf = ">=3.17"
+psutil = {version = "*", markers = "sys_platform == \"win32\""}
+requests = {version = "*", extras = ["socks"]}
+
+[package.extras]
+syncserver = ["flask", "waitress"]
+
+[[package]]
+name = "anki"
+version = "2.1.53"
 description = ""
 category = "main"
 optional = false
@@ -21,14 +42,39 @@ syncserver = ["flask", "waitress"]
 
 [[package]]
 name = "aqt"
-version = "2.1.54"
+version = ">=2.1.54"
 description = ""
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-anki = "2.1.54"
+anki = ">=2.1.54"
+beautifulsoup4 = "*"
+flask = "*"
+flask_cors = "*"
+jsonschema = "*"
+psutil = {version = "*", markers = "sys_platform == \"win32\""}
+pywin32 = {version = "*", markers = "sys_platform == \"win32\""}
+requests = "*"
+send2trash = "*"
+waitress = "*"
+winrt = {version = "*", markers = "sys_platform == \"win32\""}
+
+[package.extras]
+qt5 = ["pyqt5 (>=5.14)", "pyqtwebengine"]
+qt6 = ["pyqt6 (>=6.2)", "pyqt6-webengine (>=6.2)"]
+
+[[package]]
+name = "aqt"
+version = "2.1.53"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+anki = "2.1.53"
 beautifulsoup4 = "*"
 flask = "*"
 flask_cors = "*"
@@ -837,6 +883,18 @@ python-versions = ">=3.7"
 docs = ["sphinx", "jaraco.packaging (>=9)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
 
+[[package]]
+name = "zipp"
+version = "3.7.0"
+description = "Backport of pathlib-compatible object wrapper for zip files"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
@@ -931,6 +989,14 @@ importlib-metadata = [
 importlib-resources = [
     {file = "importlib_resources-5.8.0-py3-none-any.whl", hash = "sha256:7952325ffd516c05a8ad0858c74dff2c3343f136fe66a6002b2623dd1d43f223"},
     {file = "importlib_resources-5.8.0.tar.gz", hash = "sha256:568c9f16cb204f9decc8d6d24a572eeea27dacbb4cee9e6b03a8025736769751"},
+]
+importlib-metadata = [
+    {file = "importlib_metadata-4.11.3-py3-none-any.whl", hash = "sha256:1208431ca90a8cca1a6b8af391bb53c1a2db74e5d1cef6ddced95d4b2062edc6"},
+    {file = "importlib_metadata-4.11.3.tar.gz", hash = "sha256:ea4c597ebf37142f827b8f39299579e31685c31d3a438b59f469406afd0f2539"},
+]
+importlib-resources = [
+    {file = "importlib_resources-5.6.0-py3-none-any.whl", hash = "sha256:a9dd72f6cc106aeb50f6e66b86b69b454766dd6e39b69ac68450253058706bcc"},
+    {file = "importlib_resources-5.6.0.tar.gz", hash = "sha256:1b93238cbf23b4cde34240dd8321d99e9bf2eb4bc91c0c99b2886283e7baad85"},
 ]
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
@@ -1400,4 +1466,8 @@ wrapt = [
 zipp = [
     {file = "zipp-3.8.0-py3-none-any.whl", hash = "sha256:c4f6e5bbf48e74f7a38e7cc5b0480ff42b0ae5178957d564d18932525d5cf099"},
     {file = "zipp-3.8.0.tar.gz", hash = "sha256:56bf8aadb83c24db6c4b577e13de374ccfb67da2078beba1d037c17980bf43ad"},
+]
+zipp = [
+    {file = "zipp-3.7.0-py3-none-any.whl", hash = "sha256:b47250dd24f92b7dd6a0a8fc5244da14608f3ca90a5efcd37a3b1642fac9a375"},
+    {file = "zipp-3.7.0.tar.gz", hash = "sha256:9f50f446828eb9d45b267433fd3e9da8d801f614129124863f9c51ebceafb87d"},
 ]
