@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2022 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,18 +28,28 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import json
+from dataclasses import dataclass
+from pathlib import Path
 
-"""
-A simple pytest plugin for testing Anki add-ons
-"""
+from packaging.version import Version
 
-__all__ = ["AnkiStateUpdate", "AnkiWebViewType", "AnkiSessionError", "AnkiSession"]
+_ANKI_CURRENT_FILE = "anki-current.json"
+_ANKI_CURRENT_FILE_PATH = Path(__file__).parent / _ANKI_CURRENT_FILE
 
-from ._anki import AnkiStateUpdate, AnkiWebViewType  # noqa: F401
-from ._errors import AnkiSessionError  # noqa: F401
-from ._session import AnkiSession  # noqa: F401
 
-__version__ = "1.0.0-beta.7"
-__author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
-__title__ = "pytest-anki"
-__homepage__ = "https://github.com/glutanimate/pytest-anki"
+@dataclass
+class LatestTestedLibraryVersions:
+    anki: Version
+    python: Version
+    pyqt: Version
+    pyqtwebengine: Version
+    chrome: Version
+
+
+def get_latest_tested_lib_versions() -> LatestTestedLibraryVersions:
+    with _ANKI_CURRENT_FILE_PATH.open("r", encoding="utf-8") as anki_current_file:
+        anki_current_data = json.load(anki_current_file)
+    return LatestTestedLibraryVersions(
+        **{key: Version(value) for key, value in anki_current_data.items()}
+    )

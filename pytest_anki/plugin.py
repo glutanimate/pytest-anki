@@ -35,9 +35,27 @@ import pytest
 if TYPE_CHECKING:
     from pytest import FixtureRequest
     from pytestqt.qtbot import QtBot
+    from _pytest.config import Config  # FIXME: not stable
 
+from ._anki import get_anki_version
+from ._config import get_latest_tested_lib_versions
 from ._launch import anki_running
 from ._session import AnkiSession
+
+
+def pytest_configure(config: "Config"):
+    """Hook into pytest_configure stage to prepare plugin, e.g.
+    in order to assert that runtime environment is supported"""
+    latest_tested_lib_versions = get_latest_tested_lib_versions()
+    anki_version = get_anki_version()
+
+    if anki_version > (latest_tested_anki_version := latest_tested_lib_versions.anki):
+        warning = Warning(
+            "The latest Anki version pytest-anki was tested with is"
+            f" {latest_tested_anki_version}. You are using {anki_version}. pytest-anki"
+            " might not behave as expected or not work at all."
+        )
+        config.issue_config_time_warning(warning, stacklevel=2)
 
 
 @pytest.fixture
@@ -102,6 +120,9 @@ def anki_session(request: "FixtureRequest", qtbot: "QtBot") -> Iterator[AnkiSess
             If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
             you to remotely debug Qt web engine views.
 
+        skip_loading_addons {bool}:
+            If set to True, will skip loading packed and unpacked add-ons, giving the
+            caller full control over the add-on import time.
     """
 
     indirect_parameters: Optional[Dict[str, Any]] = getattr(request, "param", None)
