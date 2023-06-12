@@ -31,7 +31,7 @@
 
 from typing import Any, Callable, Dict, Optional, Tuple
 
-from PyQt5.QtCore import QMessageLogContext, QObject, QRunnable, QtMsgType, pyqtSignal
+from aqt.qt import QMessageLogContext, QObject, QRunnable, QtMsgType, pyqtSignal
 
 
 class QtMessageMatcher(QObject):

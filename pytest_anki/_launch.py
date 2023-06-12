@@ -37,7 +37,7 @@ from contextlib import contextmanager, nullcontext
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
 from unittest import mock
 
-from PyQt5.QtCore import qInstallMessageHandler
+from aqt.qt import qInstallMessageHandler
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
 from ._errors import AnkiSessionError
@@ -50,6 +50,8 @@ from ._qt import QtMessageMatcher
 from ._session import AnkiSession
 from ._types import PathLike
 from ._util import find_free_port
+
+from anki.errors import BackendIOError
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
@@ -292,7 +294,10 @@ def anki_running(
 
     # clean up what was spoiled
     if aqt.mw:
-        aqt.mw.cleanupAndExit()
+        try:
+            aqt.mw.cleanupAndExit()
+        except BackendIOError:
+            pass
 
     # remove hooks added by pytest-anki
 
