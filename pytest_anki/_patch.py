@@ -41,7 +41,7 @@ import aqt
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
 from aqt.taskman import TaskManager
-from PyQt5.QtWidgets import QMainWindow
+from aqt.qt import QMainWindow
 
 if TYPE_CHECKING:
     from anki._backend import RustBackend
