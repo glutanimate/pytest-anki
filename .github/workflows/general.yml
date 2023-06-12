@@ -27,7 +27,7 @@ jobs:
       uses: actions/checkout@v2
     - id: set-matrix
       run: |
-        content=$(cat ./anki-current.json)
+        content=$(cat ./pytest_anki/anki-current.json)
         content="${content//'%'/'%25'}"
         content="${content//$'\n'/'%0A'}"
         content="${content//$'\r'/'%0D'}"
