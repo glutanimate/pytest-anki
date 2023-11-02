@@ -156,6 +156,11 @@ class AnkiSession:
     def unload_profile(self, on_profile_unloaded: Optional[Callable] = None):
         """Unload current profile, optionally running a callback when profile
         unload complete"""
+
+        # Run closures before unloading collection to avoid errors due to closures
+        # trying to access the collection after it has been unloaded.
+        self._mw.taskman._on_closures_pending()
+
         if on_profile_unloaded is None:
             on_profile_unloaded = lambda *args, **kwargs: None  # noqa: E731
         self._mw.unloadProfile(on_profile_unloaded)
