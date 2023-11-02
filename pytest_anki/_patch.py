@@ -167,7 +167,7 @@ def patch_anki(
 
     old_init = AnkiQt.__init__
     old_key = AnkiApp.KEY
-    old_setupAutoUpdate = AnkiQt.setupAutoUpdate
+    old_setupAutoUpdate = AnkiQt.setup_auto_update
     old_maybe_check_for_addon_updates = AnkiQt.maybe_check_for_addon_updates
     old_errorHandler = errors.ErrorHandler
 
