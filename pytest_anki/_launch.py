@@ -252,7 +252,7 @@ def anki_running(
                         set_qt_message_handler_installer(install_message_handler)
 
                         maybe_wait_for_web_debugging = qtbot.wait_signal(
-                            qt_message_matcher.match_found
+                            qt_message_matcher.match_found, timeout=15000
                         )
                     else:
                         maybe_wait_for_web_debugging = nullcontext()
