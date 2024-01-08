@@ -155,10 +155,9 @@ def anki_running(
             for the specified add-on to. Useful for simulating specific config set-ups.
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
-
-        web_debugging_port {Optional[int]}:
-            If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
-            you to remotely debug Qt web engine views.
+            
+        enable_web_debugging {bool}:
+            If set to True, will enable web debugging for Qt web views.
 
         skip_loading_addons {bool}:
             If set to True, will skip loading packed and unpacked add-ons, giving the
@@ -227,7 +226,7 @@ def anki_running(
 
                 with mock.patch.dict(os.environ, environment):
 
-                    if os.environ.get(QTWEBENGINE_REMOTE_DEBUGGING):
+                    if enable_web_debugging and os.environ.get(QTWEBENGINE_REMOTE_DEBUGGING):
 
                         # We want to wait until remote debugging started to yield the
                         # Anki session, so we monitor Qt's log for the corresponding msg
@@ -252,7 +251,7 @@ def anki_running(
                         set_qt_message_handler_installer(install_message_handler)
 
                         maybe_wait_for_web_debugging = qtbot.wait_signal(
-                            qt_message_matcher.match_found, timeout=15000
+                            qt_message_matcher.match_found
                         )
                     else:
                         maybe_wait_for_web_debugging = nullcontext()
