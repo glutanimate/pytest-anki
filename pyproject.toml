@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytest-anki"
-version = "1.0.0-beta.3"
+version = "1.0.0-beta.3.post1"
 description = "A pytest plugin for testing Anki add-ons"
 authors = ["Aristotelis P. (Glutanimate)", "Michal Krassowski"]
 license = "AGPL-3.0-or-later"
