@@ -560,6 +560,15 @@ wheels = [
 ]
 
 [[package]]
+name = "nodeenv"
+version = "1.9.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/16/fc88b08840de0e0a72a2f9d8c6bae36be573e475a6326ae854bcc549fc45/nodeenv-1.9.1.tar.gz", hash = "sha256:6ec12890a2dab7946721edbfbcd91f3319c6ccc9aec47be7c7e6b7011ee6645f", size = 47437 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d2/1d/1b658dbd2b9fa9c4c9f32accbfc0205d532c8c6194dc0f2a4c0428e7128a/nodeenv-1.9.1-py2.py3-none-any.whl", hash = "sha256:ba11c9782d29c27c70ffbdda2d7415098754709be8a7056d79a737cd901155c9", size = 22314 },
+]
+
+[[package]]
 name = "orjson"
 version = "3.6.7"
 source = { registry = "https://pypi.org/simple" }
@@ -998,6 +1007,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pyright"
+version = "1.1.398"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "nodeenv" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/24/d6/48740f1d029e9fc4194880d1ad03dcf0ba3a8f802e0e166b8f63350b3584/pyright-1.1.398.tar.gz", hash = "sha256:357a13edd9be8082dc73be51190913e475fa41a6efb6ec0d4b7aab3bc11638d8", size = 3892675 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/58/e0/5283593f61b3c525d6d7e94cfb6b3ded20b3df66e953acaf7bb4f23b3f6e/pyright-1.1.398-py3-none-any.whl", hash = "sha256:0a70bfd007d9ea7de1cf9740e1ad1a40a122592cfe22a3f6791b06162ad08753", size = 5780235 },
+]
+
+[[package]]
 name = "pyrsistent"
 version = "0.18.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1139,6 +1161,7 @@ anki = [
 dev = [
     { name = "mypy" },
     { name = "pylint" },
+    { name = "pyright" },
     { name = "requests" },
     { name = "ruff" },
     { name = "types-requests" },
@@ -1215,6 +1238,7 @@ anki = [
 dev = [
     { name = "mypy", specifier = "~=1.15" },
     { name = "pylint", specifier = "~=3.3" },
+    { name = "pyright", specifier = ">=1.1.398" },
     { name = "requests", specifier = "~=2.26" },
     { name = "ruff", specifier = "~=0.11.0" },
     { name = "types-requests", specifier = "~=2.25" },

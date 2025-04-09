@@ -16,6 +16,7 @@ test:
 # Run type checkers
 check:
 	python -m mypy $(MONITORED_FOLDERS)
+	python -m pyright $(MONITORED_FOLDERS)
 
 # Run code linters
 lint:
