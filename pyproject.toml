@@ -45,7 +45,6 @@ anki-2154 = ["aqt==2.1.54", "anki==2.1.54"]
 anki-2165 = ["aqt==2.1.65", "anki==2.1.65"]
 anki-2312 = ["aqt==23.12.1", "anki==23.12.1"]
 anki-2411 = ["aqt==24.11", "anki==24.11"]
-anki-2502 = ["aqt==25.02", "anki==25.02"]
 
 qt5-2154 = ["PyQt5~=5.15.5", "PyQt5-Qt5~=5.15.2", "PyQtWebEngine~=5.15.2"]
 qt5-2165 = ["PyQt5~=5.15.5", "PyQt5-Qt5~=5.15.2", "PyQtWebEngine~=5.15.2"]
@@ -56,7 +55,6 @@ qt6-2154 = ["PyQt6~=6.3.1", "PyQt6-Qt6~=6.3.1", "PyQt6-WebEngine~=6.3.1"]
 qt6-2165 = ["PyQt6~=6.5.0", "PyQt6-Qt6~=6.5.0", "PyQt6-WebEngine~=6.5.0"]
 qt6-2312 = ["PyQt6~=6.6.1", "PyQt6-Qt6~=6.6.1", "PyQt6-WebEngine~=6.6.0"]
 qt6-2411 = ["PyQt6~=6.6.1", "PyQt6-Qt6~=6.6.1", "PyQt6-WebEngine~=6.6.0"]
-qt6-2502 = ["PyQt6~=6.6.1", "PyQt6-Qt6~=6.6.1", "PyQt6-WebEngine~=6.6.0"]
 
 [dependency-groups]
 dev = [
@@ -79,7 +77,6 @@ conflicts = [
         { extra = "anki-2165" },
         { extra = "anki-2312" },
         { extra = "anki-2411" },
-        { extra = "anki-2502" },
     ],
     [
         { extra = "qt5-2154" },
@@ -92,7 +89,6 @@ conflicts = [
         { extra = "qt6-2165" },
         { extra = "qt6-2312" },
         { extra = "qt6-2411" },
-        { extra = "qt6-2502" },
     ],
 ]
 
