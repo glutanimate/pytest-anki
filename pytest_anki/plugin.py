@@ -33,12 +33,12 @@ from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional
 import pytest
 
 if TYPE_CHECKING:
-    from _pytest.config import Config  # FIXME: not stable
+    # from _pytest.config import Config  # FIXME: not stable
     from pytest import FixtureRequest
     from pytestqt.qtbot import QtBot
 
-from ._anki import get_anki_version
-from ._config import get_latest_tested_lib_versions
+# from ._anki import get_anki_version
+# from ._config import get_latest_tested_lib_versions
 from ._launch import anki_running
 from ._session import AnkiSession
 
