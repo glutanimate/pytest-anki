@@ -69,6 +69,7 @@ dev = [
     "requests~=2.26",
     "types-requests~=2.25",
     "pyright>=1.1.398",
+    "pytest-anki[recommended-plugins]",
 ]
 anki = ["aqt>=2.1.54,<25.2", "anki>=2.1.54,<25.2"]
 qt5 = [
