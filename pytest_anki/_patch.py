@@ -168,11 +168,11 @@ def patch_anki(
     old_init = AnkiQt.__init__
     old_key = AnkiApp.KEY
 
-    if hasattr(AnkiQt, "setup_auto_update"):
-        old_setupAutoUpdate = AnkiQt.setup_auto_update
-    else:
-        old_setupAutoUpdate = AnkiQt.setupAutoUpdate
+    setup_auto_update_attribute = (
+        "setupAutoUpdate" if hasattr(AnkiQt, "setupAutoUpdate") else "setup_auto_update"
+    )
 
+    old_setup_auto_update = getattr(AnkiQt, setup_auto_update_attribute)
     old_maybe_check_for_addon_updates = AnkiQt.maybe_check_for_addon_updates
     old_errorHandler = errors.ErrorHandler
 
@@ -182,7 +182,7 @@ def patch_anki(
 
     AnkiQt.__init__ = patched_ankiqt_init  # type: ignore
     AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
-    AnkiQt.setupAutoUpdate = Mock()  # type: ignore[assignment]
+    setattr(AnkiQt, setup_auto_update_attribute, Mock())
     AnkiQt.maybe_check_for_addon_updates = Mock()  # type: ignore[assignment]
     errors.ErrorHandler = Mock()  # type: ignore[misc]
 
@@ -190,7 +190,7 @@ def patch_anki(
 
     AnkiQt.__init__ = old_init  # type: ignore[assignment]
     AnkiApp.KEY = old_key  # type: ignore[assignment]
-    AnkiQt.setupAutoUpdate = old_setupAutoUpdate  # type: ignore[assignment]
+    setattr(AnkiQt, setup_auto_update_attribute, old_setup_auto_update)
     AnkiQt.maybe_check_for_addon_updates = (  # type: ignore[assignment]
         old_maybe_check_for_addon_updates
     )
