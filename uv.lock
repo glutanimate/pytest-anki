@@ -1263,7 +1263,7 @@ requires-dist = [
     { name = "pyqtwebengine", marker = "extra == 'qt5-2411'", specifier = "~=5.15.2" },
     { name = "pytest", specifier = "~=6.2.5" },
     { name = "pytest-forked", marker = "extra == 'recommended-plugins'", specifier = "~=1.4.0" },
-    { name = "pytest-qt", specifier = ">=4.0.2,<5" },
+    { name = "pytest-qt", specifier = "~=4.4.0" },
     { name = "pytest-xdist", marker = "extra == 'recommended-plugins'", specifier = "~=2.5.0" },
     { name = "pytest-xvfb", marker = "extra == 'recommended-plugins'", specifier = "~=3.1.1" },
     { name = "selenium", specifier = ">=3.141.0,<4" },
@@ -1309,14 +1309,15 @@ wheels = [
 
 [[package]]
 name = "pytest-qt"
-version = "4.0.2"
+version = "4.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "pluggy" },
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/05/28a2b0a12446c6bf3852d445f28d2a3ce31155dc072af103e58f42fe7e8d/pytest-qt-4.0.2.tar.gz", hash = "sha256:dfc5240dec7eb43b76bcb5f9a87eecae6ef83592af49f3af5f1d5d093acaa93e", size = 113466 }
+sdist = { url = "https://files.pythonhosted.org/packages/53/2c/6a477108342bbe1f5a81a2c54c86c3efadc35f6ad47c76f00c75764a0f7c/pytest-qt-4.4.0.tar.gz", hash = "sha256:76896142a940a4285339008d6928a36d4be74afec7e634577e842c9cc5c56844", size = 125443 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/3c/e7452af7da4fb1b8c21520bf201c373571d95f9bc715a51499ff1fe57638/pytest_qt-4.0.2-py2.py3-none-any.whl", hash = "sha256:e03847ac02a890ccaac0fde1748855b9dce425aceba62005c6cfced6cf7d5456", size = 33935 },
+    { url = "https://files.pythonhosted.org/packages/4c/51/6cc5b9c1ecdcd78e6cde97e03d05f5a4ace8f720c5ce0f26f9dce474a0da/pytest_qt-4.4.0-py3-none-any.whl", hash = "sha256:001ed2f8641764b394cf286dc8a4203e40eaf9fff75bf0bfe5103f7f8d0c591d", size = 36286 },
 ]
 
 [[package]]
