@@ -39,9 +39,15 @@ from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
 from unittest import mock
 
 from anki.errors import BackendIOError
+from packaging.version import Version
 from PyQt5.QtCore import qInstallMessageHandler
 
-from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
+from ._anki import (
+    AnkiStateUpdate,
+    get_anki_version,
+    update_anki_colconf_state,
+    update_anki_profile_state,
+)
 from ._errors import AnkiSessionError
 from ._patch import (
     patch_anki,
@@ -64,7 +70,15 @@ QTWEBENGINE_REMOTE_DEBUGGING = "QTWEBENGINE_REMOTE_DEBUGGING"
 def temporary_user(anki_base_dir: str, name: str, lang: str) -> Iterator[str]:
     from aqt.profiles import ProfileManager
 
-    pm = ProfileManager(base=Path(anki_base_dir))
+    if TYPE_CHECKING:  # < 2.1.56 primary dev target
+        base_dir_path: str
+
+    if get_anki_version() >= Version("2.1.56"):
+        base_dir_path = Path(anki_base_dir)  # type: ignore
+    else:
+        base_dir_path = anki_base_dir
+
+    pm = ProfileManager(base=base_dir_path)
 
     pm.setupMeta()
     pm.setLang(lang)
