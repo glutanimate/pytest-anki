@@ -6,13 +6,10 @@ inputs:
     description: "Python interpreter version"
     required: true
   anki:
-    description: "Anki version. Set this to 'prerelease' to install either the latest release or prerelease."
+    description: "Anki version extra dependency group, as specified in pyproject.toml"
     required: true
-  pyqt:
-    description: "PyQt widget toolkit version"
-    required: true
-  pyqtwebengine:
-    description: "PyQt WebEngine version"
+  qt:
+    description: "Qt version extra dependency group, as specified in pyproject.toml"
     required: true
   chrome:
     description: "Chrome version"
@@ -22,7 +19,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout pytest-anki
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up environment
       uses: ./.github/actions/setup_system
@@ -32,10 +29,8 @@ runs:
 
     - name: Set up project
       uses: ./.github/actions/setup_project
-
-    - name: Set up Anki
-      uses: ./.github/actions/setup_anki
       with:
+        python: ${{ inputs.python }}
         anki: ${{ inputs.anki }}
-        pyqt: ${{ inputs.pyqt }}
-        pyqtwebengine: ${{ inputs.pyqtwebengine }}
+        qt: ${{ inputs.qt }}
+

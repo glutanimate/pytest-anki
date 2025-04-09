@@ -7,7 +7,7 @@ TEST_FLAGS ?= -n4
 
 # Set up project
 install:
-	poetry install
+	uv sync --extra anki-2154 --extra qt5-2154 --no-group qt6
 
 # Run tests
 test:
@@ -30,7 +30,7 @@ format:
 
 # Build project
 build:
-	poetry build
+	uv build
 
 # Show help message
 help:

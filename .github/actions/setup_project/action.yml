@@ -1,16 +1,29 @@
 name: "Set up project"
 description: "Set up project"
 
+inputs:
+  python:
+    description: "Python interpreter version"
+    required: true
+  anki:
+    description: "Anki version extra dependency group, as specified in pyproject.toml"
+    required: true
+  qt:
+    description: "Qt version extra dependency group, as specified in pyproject.toml"
+    required: true
+
 runs:
   using: "composite"
   steps:
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
       with:
-        version: 1.1.8
-        virtualenvs-create: false
+        version: "0.6.13"
+        python-version: ${{ inputs.python }}
+        # enable-cache: true
+        # cache-dependency-glob: "uv.lock"
 
     - name: Set up pytest-anki
       shell: bash
       run: |
-        make install
+        uv sync --extra ${{ inputs.anki }} --extra ${{ inputs.qt }} --no-group qt6 --no-group qt5
