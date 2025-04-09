@@ -47,12 +47,9 @@ from aqt.main import AnkiQt
 from pytest_anki import AnkiSession, AnkiSessionError, AnkiStateUpdate
 
 if TYPE_CHECKING:
+    from anki.collection import Collection
     from pytestqt.qtbot import QtBot
 
-    try:
-        from anki.collection import Collection
-    except ImportError:
-        from anki.collection import _Collection as Collection
 
 # Helpers
 

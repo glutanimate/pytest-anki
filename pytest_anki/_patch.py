@@ -116,7 +116,7 @@ def custom_init_factory(post_ui_setup_callback: PostUISetupCallbackType):
     ):
         import aqt
 
-        QMainWindow.__init__(main_window)
+        QMainWindow.__init__(main_window)  # pyright: ignore[reportArgumentType]
         main_window.backend = backend
         main_window.state = "startup"
         main_window.opts = opts
