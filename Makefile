@@ -25,7 +25,6 @@ lint:
 # Run code formatters
 format:
 	python -m ruff check --fix $(MONITORED_FOLDERS)
-	python -m autoflake --recursive --in-place --remove-all-unused-imports $(MONITORED_FOLDERS)
 	python -m ruff format $(MONITORED_FOLDERS)
 
 # Build project

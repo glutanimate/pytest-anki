@@ -54,7 +54,6 @@ dev = [
     "mypy>=0.910,<0.911",
     "requests>=2.26.0,<3",
     "types-requests>=2.25.6,<3",
-    "autoflake~=1.4",
 ]
 qt5 = [
     "PyQt5>=5.14.1,<6",

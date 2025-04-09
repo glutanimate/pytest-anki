@@ -82,15 +82,6 @@ wheels = [
 ]
 
 [[package]]
-name = "autoflake"
-version = "1.4"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pyflakes" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/11/2e/0a7618eb5e69483d62b0f86c8d1eb7fdca2c2781f6f0cd5f3a3286398475/autoflake-1.4.tar.gz", hash = "sha256:61a353012cff6ab94ca062823d1fb2f692c4acda51c76ff83a8d77915fba51ea", size = 22506 }
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.10.0"
 source = { registry = "https://pypi.org/simple" }
@@ -508,15 +499,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pyflakes"
-version = "2.3.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a8/0f/0dc480da9162749bf629dca76570972dd9cce5bedc60196a3c912875c87d/pyflakes-2.3.1.tar.gz", hash = "sha256:f5bc8ecabc05bb9d291eb5203d6810b49040f6ff446a756326104746cc00c1db", size = 68567 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/11/2a745612f1d3cbbd9c69ba14b1b43a35a2f5c3c81cd0124508c52c64307f/pyflakes-2.3.1-py2.py3-none-any.whl", hash = "sha256:7893783d01b8a89811dd72d7dfd4d84ff098e5eed95cfa8905b22bbffe52efc3", size = 68805 },
-]
-
-[[package]]
 name = "pylint"
 version = "2.10.2"
 source = { registry = "https://pypi.org/simple" }
@@ -773,7 +755,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "autoflake" },
     { name = "mypy" },
     { name = "pylint" },
     { name = "requests" },
@@ -805,7 +786,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "autoflake", specifier = "~=1.4" },
     { name = "mypy", specifier = ">=0.910,<0.911" },
     { name = "pylint", specifier = ">=2.10.2,<3" },
     { name = "requests", specifier = ">=2.26.0,<3" },

@@ -156,7 +156,7 @@ make lint
 make test
 ```
 
-This project uses `black`, `isort` and `autoflake` to enforce a consistent code style. To auto-format your code you can use:
+This project uses `ruff` to enforce a consistent code style. To auto-format your code you can use:
 
 ```bash
 make format
