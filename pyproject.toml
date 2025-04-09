@@ -6,7 +6,7 @@ authors = [
     { name = "Aristotelis P. (Glutanimate)" },
     { name = "Michal Krassowski" },
 ]
-requires-python = "~=3.8"
+requires-python = "~=3.9"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
 keywords = [
@@ -23,7 +23,6 @@ classifiers = [
     "Topic :: Software Development :: Testing",
     "Topic :: Software Development :: User Interfaces",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Framework :: Pytest",
     "Intended Audience :: Developers",
@@ -50,8 +49,8 @@ anki = "pytest_anki.plugin"
 [dependency-groups]
 dev = [
     "ruff>=0.11.0",
-    "pylint>=2.10.2,<3",
-    "mypy>=0.910,<0.911",
+    "pylint~=3.3",
+    "mypy~=1.15",
     "requests>=2.26.0,<3",
     "types-requests>=2.25.6,<3",
 ]
