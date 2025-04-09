@@ -228,6 +228,10 @@ def anki_running(
             ) as user_name:
                 environment = {}
 
+                # TODO: Only apply when using Qt5 on Linux
+                # cf. https://docs.ankiweb.net/platform/linux/blank-window.html
+                environment["QTWEBENGINE_CHROMIUM_FLAGS"] = "--no-sandbox"
+
                 if enable_web_debugging:
                     web_debugging_port = find_free_port()
                     if web_debugging_port is None:
