@@ -166,7 +166,7 @@ make format
 
 *pytest-anki* is
 
-*Copyright © 2019-2021 [Aristotelis P.](https://glutanimate.com/contact/) (Glutanimate) and [contributors](./CONTRIBUTORS)*
+*Copyright © 2019-2025 [Aristotelis P.](https://glutanimate.com/contact/) (Glutanimate) and [contributors](./CONTRIBUTORS)*
 
 *Copyright © 2017-2019 [Michal Krassowski](https://github.com/krassowski/anki_testing)*
 

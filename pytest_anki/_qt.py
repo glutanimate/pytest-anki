@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
