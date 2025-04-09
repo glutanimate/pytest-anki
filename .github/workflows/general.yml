@@ -21,7 +21,7 @@ jobs:
       matrix:
         include:
           - anki: anki-2154
-            python: 3.9.10
+            python: 3.9.15
             qt: qt5-2154
             chrome: 83.0.4103.122
 
