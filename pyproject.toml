@@ -21,11 +21,9 @@ classifiers = [
     "Framework :: Pytest",
     "Intended Audience :: Developers",
 ]
+# TODO: Make selenium optional
 dependencies = [
-    "pytest>=3.5.0",
-    "pytest-forked>=1.3.0,<2",
-    "pytest-xdist>=2.3.0,<3",
-    "pytest-xvfb>=2.0.0,<3",
+    "pytest~=6.2.5",
     "pytest-qt>=4.0.2,<5",
     "selenium>=3.141.0,<4",
     "packaging~=21.3",
@@ -56,6 +54,13 @@ qt6-2165 = ["PyQt6~=6.5.0", "PyQt6-Qt6~=6.5.0", "PyQt6-WebEngine~=6.5.0"]
 qt6-2312 = ["PyQt6~=6.6.1", "PyQt6-Qt6~=6.6.1", "PyQt6-WebEngine~=6.6.0"]
 qt6-2411 = ["PyQt6~=6.6.1", "PyQt6-Qt6~=6.6.1", "PyQt6-WebEngine~=6.6.0"]
 
+recommended-plugins = [
+    "pytest-xvfb~=3.1.1",
+    "pytest-xdist~=2.5.0",
+    "pytest-forked~=1.4.0",
+]
+
+# TODO: Might need to add some of the recommended plugins to dev dependencies?
 [dependency-groups]
 dev = [
     "ruff~=0.11.0",

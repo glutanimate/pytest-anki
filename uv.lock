@@ -306,12 +306,9 @@ wheels = [
 
 [[package]]
 name = "atomicwrites"
-version = "1.4.0"
+version = "1.4.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/55/8d/74a75635f2c3c914ab5b3850112fd4b0c8039975ecb320e4449aa363ba54/atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a", size = 11790 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/a0/da5f49008ec6e9a658dbf5d7310a4debd397bce0b4db03cf8a410066bb87/atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197", size = 6790 },
-]
+sdist = { url = "https://files.pythonhosted.org/packages/87/c6/53da25344e3e3a9c01095a89f16dbcda021c609ddb42dd6d7c0528236fb2/atomicwrites-1.4.1.tar.gz", hash = "sha256:81b2c9071a49367a7f770170e5eec8cb66567cfbbc8c73d20ce5ca4a8d71cf11", size = 14227 }
 
 [[package]]
 name = "attrs"
@@ -411,11 +408,11 @@ wheels = [
 
 [[package]]
 name = "execnet"
-version = "1.9.0"
+version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/7a/3c/b5ac9fc61e1e559ced3e40bf5b518a4142536b34eb274aa50dff29cb89f5/execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5", size = 173884 }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/ff/b4c0dc78fbe20c3e59c0c7334de0c27eb4001a2b2017999af398bf730817/execnet-2.1.1.tar.gz", hash = "sha256:5189b52c6121c24feae288166ab41b32549c7e2348652736540b9e6e7d4e72e3", size = 166524 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/c0/3072ecc23f4c5e0a1af35e3a222855cfd9c80a1a105ca67be3b6172637dd/execnet-1.9.0-py2.py3-none-any.whl", hash = "sha256:a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142", size = 39002 },
+    { url = "https://files.pythonhosted.org/packages/43/09/2aea36ff60d16dd8879bdb2f5b3ee0ba8d08cbbdcdfe870e695ce3784385/execnet-2.1.1-py3-none-any.whl", hash = "sha256:26dee51f1b80cebd6d0ca8e74dd8745419761d3bef34163928cbebbdc4749fdc", size = 40612 },
 ]
 
 [[package]]
@@ -679,11 +676,11 @@ wheels = [
 
 [[package]]
 name = "pluggy"
-version = "1.0.0"
+version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a1/16/db2d7de3474b6e37cbb9c008965ee63835bba517e22cdb8c35b5116b5ce1/pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159", size = 51510 }
+sdist = { url = "https://files.pythonhosted.org/packages/96/2d/02d4312c973c6050a18b314a5ad0b3210edb65a906f868e31c111dede4a6/pluggy-1.5.0.tar.gz", hash = "sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1", size = 67955 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9e/01/f38e2ff29715251cf25532b9082a1589ab7e4f571ced434f98d0139336dc/pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3", size = 13667 },
+    { url = "https://files.pythonhosted.org/packages/88/5f/e351af9a41f866ac3f1fac4ca0613908d9a41741cfcf2228f4ad853b697d/pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669", size = 20556 },
 ]
 
 [[package]]
@@ -1122,10 +1119,7 @@ dependencies = [
     { name = "aqt", version = "25.2", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-11-pytest-anki-anki-2154' and extra == 'extra-11-pytest-anki-anki-2165') or (extra == 'extra-11-pytest-anki-anki-2154' and extra == 'extra-11-pytest-anki-anki-2312') or (extra == 'extra-11-pytest-anki-anki-2154' and extra == 'extra-11-pytest-anki-anki-2411') or (extra == 'extra-11-pytest-anki-anki-2165' and extra == 'extra-11-pytest-anki-anki-2312') or (extra == 'extra-11-pytest-anki-anki-2165' and extra == 'extra-11-pytest-anki-anki-2411') or (extra == 'extra-11-pytest-anki-anki-2312' and extra == 'extra-11-pytest-anki-anki-2411') or (extra == 'extra-11-pytest-anki-qt5-2154' and extra == 'extra-11-pytest-anki-qt5-2165') or (extra == 'extra-11-pytest-anki-qt5-2154' and extra == 'extra-11-pytest-anki-qt5-2312') or (extra == 'extra-11-pytest-anki-qt5-2154' and extra == 'extra-11-pytest-anki-qt5-2411') or (extra == 'extra-11-pytest-anki-qt5-2165' and extra == 'extra-11-pytest-anki-qt5-2312') or (extra == 'extra-11-pytest-anki-qt5-2165' and extra == 'extra-11-pytest-anki-qt5-2411') or (extra == 'extra-11-pytest-anki-qt5-2312' and extra == 'extra-11-pytest-anki-qt5-2411') or (extra == 'extra-11-pytest-anki-qt6-2154' and extra == 'extra-11-pytest-anki-qt6-2165') or (extra == 'extra-11-pytest-anki-qt6-2154' and extra == 'extra-11-pytest-anki-qt6-2312') or (extra == 'extra-11-pytest-anki-qt6-2154' and extra == 'extra-11-pytest-anki-qt6-2411') or (extra == 'extra-11-pytest-anki-qt6-2165' and extra == 'extra-11-pytest-anki-qt6-2312') or (extra == 'extra-11-pytest-anki-qt6-2165' and extra == 'extra-11-pytest-anki-qt6-2411') or (extra == 'extra-11-pytest-anki-qt6-2312' and extra == 'extra-11-pytest-anki-qt6-2411') or (extra != 'extra-11-pytest-anki-anki-2154' and extra != 'extra-11-pytest-anki-anki-2165' and extra != 'extra-11-pytest-anki-anki-2312' and extra != 'extra-11-pytest-anki-anki-2411')" },
     { name = "packaging" },
     { name = "pytest" },
-    { name = "pytest-forked" },
     { name = "pytest-qt" },
-    { name = "pytest-xdist" },
-    { name = "pytest-xvfb" },
     { name = "selenium" },
 ]
 
@@ -1185,6 +1179,11 @@ qt6-2411 = [
     { name = "pyqt6", version = "6.6.1", source = { registry = "https://pypi.org/simple" } },
     { name = "pyqt6-qt6", version = "6.6.3", source = { registry = "https://pypi.org/simple" } },
     { name = "pyqt6-webengine", version = "6.6.0", source = { registry = "https://pypi.org/simple" } },
+]
+recommended-plugins = [
+    { name = "pytest-forked" },
+    { name = "pytest-xdist" },
+    { name = "pytest-xvfb" },
 ]
 
 [package.dev-dependencies]
@@ -1262,14 +1261,14 @@ requires-dist = [
     { name = "pyqtwebengine", marker = "extra == 'qt5-2165'", specifier = "~=5.15.2" },
     { name = "pyqtwebengine", marker = "extra == 'qt5-2312'", specifier = "~=5.15.2" },
     { name = "pyqtwebengine", marker = "extra == 'qt5-2411'", specifier = "~=5.15.2" },
-    { name = "pytest", specifier = ">=3.5.0" },
-    { name = "pytest-forked", specifier = ">=1.3.0,<2" },
+    { name = "pytest", specifier = "~=6.2.5" },
+    { name = "pytest-forked", marker = "extra == 'recommended-plugins'", specifier = "~=1.4.0" },
     { name = "pytest-qt", specifier = ">=4.0.2,<5" },
-    { name = "pytest-xdist", specifier = ">=2.3.0,<3" },
-    { name = "pytest-xvfb", specifier = ">=2.0.0,<3" },
+    { name = "pytest-xdist", marker = "extra == 'recommended-plugins'", specifier = "~=2.5.0" },
+    { name = "pytest-xvfb", marker = "extra == 'recommended-plugins'", specifier = "~=3.1.1" },
     { name = "selenium", specifier = ">=3.141.0,<4" },
 ]
-provides-extras = ["anki-2154", "anki-2165", "anki-2312", "anki-2411", "qt5-2154", "qt5-2165", "qt5-2312", "qt5-2411", "qt6-2154", "qt6-2165", "qt6-2312", "qt6-2411"]
+provides-extras = ["anki-2154", "anki-2165", "anki-2312", "anki-2411", "qt5-2154", "qt5-2165", "qt5-2312", "qt5-2411", "qt6-2154", "qt6-2165", "qt6-2312", "qt6-2411", "recommended-plugins"]
 
 [package.metadata.requires-dev]
 anki = [
@@ -1297,15 +1296,15 @@ qt6 = [
 
 [[package]]
 name = "pytest-forked"
-version = "1.3.0"
+version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "py" },
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/62/92/2d418d7b0c9d68a2e885b66d7f6805f9678ce56ad2b3a77669437b2d139a/pytest-forked-1.3.0.tar.gz", hash = "sha256:6aa9ac7e00ad1a539c41bec6d21011332de671e938c7637378ec9710204e37ca", size = 9850 }
+sdist = { url = "https://files.pythonhosted.org/packages/f1/bc/0121a2e386b261b69f4f5aa48e5304c947451dce70d68628cb28d5cd0d28/pytest-forked-1.4.0.tar.gz", hash = "sha256:8b67587c8f98cbbadfdd804539ed5455b6ed03802203485dd2f53c1422d7440e", size = 10197 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9d/88/77eeb091b4fa79f28c08718f6e6ebff5827d9d1c1dd9974218ddfbe031ee/pytest_forked-1.3.0-py2.py3-none-any.whl", hash = "sha256:dc4147784048e70ef5d437951728825a131b81714b398d5d52f17c7c144d8815", size = 4706 },
+    { url = "https://files.pythonhosted.org/packages/0c/36/c56ef2aea73912190cdbcc39aaa860db8c07c1a5ce8566994ec9425453db/pytest_forked-1.4.0-py3-none-any.whl", hash = "sha256:bbbb6717efc886b9d64537b41fb1497cfaf3c9601276be8da2cccfea5a3c8ad8", size = 4885 },
 ]
 
 [[package]]
@@ -1322,29 +1321,29 @@ wheels = [
 
 [[package]]
 name = "pytest-xdist"
-version = "2.3.0"
+version = "2.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "execnet" },
     { name = "pytest" },
     { name = "pytest-forked" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d8/2a/d6333010844cd3931a57d17ae1203d2404fee689704c3f9a665c31d7faae/pytest-xdist-2.3.0.tar.gz", hash = "sha256:e8ecde2f85d88fbcadb7d28cb33da0fa29bca5cf7d5967fa89fc0e97e5299ea5", size = 66072 }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/43/9dbc32d297d6eae85d6c05dc8e8d3371061bd6cbe56a2f645d9ea4b53d9b/pytest-xdist-2.5.0.tar.gz", hash = "sha256:4580deca3ff04ddb2ac53eba39d76cb5dd5edeac050cb6fbc768b0dd712b4edf", size = 72455 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6b/fb/8908bb19c3e073b43727db01d4b488cb75fdc00f76ee9b703d23c7119738/pytest_xdist-2.3.0-py3-none-any.whl", hash = "sha256:ed3d7da961070fce2a01818b51f6888327fb88df4379edeb6b9d990e789d9c8d", size = 37624 },
+    { url = "https://files.pythonhosted.org/packages/21/08/b1945d4b4986eb1aa10cf84efc5293bba39da80a2f95db3573dd90678408/pytest_xdist-2.5.0-py3-none-any.whl", hash = "sha256:6fe5c74fec98906deb8f2d2b616b5c782022744978e7bd4695d39c8f42d0ce65", size = 41698 },
 ]
 
 [[package]]
 name = "pytest-xvfb"
-version = "2.0.0"
+version = "3.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pytest" },
     { name = "pyvirtualdisplay" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/a5/78bbf89d95bdcf9c391c9ccab136fada0ad9bb8d5b8f467bbab7c4b5217e/pytest-xvfb-2.0.0.tar.gz", hash = "sha256:c4ba642de05499940db7f65ee111621939be513e3e75c3da9156b7235e2ed8cf", size = 6575 }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/ce/b3444c98eab123b7348d55d4705c2f1095a6bdf8dae85bc6a34ab5222845/pytest_xvfb-3.1.1.tar.gz", hash = "sha256:90593634427d974b272e845793e4533f5b827c9d84c051879013624504175e44", size = 9022 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cd/7d/ee4c502197eed1bb549f7f805190df6b37f3fb7a3e918acb734adde3c643/pytest_xvfb-2.0.0-py3-none-any.whl", hash = "sha256:6d21b46f099c06d6b8b200e73341da3adb73d67e9139c55d617930881779360b", size = 5073 },
+    { url = "https://files.pythonhosted.org/packages/26/6e/859b1e496671fb236153c2caed519301c53f7cf3dfcaac809caae695b5a4/pytest_xvfb-3.1.1-py3-none-any.whl", hash = "sha256:3270f91417cfa0652b7c5a90e93a676e3a80bec12ccbd20cae3b42511e4aba98", size = 5861 },
 ]
 
 [[package]]
