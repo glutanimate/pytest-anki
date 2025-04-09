@@ -34,8 +34,8 @@ from typing import Any, Dict, NamedTuple, Optional
 
 from aqt.addons import AddonManager
 
-from ._types import PathLike
-from ._util import create_json
+from .types import PathLike
+from .util import create_json
 
 
 def _to_path(path: PathLike) -> Path:

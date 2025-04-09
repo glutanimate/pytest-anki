@@ -48,11 +48,16 @@ from PyQt5.QtCore import QThreadPool, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 from selenium import webdriver
 
-from ._addons import ConfigPaths, create_addon_config
-from ._anki import AnkiStateUpdate, AnkiWebViewType, get_collection, update_anki_state
-from ._errors import AnkiSessionError
-from ._qt import SignallingWorker
-from ._types import PathLike
+from .addons import ConfigPaths, create_addon_config
+from .anki import (
+    AnkiStateUpdate,
+    AnkiWebViewType,
+    get_collection,
+    update_anki_state,
+)
+from .errors import AnkiSessionError
+from .qt import SignallingWorker
+from .types import PathLike
 
 if TYPE_CHECKING:
     from anki.collection import Collection

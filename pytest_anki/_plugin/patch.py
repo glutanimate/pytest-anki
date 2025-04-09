@@ -48,13 +48,13 @@ if TYPE_CHECKING:
     from anki.collection import Collection
     from aqt.profiles import ProfileManager as ProfileManagerType
 
-from ._addons import (
+from .addons import (
     create_addon_config,
     install_addon_from_folder,
     install_addon_from_package,
 )
-from ._anki import AnkiStateUpdate, update_anki_meta_state
-from ._types import PathLike
+from .anki import AnkiStateUpdate, update_anki_meta_state
+from .types import PathLike
 
 PostUISetupCallbackType = Callable[[AnkiQt], None]
 

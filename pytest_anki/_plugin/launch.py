@@ -42,22 +42,22 @@ from anki.errors import BackendIOError
 from packaging.version import Version
 from PyQt5.QtCore import qInstallMessageHandler
 
-from ._anki import (
+from .anki import (
     AnkiStateUpdate,
     get_anki_version,
     update_anki_colconf_state,
     update_anki_profile_state,
 )
-from ._errors import AnkiSessionError
-from ._patch import (
+from .errors import AnkiSessionError
+from .patch import (
     patch_anki,
     post_ui_setup_callback_factory,
     set_qt_message_handler_installer,
 )
-from ._qt import QtMessageMatcher
-from ._session import AnkiSession
-from ._types import PathLike
-from ._util import find_free_port
+from .qt import QtMessageMatcher
+from .session import AnkiSession
+from .types import PathLike
+from .util import find_free_port
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot

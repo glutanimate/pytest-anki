@@ -39,8 +39,8 @@ if TYPE_CHECKING:
 
 # from ._anki import get_anki_version
 # from ._config import get_latest_tested_lib_versions
-from ._launch import anki_running
-from ._session import AnkiSession
+from ._plugin.launch import anki_running
+from ._plugin.session import AnkiSession
 
 # def pytest_configure(config: "Config"):
 #     """Hook into pytest_configure stage to prepare plugin, e.g.

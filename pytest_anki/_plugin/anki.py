@@ -34,8 +34,8 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from packaging.version import Version
 
-from ._errors import AnkiSessionError
-from ._util import get_nested_attribute
+from .errors import AnkiSessionError
+from .util import get_nested_attribute
 
 if TYPE_CHECKING:
     from anki.collection import Collection
