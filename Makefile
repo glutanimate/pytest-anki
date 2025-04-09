@@ -19,14 +19,14 @@ check:
 
 # Run code linters
 lint:
-	python -m flake8 $(MONITORED_FOLDERS)
-	python -m black --check $(MONITORED_FOLDERS)
+	python -m ruff check $(MONITORED_FOLDERS)
+	python -m ruff format --check $(MONITORED_FOLDERS)
 
 # Run code formatters
 format:
-	python -m isort $(MONITORED_FOLDERS)
+	python -m ruff check --fix $(MONITORED_FOLDERS)
 	python -m autoflake --recursive --in-place --remove-all-unused-imports $(MONITORED_FOLDERS)
-	python -m black $(MONITORED_FOLDERS)
+	python -m ruff format $(MONITORED_FOLDERS)
 
 # Build project
 build:
