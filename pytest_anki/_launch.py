@@ -34,6 +34,7 @@ import os
 import shutil
 import tempfile
 from contextlib import contextmanager, nullcontext
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
 from unittest import mock
 
@@ -63,7 +64,7 @@ QTWEBENGINE_REMOTE_DEBUGGING = "QTWEBENGINE_REMOTE_DEBUGGING"
 def temporary_user(anki_base_dir: str, name: str, lang: str) -> Iterator[str]:
     from aqt.profiles import ProfileManager
 
-    pm = ProfileManager(base=anki_base_dir)
+    pm = ProfileManager(base=Path(anki_base_dir))
 
     pm.setupMeta()
     pm.setLang(lang)
