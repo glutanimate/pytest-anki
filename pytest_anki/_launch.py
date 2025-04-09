@@ -37,6 +37,7 @@ from contextlib import contextmanager, nullcontext
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
 from unittest import mock
 
+from anki.errors import BackendIOError
 from PyQt5.QtCore import qInstallMessageHandler
 
 from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
@@ -51,8 +52,6 @@ from ._session import AnkiSession
 from ._types import PathLike
 from ._util import find_free_port
 
-from anki.errors import BackendIOError
-
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
 
@@ -62,7 +61,6 @@ QTWEBENGINE_REMOTE_DEBUGGING = "QTWEBENGINE_REMOTE_DEBUGGING"
 
 @contextmanager
 def temporary_user(anki_base_dir: str, name: str, lang: str) -> Iterator[str]:
-
     from aqt.profiles import ProfileManager
 
     pm = ProfileManager(base=anki_base_dir)
@@ -175,7 +173,6 @@ def anki_running(
     from aqt import gui_hooks
 
     with base_directory(base_path=base_path, base_name=base_name) as anki_base_dir:
-
         # Callback to run between main UI initialization and finishing steps of UI
         # initialization (add-on loading time)
 
@@ -214,7 +211,6 @@ def anki_running(
             with temporary_user(
                 anki_base_dir=anki_base_dir, name=profile_name, lang=lang
             ) as user_name:
-
                 environment = {}
 
                 if enable_web_debugging:
@@ -226,9 +222,7 @@ def anki_running(
                     web_debugging_port = None
 
                 with mock.patch.dict(os.environ, environment):
-
                     if os.environ.get(QTWEBENGINE_REMOTE_DEBUGGING):
-
                         # We want to wait until remote debugging started to yield the
                         # Anki session, so we monitor Qt's log for the corresponding msg
                         qt_message_matcher = QtMessageMatcher(

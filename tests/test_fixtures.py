@@ -184,10 +184,8 @@ def test_can_preset_anki_state(anki_session: AnkiSession):
 
     with anki_session.profile_loaded():
         assert (
-            addon.profile_storage
-            == _my_anki_state.profile_storage[package_name]  # type: ignore
+            addon.profile_storage == _my_anki_state.profile_storage[package_name]  # type: ignore
         )
         assert (
-            addon.colconf_storage
-            == _my_anki_state.colconf_storage[package_name]  # type: ignore
+            addon.colconf_storage == _my_anki_state.colconf_storage[package_name]  # type: ignore
         )

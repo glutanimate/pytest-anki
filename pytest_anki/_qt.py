@@ -35,7 +35,6 @@ from PyQt5.QtCore import QMessageLogContext, QObject, QRunnable, QtMsgType, pyqt
 
 
 class QtMessageMatcher(QObject):
-
     match_found = pyqtSignal()
 
     def __init__(self, matched_phrase: str):

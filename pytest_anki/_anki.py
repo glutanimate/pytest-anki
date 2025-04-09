@@ -58,7 +58,6 @@ class AnkiWebViewType(Enum):
 
 @dataclass
 class AnkiStateUpdate:
-
     """
     Specifies Anki object state to be pre-configured for the test session.
 

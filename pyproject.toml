@@ -121,7 +121,7 @@ exclude = "tests/samples/"
 line-length = 88
 target-version = "py38"
 extend-exclude = ["__pycache__", "tests/samples"]
-ignore = ["E203", "E266", "E501"]
+lint.ignore = ["E203", "E266", "E501"]
 lint.select = ["E", "F", "I"]
 
 [tool.ruff.lint.isort]
