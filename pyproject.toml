@@ -1,6 +1,6 @@
 [project]
 name = "pytest-anki"
-version = "1.0.0-beta.7"
+version = "2.0.0-dev.1"
 description = "A pytest plugin for testing Anki add-ons"
 authors = [
     { name = "Aristotelis P. (Glutanimate)" },
