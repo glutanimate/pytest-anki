@@ -44,6 +44,7 @@ from typing import (
     Union,
 )
 
+from anki.decks import DeckId
 from anki.importing.apkg import AnkiPackageImporter
 from PyQt5.QtCore import QThreadPool, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile
@@ -189,7 +190,8 @@ class AnkiSession:
 
         def highest_level_did(dids: Iterable[int]) -> int:
             return min(
-                dids, key=lambda did: self.collection.decks.name(did).count("::")
+                dids,
+                key=lambda did: self.collection.decks.name(DeckId(did)).count("::"),
             )
 
         # deck IDs are strings on <=2.1.26
@@ -205,7 +207,7 @@ class AnkiSession:
             # passing in an int for now.
             self.collection.decks.remove([deck_id])  # type: ignore[list-item]
         except AttributeError:  # legacy
-            self.collection.decks.rem(deck_id, cardsToo=True)
+            self.collection.decks.rem(DeckId(deck_id), cardsToo=True)
 
     @contextmanager
     def deck_installed(self, path: PathLike) -> Iterator[int]:
