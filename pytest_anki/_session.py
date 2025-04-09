@@ -44,8 +44,6 @@ from typing import (
     Union,
 )
 
-from anki.decks import DeckId
-from anki.importing.apkg import AnkiPackageImporter
 from PyQt5.QtCore import QThreadPool, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 from selenium import webdriver
@@ -181,6 +179,9 @@ class AnkiSession:
 
     def install_deck(self, path: PathLike) -> int:
         """Install deck from specified .apkg file, returning deck ID"""
+        from anki.decks import DeckId
+        from anki.importing.apkg import AnkiPackageImporter
+
         old_ids = set(self._get_deck_ids())
 
         importer = AnkiPackageImporter(col=self.collection, file=str(path))
@@ -201,6 +202,8 @@ class AnkiSession:
 
     def remove_deck(self, deck_id: int):
         """Remove deck as specified by provided deck ID"""
+        from anki.decks import DeckId
+
         try:  # 2.1.28+
             # Deck methods on 2.1.45 and up use a DeckId NewType derived from int.
             # This only makes a difference at type-check time, so we stick with
