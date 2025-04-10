@@ -40,7 +40,7 @@ from unittest import mock
 
 from anki.errors import BackendIOError
 from packaging.version import Version
-from PyQt5.QtCore import qInstallMessageHandler
+from PyQt6.QtCore import qInstallMessageHandler
 
 from .anki import (
     AnkiStateUpdate,
