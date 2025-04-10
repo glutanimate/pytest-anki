@@ -12,13 +12,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # Qt5 requires a number of X11-related dependencies to be installed system-wide.
-    # Rather than installing each individually, we install libqt5 on the machine which
-    # in turn takes care of installing all deps also needed for the PyPI version of Qt5
-    - name: Install xvfb / qt dependencies
-      shell: bash
-      run: |
-        sudo apt-get install libqt5gui5
+    - name: Install Qt dependencies
+      uses: tlambert03/setup-qt-libs@v1
 
     - name: Set up chromedriver
       shell: bash
