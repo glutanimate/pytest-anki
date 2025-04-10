@@ -76,8 +76,6 @@ qt6-2411 = [
 
 recommended-plugins = [
     "pytest-xvfb~=3.1.1",
-    "pytest-xdist~=2.5.0",
-    "pytest-forked~=1.4.0",
 ]
 
 [dependency-groups]

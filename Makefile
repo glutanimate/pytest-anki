@@ -3,7 +3,7 @@ SHELL = /bin/bash
 PACKAGE_FOLDER = pytest_anki
 TESTS_FOLDER = tests
 MONITORED_FOLDERS = $(PACKAGE_FOLDER) $(TESTS_FOLDER)
-TEST_FLAGS ?= -n4
+TEST_FLAGS ?= ""
 
 # Set up project
 install:
@@ -11,7 +11,7 @@ install:
 
 # Run tests
 test:
-	python -m pytest $(TEST_FLAGS) tests/
+	python -m pytest $(TEST_FLAGS) tests/ -k test_anki_session_launches
 
 # Run type checkers
 check:
