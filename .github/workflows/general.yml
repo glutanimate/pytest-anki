@@ -22,8 +22,8 @@ jobs:
         include:
           - anki: anki-2154
             python: 3.9.15
-            qt: qt5-2154
-            chrome: 83.0.4103.122
+            qt: qt6-2154
+            chrome: 94.0.4606.126
 
     steps:
       - name: Checkout pytest-anki
