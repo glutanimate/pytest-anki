@@ -18,6 +18,7 @@ jobs:
   test-anki-matrix:
     runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
         include:
           - anki: anki-2154
