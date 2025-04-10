@@ -115,9 +115,10 @@ def anki_session(request: "FixtureRequest", qtbot: "QtBot") -> Iterator[AnkiSess
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
 
-        web_debugging_port {Optional[int]}:
-            If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
-            you to remotely debug Qt web engine views.
+        enable_web_debugging {bool}:
+            If set to True, will enable web debugging, allowing you to interact with
+            Anki's web view via a Selenium web driver. For more information, see
+            AnkiSession.run_with_chrome_driver().
 
         skip_loading_addons {bool}:
             If set to True, will skip loading packed and unpacked add-ons, giving the

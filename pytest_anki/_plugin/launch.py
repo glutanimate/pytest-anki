@@ -169,9 +169,10 @@ def anki_running(
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
 
-        web_debugging_port {Optional[int]}:
-            If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
-            you to remotely debug Qt web engine views.
+        enable_web_debugging {bool}:
+            If set to True, will enable web debugging, allowing you to interact with
+            Anki's web view via a Selenium web driver. For more information, see
+            AnkiSession.run_with_chrome_driver().
 
         skip_loading_addons {bool}:
             If set to True, will skip loading packed and unpacked add-ons, giving the
@@ -232,16 +233,20 @@ def anki_running(
                 # cf. https://docs.ankiweb.net/platform/linux/blank-window.html
                 environment["QTWEBENGINE_CHROMIUM_FLAGS"] = "--no-sandbox"
 
+                web_debugging_port = None
+
                 if enable_web_debugging:
                     web_debugging_port = find_free_port()
                     if web_debugging_port is None:
                         raise OSError("Could not find a free port for remote debugging")
                     environment[QTWEBENGINE_REMOTE_DEBUGGING] = str(web_debugging_port)
-                else:
-                    web_debugging_port = None
 
                 with mock.patch.dict(os.environ, environment):
-                    if os.environ.get(QTWEBENGINE_REMOTE_DEBUGGING):
+                    if not enable_web_debugging or not os.environ.get(
+                        QTWEBENGINE_REMOTE_DEBUGGING
+                    ):
+                        maybe_wait_for_web_debugging = nullcontext()
+                    else:
                         # We want to wait until remote debugging started to yield the
                         # Anki session, so we monitor Qt's log for the corresponding msg
                         qt_message_matcher = QtMessageMatcher(
@@ -267,8 +272,6 @@ def anki_running(
                         maybe_wait_for_web_debugging = qtbot.wait_signal(
                             qt_message_matcher.match_found
                         )
-                    else:
-                        maybe_wait_for_web_debugging = nullcontext()
 
                     with maybe_wait_for_web_debugging:
                         # We don't pass in -p <profile> in order to avoid
