@@ -134,7 +134,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
-qt_api = "pyqt5"
+qt_api = "pyqt6"
 
 [tool.mypy]
 show_error_codes = true

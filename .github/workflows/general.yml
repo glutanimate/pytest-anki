@@ -28,6 +28,14 @@ jobs:
             python: 3.9.15
             qt: qt6-2165
             chrome: 108.0.5359.220
+          - anki: anki-2312
+            python: 3.9.15
+            qt: qt6-2312
+            chrome: 112.0.5615.213
+          - anki: anki-2411
+            python: 3.9.18
+            qt: qt6-2411
+            chrome: 112.0.5615.213
 
     steps:
       - name: Checkout pytest-anki
