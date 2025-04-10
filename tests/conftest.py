@@ -41,7 +41,8 @@ if TYPE_CHECKING:
 
 
 def pytest_collection_modifyitems(items: list["Item"], config: "Config") -> None:
-    pass
+    for item in items:
+        item.add_marker("forked")
 
 
 # Mini pytest plugin to set environment variables for specific tests

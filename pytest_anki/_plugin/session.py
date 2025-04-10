@@ -213,7 +213,6 @@ class AnkiSession:
             # Deck methods on 2.1.45 and up use a DeckId NewType derived from int.
             # This only makes a difference at type-check time, so we stick with
             # passing in an int for now.
-            # FIXME: Remove shim, apply DeckId here rather than in except
             self.collection.decks.remove([deck_id])  # type: ignore[list-item]
         except AttributeError:  # legacy
             self.collection.decks.rem(DeckId(deck_id), cardsToo=True)
