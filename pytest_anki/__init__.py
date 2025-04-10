@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,11 +35,11 @@ A simple pytest plugin for testing Anki add-ons
 
 __all__ = ["AnkiStateUpdate", "AnkiWebViewType", "AnkiSessionError", "AnkiSession"]
 
-from ._anki import AnkiStateUpdate, AnkiWebViewType  # noqa: F401
-from ._errors import AnkiSessionError  # noqa: F401
-from ._session import AnkiSession  # noqa: F401
+from ._plugin.anki import AnkiStateUpdate, AnkiWebViewType  # noqa: F401
+from ._plugin.errors import AnkiSessionError  # noqa: F401
+from ._plugin.session import AnkiSession  # noqa: F401
 
-__version__ = "1.0.0-beta.7"
+__version__ = "2.0.0-dev.1"
 __author__ = "Aristotelis P. (Glutanimate), Michal Krassowski"
 __title__ = "pytest-anki"
 __homepage__ = "https://github.com/glutanimate/pytest-anki"

@@ -2,7 +2,7 @@
 #
 # Copyright (C)  2017-2021 Ankitects Pty Ltd and contributors
 # Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,22 +34,30 @@ import os
 import shutil
 import tempfile
 from contextlib import contextmanager, nullcontext
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
 from unittest import mock
 
-from PyQt5.QtCore import qInstallMessageHandler
+from anki.errors import BackendIOError
+from packaging.version import Version
+from PyQt6.QtCore import qInstallMessageHandler
 
-from ._anki import AnkiStateUpdate, update_anki_colconf_state, update_anki_profile_state
-from ._errors import AnkiSessionError
-from ._patch import (
+from .anki import (
+    AnkiStateUpdate,
+    get_anki_version,
+    update_anki_colconf_state,
+    update_anki_profile_state,
+)
+from .errors import AnkiSessionError
+from .patch import (
     patch_anki,
     post_ui_setup_callback_factory,
     set_qt_message_handler_installer,
 )
-from ._qt import QtMessageMatcher
-from ._session import AnkiSession
-from ._types import PathLike
-from ._util import find_free_port
+from .qt import QtMessageMatcher
+from .session import AnkiSession
+from .types import PathLike
+from .util import find_free_port
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
@@ -60,10 +68,17 @@ QTWEBENGINE_REMOTE_DEBUGGING = "QTWEBENGINE_REMOTE_DEBUGGING"
 
 @contextmanager
 def temporary_user(anki_base_dir: str, name: str, lang: str) -> Iterator[str]:
-
     from aqt.profiles import ProfileManager
 
-    pm = ProfileManager(base=anki_base_dir)
+    if TYPE_CHECKING:  # < 2.1.56 primary dev target
+        base_dir_path: str
+
+    if get_anki_version() >= Version("2.1.56"):
+        base_dir_path = Path(anki_base_dir)  # type: ignore
+    else:
+        base_dir_path = anki_base_dir
+
+    pm = ProfileManager(base=base_dir_path)
 
     pm.setupMeta()
     pm.setLang(lang)
@@ -154,9 +169,10 @@ def anki_running(
             Each list member needs to be specified as a tuple of add-on package name
             and dictionary of user configuration values to set.
 
-        web_debugging_port {Optional[int]}:
-            If specified, launches Anki with QTWEBENGINE_REMOTE_DEBUGGING set, allowing
-            you to remotely debug Qt web engine views.
+        enable_web_debugging {bool}:
+            If set to True, will enable web debugging, allowing you to interact with
+            Anki's web view via a Selenium web driver. For more information, see
+            AnkiSession.run_with_chrome_driver().
 
         skip_loading_addons {bool}:
             If set to True, will skip loading packed and unpacked add-ons, giving the
@@ -173,7 +189,6 @@ def anki_running(
     from aqt import gui_hooks
 
     with base_directory(base_path=base_path, base_name=base_name) as anki_base_dir:
-
         # Callback to run between main UI initialization and finishing steps of UI
         # initialization (add-on loading time)
 
@@ -212,21 +227,26 @@ def anki_running(
             with temporary_user(
                 anki_base_dir=anki_base_dir, name=profile_name, lang=lang
             ) as user_name:
-
                 environment = {}
+
+                # TODO: Only apply when using Qt5 on Linux
+                # cf. https://docs.ankiweb.net/platform/linux/blank-window.html
+                environment["QTWEBENGINE_CHROMIUM_FLAGS"] = "--no-sandbox"
+
+                web_debugging_port = None
 
                 if enable_web_debugging:
                     web_debugging_port = find_free_port()
                     if web_debugging_port is None:
                         raise OSError("Could not find a free port for remote debugging")
                     environment[QTWEBENGINE_REMOTE_DEBUGGING] = str(web_debugging_port)
-                else:
-                    web_debugging_port = None
 
                 with mock.patch.dict(os.environ, environment):
-
-                    if os.environ.get(QTWEBENGINE_REMOTE_DEBUGGING):
-
+                    if not enable_web_debugging or not os.environ.get(
+                        QTWEBENGINE_REMOTE_DEBUGGING
+                    ):
+                        maybe_wait_for_web_debugging = nullcontext()
+                    else:
                         # We want to wait until remote debugging started to yield the
                         # Anki session, so we monitor Qt's log for the corresponding msg
                         qt_message_matcher = QtMessageMatcher(
@@ -252,8 +272,6 @@ def anki_running(
                         maybe_wait_for_web_debugging = qtbot.wait_signal(
                             qt_message_matcher.match_found
                         )
-                    else:
-                        maybe_wait_for_web_debugging = nullcontext()
 
                     with maybe_wait_for_web_debugging:
                         # We don't pass in -p <profile> in order to avoid
@@ -292,7 +310,10 @@ def anki_running(
 
     # clean up what was spoiled
     if aqt.mw:
-        aqt.mw.cleanupAndExit()
+        try:
+            aqt.mw.cleanupAndExit()
+        except BackendIOError:
+            pass
 
     # remove hooks added by pytest-anki
 

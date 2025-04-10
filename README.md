@@ -135,7 +135,7 @@ Especially if you run your tests headlessly with `xvfb`, you might run into case
 
 ## Contributing
 
-Contributions are welcome! To set up `pytest-anki` for development, please first make sure you have Python 3.8+ and [poetry](https://python-poetry.org/docs/) installed, then run the following steps:
+Contributions are welcome! To set up `pytest-anki` for development, please first make sure you have Python 3.8+ and [poetry](https://python-poetry.org/docs/) installed (1.3.x or later), then run the following steps:
 
 ```
 $ git clone https://github.com/glutanimate/pytest-anki.git
@@ -156,7 +156,7 @@ make lint
 make test
 ```
 
-This project uses `black`, `isort` and `autoflake` to enforce a consistent code style. To auto-format your code you can use:
+This project uses `ruff` to enforce a consistent code style. To auto-format your code you can use:
 
 ```bash
 make format
@@ -166,7 +166,7 @@ make format
 
 *pytest-anki* is
 
-*Copyright © 2019-2021 [Aristotelis P.](https://glutanimate.com/contact/) (Glutanimate) and [contributors](./CONTRIBUTORS)*
+*Copyright © 2019-2025 [Aristotelis P.](https://glutanimate.com/contact/) (Glutanimate) and [contributors](./CONTRIBUTORS)*
 
 *Copyright © 2017-2019 [Michal Krassowski](https://github.com/krassowski/anki_testing)*
 

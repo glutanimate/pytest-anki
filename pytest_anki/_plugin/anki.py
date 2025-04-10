@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,8 +34,8 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from packaging.version import Version
 
-from ._errors import AnkiSessionError
-from ._util import get_nested_attribute
+from .errors import AnkiSessionError
+from .util import get_nested_attribute
 
 if TYPE_CHECKING:
     from anki.collection import Collection
@@ -58,7 +58,6 @@ class AnkiWebViewType(Enum):
 
 @dataclass
 class AnkiStateUpdate:
-
     """
     Specifies Anki object state to be pre-configured for the test session.
 

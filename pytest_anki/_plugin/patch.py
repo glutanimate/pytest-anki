@@ -2,7 +2,7 @@
 #
 # Copyright (C)  2017-2021 Ankitects Pty Ltd and contributors
 # Copyright (C)  2017-2019 Michal Krassowski <https://github.com/krassowski>
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -41,20 +41,20 @@ import aqt
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
 from aqt.taskman import TaskManager
-from PyQt5.QtWidgets import QMainWindow
+from PyQt6.QtWidgets import QMainWindow
 
 if TYPE_CHECKING:
     from anki._backend import RustBackend
     from anki.collection import Collection
     from aqt.profiles import ProfileManager as ProfileManagerType
 
-from ._addons import (
+from .addons import (
     create_addon_config,
     install_addon_from_folder,
     install_addon_from_package,
 )
-from ._anki import AnkiStateUpdate, update_anki_meta_state
-from ._types import PathLike
+from .anki import AnkiStateUpdate, update_anki_meta_state
+from .types import PathLike
 
 PostUISetupCallbackType = Callable[[AnkiQt], None]
 
@@ -116,7 +116,7 @@ def custom_init_factory(post_ui_setup_callback: PostUISetupCallbackType):
     ):
         import aqt
 
-        QMainWindow.__init__(main_window)
+        QMainWindow.__init__(main_window)  # pyright: ignore[reportArgumentType]
         main_window.backend = backend
         main_window.state = "startup"
         main_window.opts = opts
@@ -167,7 +167,12 @@ def patch_anki(
 
     old_init = AnkiQt.__init__
     old_key = AnkiApp.KEY
-    old_setupAutoUpdate = AnkiQt.setupAutoUpdate
+
+    setup_auto_update_attribute = (
+        "setupAutoUpdate" if hasattr(AnkiQt, "setupAutoUpdate") else "setup_auto_update"
+    )
+
+    old_setup_auto_update = getattr(AnkiQt, setup_auto_update_attribute)
     old_maybe_check_for_addon_updates = AnkiQt.maybe_check_for_addon_updates
     old_errorHandler = errors.ErrorHandler
 
@@ -177,7 +182,7 @@ def patch_anki(
 
     AnkiQt.__init__ = patched_ankiqt_init  # type: ignore
     AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
-    AnkiQt.setupAutoUpdate = Mock()  # type: ignore[assignment]
+    setattr(AnkiQt, setup_auto_update_attribute, Mock())
     AnkiQt.maybe_check_for_addon_updates = Mock()  # type: ignore[assignment]
     errors.ErrorHandler = Mock()  # type: ignore[misc]
 
@@ -185,7 +190,7 @@ def patch_anki(
 
     AnkiQt.__init__ = old_init  # type: ignore[assignment]
     AnkiApp.KEY = old_key  # type: ignore[assignment]
-    AnkiQt.setupAutoUpdate = old_setupAutoUpdate  # type: ignore[assignment]
+    setattr(AnkiQt, setup_auto_update_attribute, old_setup_auto_update)
     AnkiQt.maybe_check_for_addon_updates = (  # type: ignore[assignment]
         old_maybe_check_for_addon_updates
     )

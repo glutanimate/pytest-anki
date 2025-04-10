@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,54 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import os
+from collections import defaultdict
+from typing import TYPE_CHECKING, Dict, Optional
 
-def pytest_collection_modifyitems(items):
+if TYPE_CHECKING:
+    from _pytest.config import Config
+    from pytest import Item
+
+
+# Fork all tests to avoid side effects
+
+
+def pytest_collection_modifyitems(items: list["Item"], config: "Config") -> None:
     for item in items:
         item.add_marker("forked")
+
+
+# Mini pytest plugin to set environment variables for specific tests
+
+
+_env_store: Dict[str, Dict[str, Optional[str]]] = defaultdict(dict)
+
+
+def pytest_configure(config: "Config") -> None:
+    config.addinivalue_line(
+        "markers", "env(dict): set environment variables for a specific test"
+    )
+
+
+def pytest_runtest_setup(item: "Item") -> None:
+    marker = item.get_closest_marker("env")
+    if marker:
+        env_vars = marker.args[0] if marker.args else marker.kwargs
+        node_id = item.nodeid
+
+        for key, value in env_vars.items():
+            _env_store[node_id][key] = os.environ.get(key)
+            os.environ[key] = str(value)
+
+
+def pytest_runtest_teardown(item: "Item") -> None:
+    marker = item.get_closest_marker("env")
+    if marker:
+        node_id = item.nodeid
+        if node_id in _env_store:
+            for key, original_value in _env_store[node_id].items():
+                if original_value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = original_value
+            del _env_store[node_id]

@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -47,12 +47,9 @@ from aqt.main import AnkiQt
 from pytest_anki import AnkiSession, AnkiSessionError, AnkiStateUpdate
 
 if TYPE_CHECKING:
+    from anki.collection import Collection
     from pytestqt.qtbot import QtBot
 
-    try:
-        from anki.collection import Collection
-    except ImportError:
-        from anki.collection import _Collection as Collection
 
 # Helpers
 

@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,11 @@ def test_can_set_anki_session_properties(anki_session: AnkiSession):
 
     with anki_session.profile_loaded():
         assert anki_session.mw.pm.name == _profile_name
-        assert lang.currentLang == _lang.split("_")[0]
+        if hasattr(lang, "currentLang"):  # <= 2.1.49
+            anki_current_lang = lang.currentLang  # type: ignore
+        else:
+            anki_current_lang = lang.current_lang
+        assert anki_current_lang == _lang.split("_")[0]
 
 
 # Preloading Anki state
@@ -184,10 +188,8 @@ def test_can_preset_anki_state(anki_session: AnkiSession):
 
     with anki_session.profile_loaded():
         assert (
-            addon.profile_storage
-            == _my_anki_state.profile_storage[package_name]  # type: ignore
+            addon.profile_storage == _my_anki_state.profile_storage[package_name]  # type: ignore
         )
         assert (
-            addon.colconf_storage
-            == _my_anki_state.colconf_storage[package_name]  # type: ignore
+            addon.colconf_storage == _my_anki_state.colconf_storage[package_name]  # type: ignore
         )

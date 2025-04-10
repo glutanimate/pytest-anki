@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,8 +34,8 @@ from typing import Any, Dict, NamedTuple, Optional
 
 from aqt.addons import AddonManager
 
-from ._types import PathLike
-from ._util import create_json
+from .types import PathLike
+from .util import create_json
 
 
 def _to_path(path: PathLike) -> Path:

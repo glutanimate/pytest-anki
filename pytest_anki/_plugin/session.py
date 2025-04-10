@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     Iterator,
     List,
     Optional,
@@ -43,16 +44,20 @@ from typing import (
     Union,
 )
 
-from anki.importing.apkg import AnkiPackageImporter
-from PyQt5.QtCore import QThreadPool, QTimer
-from PyQt5.QtWebEngineWidgets import QWebEngineProfile
+from PyQt6.QtCore import QThreadPool, QTimer
+from PyQt6.QtWebEngineCore import QWebEngineProfile
 from selenium import webdriver
 
-from ._addons import ConfigPaths, create_addon_config
-from ._anki import AnkiStateUpdate, AnkiWebViewType, get_collection, update_anki_state
-from ._errors import AnkiSessionError
-from ._qt import SignallingWorker
-from ._types import PathLike
+from .addons import ConfigPaths, create_addon_config
+from .anki import (
+    AnkiStateUpdate,
+    AnkiWebViewType,
+    get_collection,
+    update_anki_state,
+)
+from .errors import AnkiSessionError
+from .qt import SignallingWorker
+from .types import PathLike
 
 if TYPE_CHECKING:
     from anki.collection import Collection
@@ -156,6 +161,11 @@ class AnkiSession:
     def unload_profile(self, on_profile_unloaded: Optional[Callable] = None):
         """Unload current profile, optionally running a callback when profile
         unload complete"""
+
+        # Run closures before unloading collection to avoid errors due to closures
+        # trying to access the collection after it has been unloaded.
+        self._mw.taskman._on_closures_pending()
+
         if on_profile_unloaded is None:
             on_profile_unloaded = lambda *args, **kwargs: None  # noqa: E731
         self._mw.unloadProfile(on_profile_unloaded)
@@ -174,6 +184,9 @@ class AnkiSession:
 
     def install_deck(self, path: PathLike) -> int:
         """Install deck from specified .apkg file, returning deck ID"""
+        from anki.decks import DeckId
+        from anki.importing.apkg import AnkiPackageImporter
+
         old_ids = set(self._get_deck_ids())
 
         importer = AnkiPackageImporter(col=self.collection, file=str(path))
@@ -181,20 +194,28 @@ class AnkiSession:
 
         new_ids = set(self._get_deck_ids())
 
+        def highest_level_did(dids: Iterable[int]) -> int:
+            return min(
+                dids,
+                key=lambda did: self.collection.decks.name(DeckId(did)).count("::"),
+            )
+
         # deck IDs are strings on <=2.1.26
-        deck_id = int(next(iter(new_ids - old_ids)))
+        deck_id = int(highest_level_did(new_ids - old_ids))
 
         return deck_id
 
     def remove_deck(self, deck_id: int):
         """Remove deck as specified by provided deck ID"""
+        from anki.decks import DeckId
+
         try:  # 2.1.28+
             # Deck methods on 2.1.45 and up use a DeckId NewType derived from int.
             # This only makes a difference at type-check time, so we stick with
             # passing in an int for now.
             self.collection.decks.remove([deck_id])  # type: ignore[list-item]
         except AttributeError:  # legacy
-            self.collection.decks.rem(deck_id, cardsToo=True)
+            self.collection.decks.rem(DeckId(deck_id), cardsToo=True)
 
     @contextmanager
     def deck_installed(self, path: PathLike) -> Iterator[int]:

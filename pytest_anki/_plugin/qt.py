@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,10 @@
 
 from typing import Any, Callable, Dict, Optional, Tuple
 
-from PyQt5.QtCore import QMessageLogContext, QObject, QRunnable, QtMsgType, pyqtSignal
+from PyQt6.QtCore import QMessageLogContext, QObject, QRunnable, QtMsgType, pyqtSignal
 
 
 class QtMessageMatcher(QObject):
-
     match_found = pyqtSignal()
 
     def __init__(self, matched_phrase: str):

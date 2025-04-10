@@ -1,6 +1,6 @@
 # pytest-anki
 #
-# Copyright (C)  2019-2021 Aristotelis P. <https://glutanimate.com/>
+# Copyright (C)  2019-2025 Aristotelis P. <https://glutanimate.com/>
 #                and contributors (see CONTRIBUTORS file)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import requests
 from pytestqt.qtbot import TimeoutError
 from selenium import webdriver
 
-from pytest_anki import AnkiSession, AnkiWebViewType
+from pytest_anki import AnkiSession, AnkiSessionError, AnkiWebViewType
 
 
 def test_run_in_thread(anki_session: AnkiSession):
@@ -116,3 +116,24 @@ def test_web_driver_can_interact_with_anki(anki_session: AnkiSession):
             assert anki_session.mw.state == "overview"
 
         anki_session.qtbot.wait_until(mw_state_switched)
+
+
+@pytest.mark.env({"QTWEBENGINE_REMOTE_DEBUGGING": "12345"})
+@pytest.mark.parametrize(
+    "anki_session",
+    [
+        dict(
+            enable_web_debugging=False,
+        )
+    ],
+    indirect=True,
+)
+def test_web_debugging_can_be_disabled_even_when_port_set(anki_session: AnkiSession):
+    assert anki_session.web_debugging_port is None
+
+    with pytest.raises(AnkiSessionError) as exception_info:
+        anki_session.run_with_chrome_driver(
+            lambda driver: None, AnkiWebViewType.main_webview
+        )
+
+    assert str(exception_info.value) == "Web debugging interface is not active"
