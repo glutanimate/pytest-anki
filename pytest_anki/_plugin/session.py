@@ -46,6 +46,7 @@ from typing import (
 )
 from unittest import mock
 
+import aqt.qt as aqt_qt
 from aqt.qt import QThreadPool, QTimer, QWebEngineProfile
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -138,7 +139,16 @@ class AnkiSession:
 
     @property
     def chromium_version(self) -> str:
-        """Version of the Chromium that QtWebEngine runs, e.g. '102.0.5005.177'"""
+        """Version of the Chromium that QtWebEngine runs, e.g. '102.0.5005.177'
+
+        Asked of QtWebEngine where it can say (Qt 6.2 and later): the user
+        agent of QtWebEngine 6.11 (Anki 26.08) carries the reduced
+        'Chrome/140.0.0.0', and a chromedriver refuses to attach to a
+        browser reporting that version. Qt5's user agent has the full one.
+        """
+        chromium_version = getattr(aqt_qt, "qWebEngineChromiumVersion", None)
+        if chromium_version is not None:
+            return chromium_version()
         user_agent = QWebEngineProfile.defaultProfile().httpUserAgent()
         match = re.match(r".*Chrome/(.+)\s+.*", user_agent)
         if match is None:
