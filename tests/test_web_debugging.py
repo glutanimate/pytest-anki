@@ -35,6 +35,7 @@ import pytest
 import requests
 from pytestqt.qtbot import TimeoutError
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 from pytest_anki import AnkiSession, AnkiSessionError, AnkiWebViewType
 
@@ -104,7 +105,7 @@ def test_web_driver_can_select_web_view(anki_session: AnkiSession):
 
 def test_web_driver_can_interact_with_anki(anki_session: AnkiSession):
     def switch_to_deck_view(driver: webdriver.Chrome):
-        driver.find_element_by_xpath("//*[text()='Default']").click()
+        driver.find_element(By.XPATH, "//*[text()='Default']").click()
 
     with anki_session.profile_loaded():
         assert anki_session.mw.state == "deckBrowser"

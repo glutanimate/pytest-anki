@@ -11,9 +11,6 @@ inputs:
   qt:
     description: "Qt version extra dependency group, as specified in pyproject.toml"
     required: true
-  chrome:
-    description: "Chrome version"
-    required: true
 
 runs:
   using: "composite"
@@ -25,7 +22,6 @@ runs:
       uses: ./.github/actions/setup_system
       with:
         python: ${{ inputs.python }}
-        chrome: ${{ inputs.chrome }}
 
     - name: Set up project
       uses: ./.github/actions/setup_project

@@ -4,10 +4,15 @@ PACKAGE_FOLDER = pytest_anki
 TESTS_FOLDER = tests
 MONITORED_FOLDERS = $(PACKAGE_FOLDER) $(TESTS_FOLDER)
 TEST_FLAGS ?= -n4
+# Anki and Qt extras to sync (see pyproject.toml) and the interpreter, e.g.
+# `make install ANKI=anki-2502 QT=qt6-2502`; every Anki up to 25.02 runs on 3.9
+ANKI ?= anki-2154
+QT ?= qt5-2154
+PYTHON ?= 3.9
 
 # Set up project
 install:
-	uv sync --extra anki-2154 --extra qt5-2154 --no-group qt6
+	uv sync --extra $(ANKI) --extra $(QT) --no-group qt5 --no-group qt6 --python $(PYTHON)
 
 # Run tests
 test:

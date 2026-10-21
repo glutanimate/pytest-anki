@@ -28,6 +28,7 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import os
 import re
 from contextlib import contextmanager
 from types import ModuleType
@@ -40,13 +41,17 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Set,
     Tuple,
     Union,
 )
+from unittest import mock
 
-from PyQt6.QtCore import QThreadPool, QTimer
-from PyQt6.QtWebEngineCore import QWebEngineProfile
+import aqt.qt as aqt_qt
+from aqt.qt import QThreadPool, QTimer, QWebEngineProfile
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.driver_finder import DriverFinder
 
 from .addons import ConfigPaths, create_addon_config
 from .anki import (
@@ -95,6 +100,7 @@ class AnkiSession:
         self._qtbot = qtbot
         self._web_debugging_port = web_debugging_port
         self._chrome_driver: Optional[webdriver.Chrome] = None
+        self._chrome_driver_path: Optional[str] = None
 
     # Key session properties ####
 
@@ -134,6 +140,16 @@ class AnkiSession:
 
     @property
     def chromium_version(self) -> str:
+        """Version of the Chromium that QtWebEngine runs, e.g. '102.0.5005.177'
+
+        Asked of QtWebEngine where it can say (Qt 6.2 and later): the user
+        agent of QtWebEngine 6.11 (Anki 26.08) carries the reduced
+        'Chrome/140.0.0.0', and a chromedriver refuses to attach to a
+        browser reporting that version. Qt5's user agent has the full one.
+        """
+        chromium_version = getattr(aqt_qt, "qWebEngineChromiumVersion", None)
+        if chromium_version is not None:
+            return chromium_version()
         user_agent = QWebEngineProfile.defaultProfile().httpUserAgent()
         match = re.match(r".*Chrome/(.+)\s+.*", user_agent)
         if match is None:
@@ -185,14 +201,34 @@ class AnkiSession:
     def install_deck(self, path: PathLike) -> int:
         """Install deck from specified .apkg file, returning deck ID"""
         from anki.decks import DeckId
-        from anki.importing.apkg import AnkiPackageImporter
 
         old_ids = set(self._get_deck_ids())
+        # Decks of the imported cards, for an import that creates no deck
+        imported_ids: Set[int] = set()
 
-        importer = AnkiPackageImporter(col=self.collection, file=str(path))
-        importer.run()
+        try:
+            from anki.importing.apkg import AnkiPackageImporter
+        except ImportError:  # Anki 26.09 dropped the legacy importers
+            from anki.collection import (
+                ImportAnkiPackageOptions,
+                ImportAnkiPackageRequest,
+            )
 
-        new_ids = set(self._get_deck_ids())
+            # Unlike the legacy importer, this merges a deck into an existing
+            # one of the same name, such as Default
+            result = self.collection.import_anki_package(
+                ImportAnkiPackageRequest(
+                    package_path=str(path), options=ImportAnkiPackageOptions()
+                )
+            )
+            for note in (*result.log.new, *result.log.updated, *result.log.duplicate):
+                for card_id in self.collection.card_ids_of_note(note.id.nid):
+                    imported_ids.add(self.collection.get_card(card_id).did)
+        else:
+            importer = AnkiPackageImporter(col=self.collection, file=str(path))
+            importer.run()
+
+        new_ids = set(self._get_deck_ids()) - old_ids or imported_ids
 
         def highest_level_did(dids: Iterable[int]) -> int:
             return min(
@@ -201,7 +237,7 @@ class AnkiSession:
             )
 
         # deck IDs are strings on <=2.1.26
-        deck_id = int(highest_level_did(new_ids - old_ids))
+        deck_id = int(highest_level_did(new_ids))
 
         return deck_id
 
@@ -384,11 +420,7 @@ class AnkiSession:
 
         def test_wrapper() -> Optional[bool]:
             if not self._chrome_driver:
-                options = webdriver.ChromeOptions()
-                options.add_experimental_option(
-                    "debuggerAddress", f"127.0.0.1:{self._web_debugging_port}"
-                )
-                self._chrome_driver = webdriver.Chrome(options=options)
+                self._chrome_driver = self._create_chrome_driver()
 
             if web_view_title:
                 self._switch_chrome_driver_to_web_view(
@@ -397,8 +429,57 @@ class AnkiSession:
 
             return test_function(self._chrome_driver)
 
+        if self._chrome_driver is None and self._chrome_driver_path is None:
+            # Resolving the driver may download it or, when Selenium Manager's
+            # version lookup stalls, take longer than the timeout below, so it
+            # happens ahead of the timed section, on the calling thread
+            self._chrome_driver_path = self._resolve_chrome_driver_path()
+
         with self._allow_selenium_to_detect_anki():
             return self.run_in_thread_and_wait(test_wrapper, timeout=timeout)
+
+    def _create_chrome_driver(self) -> webdriver.Chrome:
+        """Attach a chromedriver to Anki's web views over the remote
+        debugging port
+
+        The driver has to match the Chromium that QtWebEngine runs, not the
+        Chrome installed on the machine, so the options name that Chromium's
+        major and leave the driver to Selenium Manager (selenium 4.6+), which
+        downloads and caches it: drivers up to 114 come from the legacy
+        chromedriver storage, later ones from Chrome for Testing. The browser
+        Selenium Manager finds alongside is never launched, since the driver
+        attaches to the running Anki; without SE_AVOID_BROWSER_DOWNLOAD it
+        would still download a matching Chrome for Testing build when the
+        installed Chrome differs, so that is switched off unless the caller
+        set it.
+        """
+        if self._chrome_driver_path is None:
+            self._chrome_driver_path = self._resolve_chrome_driver_path()
+        return webdriver.Chrome(
+            service=ChromeService(executable_path=self._chrome_driver_path),
+            options=self._chrome_driver_options(),
+        )
+
+    def _chrome_driver_options(self) -> webdriver.ChromeOptions:
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option(
+            "debuggerAddress", f"127.0.0.1:{self._web_debugging_port}"
+        )
+        options.browser_version = self.chromium_version.split(".")[0]
+        return options
+
+    def _resolve_chrome_driver_path(self) -> str:
+        """Let Selenium Manager find (and if needed download) the driver for
+        Anki's Chromium, the way webdriver.Chrome would, but separately from
+        starting it, so the network round trip stays out of any timed wait"""
+        environment = {
+            "SE_AVOID_BROWSER_DOWNLOAD": os.environ.get(
+                "SE_AVOID_BROWSER_DOWNLOAD", "true"
+            )
+        }
+        with mock.patch.dict(os.environ, environment):
+            finder = DriverFinder(ChromeService(), self._chrome_driver_options())
+            return finder.get_driver_path()
 
     def reset_chrome_driver(self):
         if not self._chrome_driver:

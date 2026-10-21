@@ -39,8 +39,8 @@ from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
 from unittest import mock
 
 from anki.errors import BackendIOError
+from aqt.qt import qInstallMessageHandler
 from packaging.version import Version
-from PyQt6.QtCore import qInstallMessageHandler
 
 from .anki import (
     AnkiStateUpdate,
@@ -259,10 +259,13 @@ def anki_running(
 
                         # On Windows and Linux, we need to monkey-patch the
                         # message handler installer to make sure that ours is
-                        # not switched out when aqt runs
+                        # not switched out when aqt runs. aqt also installs
+                        # None to restore Qt's default handler (25.02+)
                         def install_message_handler(message_handler):
                             def message_handler_wrapper(*args, **kwargs):
                                 qt_message_matcher(*args, **kwargs)
+                                if message_handler is None:
+                                    return None
                                 return message_handler(*args, **kwargs)
 
                             qInstallMessageHandler(message_handler_wrapper)

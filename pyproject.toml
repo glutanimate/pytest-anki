@@ -22,11 +22,15 @@ classifiers = [
     "Intended Audience :: Developers",
 ]
 # TODO: Make selenium optional
+# Lower bounds only: the plugin is consumed alongside whatever pytest, pytest-qt,
+# and selenium an add-on's own test environment pins. selenium 4.6 is the first
+# release that ships Selenium Manager, which resolves the chromedriver matching
+# the Chromium version of the running Anki (see AnkiSession.run_with_chrome_driver).
 dependencies = [
-    "pytest~=6.2.5",
-    "pytest-qt~=4.4.0",
-    "selenium>=3.141.0,<4",
-    "packaging~=21.3",
+    "pytest>=6.2.5",
+    "pytest-qt>=4.4.0",
+    "selenium>=4.20.0",
+    "packaging>=21.3",
     "aqt>=2.1.54",
     "anki>=2.1.54",
 ]
@@ -40,20 +44,31 @@ anki = "pytest_anki.plugin"
 
 [project.optional-dependencies]
 anki-2154 = ["aqt==2.1.54", "anki==2.1.54"]
+anki-2156 = ["aqt==2.1.56", "anki==2.1.56"]
 anki-2165 = ["aqt==2.1.65", "anki==2.1.65"]
 anki-2312 = ["aqt==23.12.1", "anki==23.12.1"]
 anki-2411 = ["aqt==24.11", "anki==24.11"]
+anki-2502 = ["aqt==25.2.7", "anki==25.2.7"]
 
 qt5-2154 = ["PyQt5==5.15.5", "PyQt5-Qt5==5.15.2", "PyQtWebEngine==5.15.5"]
+qt5-2156 = ["PyQt5==5.15.5", "PyQt5-Qt5==5.15.2", "PyQtWebEngine==5.15.5"]
 qt5-2165 = ["PyQt5==5.15.5", "PyQt5-Qt5==5.15.2", "PyQtWebEngine==5.15.5"]
 qt5-2312 = ["PyQt5==5.15.5", "PyQt5-Qt5==5.15.2", "PyQtWebEngine==5.15.5"]
 qt5-2411 = ["PyQt5==5.15.5", "PyQt5-Qt5==5.15.2", "PyQtWebEngine==5.15.5"]
+qt5-2502 = ["PyQt5==5.15.5", "PyQt5-Qt5==5.15.2", "PyQtWebEngine==5.15.5"]
 
 qt6-2154 = [
     "PyQt6==6.3.1",
     "PyQt6-Qt6==6.3.1",
     "PyQt6-WebEngine==6.3.1",
     "PyQt6-WebEngine-Qt6==6.3.1",
+]
+# The official 2.1.56 build's set (python/requirements.qt6_4.txt at 2.1.56)
+qt6-2156 = [
+    "PyQt6==6.4.0",
+    "PyQt6-Qt6==6.4.0",
+    "PyQt6-WebEngine==6.4.0",
+    "PyQt6-WebEngine-Qt6==6.4.0",
 ]
 qt6-2165 = [
     "PyQt6==6.5.0",
@@ -73,11 +88,18 @@ qt6-2411 = [
     "PyQt6-WebEngine==6.6.0",
     "PyQt6-WebEngine-Qt6==6.6.0",
 ]
+# The official 25.02 build's set (python/requirements.qt6_6.txt at 25.02.7)
+qt6-2502 = [
+    "PyQt6==6.6.1",
+    "PyQt6-Qt6==6.6.2",
+    "PyQt6-WebEngine==6.6.0",
+    "PyQt6-WebEngine-Qt6==6.6.2",
+]
 
 recommended-plugins = [
-    "pytest-xvfb~=3.1.1",
-    "pytest-xdist~=2.5.0",
-    "pytest-forked~=1.4.0",
+    "pytest-xvfb>=3.1.1",
+    "pytest-xdist>=2.5.0",
+    "pytest-forked>=1.4.0",
 ]
 
 [dependency-groups]
@@ -90,7 +112,7 @@ dev = [
     "pyright>=1.1.398",
     "pytest-anki[recommended-plugins]",
 ]
-anki = ["aqt>=2.1.54,<25.2", "anki>=2.1.54,<25.2"]
+anki = ["aqt>=2.1.54,<25.3", "anki>=2.1.54,<25.3"]
 qt5 = [
     "PyQt5>=5.15.2",
     "PyQt5-Qt5>=5.15.2",
@@ -105,29 +127,38 @@ default-groups = ["dev", "qt5", "qt6", "anki"]
 conflicts = [
     [
         { extra = "anki-2154" },
+        { extra = "anki-2156" },
         { extra = "anki-2165" },
         { extra = "anki-2312" },
         { extra = "anki-2411" },
+        { extra = "anki-2502" },
     ],
     [
         { extra = "qt5-2154" },
+        { extra = "qt5-2156" },
         { extra = "qt5-2165" },
         { extra = "qt5-2312" },
         { extra = "qt5-2411" },
+        { extra = "qt5-2502" },
     ],
     [
         { extra = "qt6-2154" },
+        { extra = "qt6-2156" },
         { extra = "qt6-2165" },
         { extra = "qt6-2312" },
         { extra = "qt6-2411" },
+        { extra = "qt6-2502" },
     ],
 ]
 
+# The package with its data files (py.typed, anki-current.json). An include
+# list naming only the data files would leave the modules out of the wheel,
+# which an editable install hides.
 [tool.hatch.build.targets.sdist]
-include = ["pytest_anki/py.typed", "pytest_anki/anki-current.json"]
+packages = ["pytest_anki"]
 
 [tool.hatch.build.targets.wheel]
-include = ["pytest_anki/py.typed", "pytest_anki/anki-current.json"]
+packages = ["pytest_anki"]
 
 [build-system]
 requires = ["hatchling"]

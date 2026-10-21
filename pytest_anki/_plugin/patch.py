@@ -40,8 +40,8 @@ from unittest.mock import Mock
 import aqt
 from aqt.main import AnkiQt
 from aqt.mediasync import MediaSyncer
+from aqt.qt import QMainWindow
 from aqt.taskman import TaskManager
-from PyQt6.QtWidgets import QMainWindow
 
 if TYPE_CHECKING:
     from anki._backend import RustBackend
@@ -139,6 +139,9 @@ def custom_init_factory(post_ui_setup_callback: PostUISetupCallbackType):
         aqt.mw = main_window
         main_window.app = app
         main_window.pm = profileManager
+        # 25.02+ reads it on every state change; setattr, since aqt before
+        # that declares no such attribute
+        setattr(main_window, "fullscreen", False)
         main_window.safeMode = False  # disable safe mode, of no use to us
         main_window.setupUI()
 
@@ -160,13 +163,16 @@ def patch_anki(
     - allow more fine-grained control of test execution environment
     - enable concurrent testing
     - bypass blocking update dialog
+    - ignore file-open events the OS derives from the test process's command line
     """
     from anki.utils import checksum
     from aqt import AnkiApp, errors
     from aqt.main import AnkiQt
+    from aqt.qt import QEvent
 
     old_init = AnkiQt.__init__
     old_key = AnkiApp.KEY
+    old_event = AnkiApp.event
 
     setup_auto_update_attribute = (
         "setupAutoUpdate" if hasattr(AnkiQt, "setupAutoUpdate") else "setup_auto_update"
@@ -180,8 +186,20 @@ def patch_anki(
         post_ui_setup_callback=post_ui_setup_callback
     )
 
+    def event_without_file_open(self: AnkiApp, evt: QEvent) -> bool:
+        # macOS hands the first positional argument of the process's command
+        # line to the application as a document to open (AppKit's openFile:),
+        # which Qt 6.9 and later forward as a QFileOpenEvent. In an xdist
+        # worker that argument is execnet's bootstrap code (python -c "..."),
+        # which Anki would hand to its import dialog, blocking the event loop.
+        # Tests never open documents through the OS, so the event is dropped.
+        if evt.type() == QEvent.Type.FileOpen:
+            return True
+        return old_event(self, evt)
+
     AnkiQt.__init__ = patched_ankiqt_init  # type: ignore
     AnkiApp.KEY = "anki" + checksum(str(uuid.uuid4()))
+    AnkiApp.event = event_without_file_open  # type: ignore[method-assign]
     setattr(AnkiQt, setup_auto_update_attribute, Mock())
     AnkiQt.maybe_check_for_addon_updates = Mock()  # type: ignore[assignment]
     errors.ErrorHandler = Mock()  # type: ignore[misc]
@@ -190,6 +208,7 @@ def patch_anki(
 
     AnkiQt.__init__ = old_init  # type: ignore[assignment]
     AnkiApp.KEY = old_key  # type: ignore[assignment]
+    AnkiApp.event = old_event  # type: ignore[method-assign]
     setattr(AnkiQt, setup_auto_update_attribute, old_setup_auto_update)
     AnkiQt.maybe_check_for_addon_updates = (  # type: ignore[assignment]
         old_maybe_check_for_addon_updates
